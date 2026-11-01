@@ -1,7 +1,49 @@
 {
   "packageDirectories": [
     {
-      "path": "force-app",
+      "path": "force-app/main/amazon-and-linkedin"
+    },
+    {
+      "path": "force-app/main/campaign-members"
+    },
+    {
+      "path": "force-app/main/campaign-tracking"
+    },
+    {
+      "path": "force-app/main/case-management"
+    },
+    {
+      "path": "force-app/main/csm-operations"
+    },
+    {
+      "path": "force-app/main/dr-app-integration"
+    },
+    {
+      "path": "force-app/main/lead-management"
+    },
+    {
+      "path": "force-app/main/notifications-and-messaging"
+    },
+    {
+      "path": "force-app/main/payments-and-pricing"
+    },
+    {
+      "path": "force-app/main/quo-conversations"
+    },
+    {
+      "path": "force-app/main/s3-files"
+    },
+    {
+      "path": "force-app/main/sales-and-contracts"
+    },
+    {
+      "path": "force-app/main/store-management"
+    },
+    {
+      "path": "force-app/main/time-tracking"
+    },
+    {
+      "path": "force-app/main/default",
       "default": true
     }
   ],
