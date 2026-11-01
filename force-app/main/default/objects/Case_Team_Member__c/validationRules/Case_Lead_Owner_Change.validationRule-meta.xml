@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Case_Lead_Owner_Change</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+ISPICKVAL( Member_Role__c , &quot;Case Lead&quot;),
+User__r.Id &lt;&gt; Case__r.OwnerId
+)</errorConditionFormula>
+    <errorDisplayField>Case__c</errorDisplayField>
+    <errorMessage>User selected as Case Lead must be the same as the Case Owner.</errorMessage>
+</ValidationRule>

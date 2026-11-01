@@ -1,0 +1,32 @@
+<template>
+    <div class="contracts">
+        <h4 class="slds-text-title_bold slds-m-bottom_small">Service contracts &amp; purchased products</h4>
+        <template lwc:if={hasContracts}>
+            <template for:each={items} for:item="contract">
+                <article key={contract.Id} class="contract">
+                    <div class="contract-header">
+                        <a href={contract.url} target="_blank" rel="noopener">{contract.Name}</a>
+                        <lightning-badge label={contract.Status}></lightning-badge>
+                    </div>
+                    <div class="contract-meta">
+                        <span>Contract {contract.ContractNumber}</span>
+                        <span>Start: <template lwc:if={contract.StartDate}><lightning-formatted-date-time value={contract.StartDate} time-zone="UTC"></lightning-formatted-date-time></template><template lwc:else>Not set</template></span>
+                        <span>End: <template lwc:if={contract.EndDate}><lightning-formatted-date-time value={contract.EndDate} time-zone="UTC"></lightning-formatted-date-time></template><template lwc:else>Not set</template></span>
+                    </div>
+                    <template lwc:if={contract.hasProducts}>
+                        <ul class="products">
+                            <template for:each={contract.products} for:item="product">
+                                <li key={product.id}>
+                                    <a href={product.url} target="_blank" rel="noopener">{product.name}</a>
+                                    <span>Qty <lightning-formatted-number value={product.quantity}></lightning-formatted-number></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                    <template lwc:else><p class="empty-products">No purchased products recorded on this contract.</p></template>
+                </article>
+            </template>
+        </template>
+        <template lwc:else><p class="empty-products">No service contracts linked to this store.</p></template>
+    </div>
+</template>

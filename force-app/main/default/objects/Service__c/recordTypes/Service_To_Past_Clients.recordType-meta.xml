@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Service_To_Past_Clients</fullName>
+    <active>true</active>
+    <label>Service To Past Clients</label>
+    <picklistValues>
+        <picklist>Billing_Type__c</picklist>
+        <values>
+            <fullName>Billable</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Non-Billable</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Choose_Task_Type__c</picklist>
+        <values>
+            <fullName>Account Health Management</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>General Task</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Document_Types__c</picklist>
+        <values>
+            <fullName>Business Registration</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GS1 Proof</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Letter of Authorization%28LOA%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Previous submission docs</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Purchasing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>product images</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Impact__c</picklist>
+        <values>
+            <fullName>High</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Low</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Medium</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Issue__c</picklist>
+        <values>
+            <fullName>Authenticity</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brand Approval</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Detail Page Removed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>GS1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Inactive</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Infringement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pricing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Removed by Brand Owner</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Search Suppressed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trademark</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Marketplace__c</picklist>
+        <values>
+            <fullName>AU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>UK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>US</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Priority_Level__c</picklist>
+        <values>
+            <fullName>Easy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>High</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Medium</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Stages__c</picklist>
+        <values>
+            <fullName>All Past clients</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Called - no answer</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cancelled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>First meeting booked</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Follow up</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Long lead nurture %28see if we can include a date to follow up%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lost %28include reason%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No interested</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No show</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Not relevant %28include reason%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Second meeting</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Won</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status__c</picklist>
+        <values>
+            <fullName>Archived</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Closed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Delayed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Progress</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Review</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>On Hold</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Open</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Resolved</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type__c</picklist>
+        <values>
+            <fullName>A-Z Claim</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brand Gating</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brand Removal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Compliance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Message</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback Removal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Full Account Audit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Issue</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Storage Increase</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violation</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

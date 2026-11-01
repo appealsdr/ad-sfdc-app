@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Service Details --></label>
+    <name>Service_Details__c</name>
+    <picklistValues>
+        <masterLabel>A-Z Claims</masterLabel>
+        <translation><!-- A-Z Claims --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>All Violations</masterLabel>
+        <translation><!-- All Violations --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Arbitration</masterLabel>
+        <translation><!-- Arbitration --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Protection</masterLabel>
+        <translation><!-- Brand Protection --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Registry</masterLabel>
+        <translation><!-- Brand Registry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Compliance</masterLabel>
+        <translation><!-- Compliance --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Customer Messages</masterLabel>
+        <translation><!-- Customer Messages --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Feedback Removal</masterLabel>
+        <translation><!-- Feedback Removal --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Feedback Removal - FBA</masterLabel>
+        <translation><!-- Feedback Removal - FBA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Feedback Removal - FBM</masterLabel>
+        <translation><!-- Feedback Removal - FBM --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Fund Disbursement</masterLabel>
+        <translation><!-- Fund Disbursement --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>LSR (Late Shipment Rate)</masterLabel>
+        <translation><!-- LSR (Late Shipment Rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Advertising - PPC</masterLabel>
+        <translation><!-- Listing Advertising - PPC --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation</masterLabel>
+        <translation><!-- Listing Creation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization - A+ Content</masterLabel>
+        <translation><!-- Listing Creation/Optimization - A+ Content --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization - Content Creation</masterLabel>
+        <translation><!-- Listing Creation/Optimization - Content Creation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization - Images</masterLabel>
+        <translation><!-- Listing Creation/Optimization - Images --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization - Video Content</masterLabel>
+        <translation><!-- Listing Creation/Optimization - Video Content --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listings Issues</masterLabel>
+        <translation><!-- Listings Issues --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ODR</masterLabel>
+        <translation><!-- ODR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>PFCR (Pre-Fulfillment Cancel Rate)</masterLabel>
+        <translation><!-- PFCR (Pre-Fulfillment Cancel Rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Private Label</masterLabel>
+        <translation><!-- Private Label --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Seller Account Creation</masterLabel>
+        <translation><!-- Seller Account Creation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Storage Increase</masterLabel>
+        <translation><!-- Storage Increase --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Suspended Account</masterLabel>
+        <translation><!-- Suspended Account --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Trademark</masterLabel>
+        <translation><!-- Trademark --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>VTR (Valid Tracking Rate)</masterLabel>
+        <translation><!-- VTR (Valid Tracking Rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - High critical</masterLabel>
+        <translation><!-- Violations - High critical --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - High impact</masterLabel>
+        <translation><!-- Violations - High impact --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - High repeat</masterLabel>
+        <translation><!-- Violations - High repeat --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - Low impact</masterLabel>
+        <translation><!-- Violations - Low impact --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - Medium impact</masterLabel>
+        <translation><!-- Violations - Medium impact --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - No impact</masterLabel>
+        <translation><!-- Violations - No impact --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations Removal</masterLabel>
+        <translation><!-- Violations Removal --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

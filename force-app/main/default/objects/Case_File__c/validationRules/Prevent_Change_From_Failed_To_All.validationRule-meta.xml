@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Prevent_Change_From_Failed_To_All</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+    ISPICKVAL(PRIORVALUE(Verification_Status__c), &quot;Failed&quot;),
+    OR(
+        ISPICKVAL(Verification_Status__c, &quot;Amazon Rejected&quot;),
+        ISPICKVAL(Verification_Status__c, &quot;Requested&quot;),
+        ISPICKVAL(Verification_Status__c, &quot;Ready For Review&quot;),
+        ISPICKVAL(Verification_Status__c, &quot;Passed&quot;),
+        ISPICKVAL(Verification_Status__c, &quot;Unable to Provide&quot;)
+    ),
+    NOT(ISBLANK(Status_Reason__c))
+)</errorConditionFormula>
+    <errorMessage>You cannot change Status from &apos;Failed&apos;</errorMessage>
+</ValidationRule>

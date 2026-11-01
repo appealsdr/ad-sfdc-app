@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Q4_Yes_Requires_Notes</fullName>
+    <active>true</active>
+    <description>Q4 (Issues Pending Too Long): notes are required when the answer is Yes.</description>
+    <errorConditionFormula>AND(
+    ISPICKVAL(Q4_Response__c, &quot;Yes&quot;),
+    ISBLANK(Q4_Answer__c)
+)</errorConditionFormula>
+    <errorDisplayField>Q4_Answer__c</errorDisplayField>
+    <errorMessage>Please add notes when the answer is Yes.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,209 @@
+<template>
+    <lightning-card title="Required Files" icon-name="standard:file">
+        <div slot="actions">
+            <lightning-button
+                label="New"
+                variant="brand"
+                onclick={handleNewClick}>
+            </lightning-button>
+        </div>
+
+        <div class="toolbar">
+            <lightning-input
+                type="search"
+                label="Search"
+                variant="label-hidden"
+                placeholder="Search by name, description, upload status, or file name"
+                value={searchTerm}
+                onchange={handleSearchChange}>
+            </lightning-input>
+        </div>
+
+        <template if:true={isLoading}>
+            <div class="loading-wrap">
+                <lightning-spinner size="medium" alternative-text="Loading required files"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:true={noFiles}>
+                <p class="empty-state">No required files found for this record.</p>
+            </template>
+
+            <template if:true={hasFiles}>
+                <div class="table-wrap">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col"><div class="slds-truncate">File Name</div></th>
+                                <th scope="col"><div class="slds-truncate">Short Description</div></th>
+                                <th scope="col"><div class="slds-truncate">File Uploaded</div></th>
+                                <th scope="col"><div class="slds-truncate">Uploaded File</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={filteredFiles} for:item="file">
+                                <tr key={file.id}>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="file-link"
+                                            data-id={file.id}
+                                            onclick={handleNameClick}>
+                                            {file.name}
+                                        </button>
+                                    </td>
+                                    <td><div class="slds-truncate">{file.shortDescription}</div></td>
+                                    <td><div class="slds-truncate">{file.uploadedLabel}</div></td>
+                                    <td>
+                                        <template if:true={file.hasUploadedFile}>
+                                            <button
+                                                type="button"
+                                                class="file-link"
+                                                data-id={file.id}
+                                                onclick={handleUploadedFileClick}>
+                                                {file.uploadedFileName}
+                                            </button>
+                                        </template>
+                                        <template if:false={file.hasUploadedFile}>
+                                            <span class="file-empty">—</span>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </template>
+    </lightning-card>
+
+    <template if:true={isCreateModalOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">New Required File</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-radio-group
+                        label="Creation Type"
+                        options={createModeOptions}
+                        value={createMode}
+                        type="button"
+                        onchange={handleCreateModeChange}>
+                    </lightning-radio-group>
+
+                    <template if:true={isDefaultMode}>
+                        <div class="form-section">
+                            <lightning-input
+                                label="Name"
+                                value={defaultName}
+                                required
+                                onchange={handleDefaultNameChange}>
+                            </lightning-input>
+                            <lightning-dual-listbox
+                                label="Accepted Format"
+                                source-label="Available"
+                                selected-label="Selected"
+                                options={acceptedFormatOptions}
+                                value={selectedAcceptedFormats}
+                                required
+                                onchange={handleAcceptedFormatChange}>
+                            </lightning-dual-listbox>
+                            <lightning-textarea
+                                label="Short Description"
+                                value={defaultShortDescription}
+                                required
+                                max-length="1000"
+                                onchange={handleDefaultShortDescriptionChange}>
+                            </lightning-textarea>
+                            <lightning-input-rich-text
+                                label="Instructions"
+                                value={defaultInstructions}
+                                onchange={handleDefaultInstructionsChange}>
+                            </lightning-input-rich-text>
+                        </div>
+                    </template>
+
+                    <template if:true={isTemplateMode}>
+                        <div class="form-section">
+                            <lightning-datatable
+                                key-field="id"
+                                data={templates}
+                                columns={templateColumns}
+                                max-row-selection="1"
+                                onrowselection={handleTemplateSelection}>
+                            </lightning-datatable>
+                        </div>
+                    </template>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={handleCloseCreateModal}></lightning-button>
+                    <template if:true={isDefaultMode}>
+                        <lightning-button
+                            label="Create"
+                            variant="brand"
+                            disabled={disableSaveDefault}
+                            onclick={handleSaveDefault}>
+                        </lightning-button>
+                    </template>
+                    <template if:true={isTemplateMode}>
+                        <lightning-button
+                            label="Create"
+                            variant="brand"
+                            disabled={disableSaveTemplate}
+                            onclick={handleSaveTemplate}>
+                        </lightning-button>
+                    </template>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <template if:true={isPreviewModalOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container preview-modal-container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">{previewFileName}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium preview-content">
+                    <template if:true={isPreviewLoading}>
+                        <div class="loading-wrap">
+                            <lightning-spinner size="medium" alternative-text="Loading preview"></lightning-spinner>
+                        </div>
+                    </template>
+
+                    <template if:true={showImagePreview}>
+                        <img src={previewUrl} alt={previewFileName} class="preview-image" />
+                    </template>
+
+                    <template if:true={showPdfPreview}>
+                        <iframe src={previewUrl} title={previewFileName} class="preview-frame"></iframe>
+                    </template>
+
+                    <template if:true={showVideoPreview}>
+                        <video controls src={previewUrl} class="preview-video"></video>
+                    </template>
+
+                    <template if:true={showTextPreview}>
+                        <iframe src={previewUrl} title={previewFileName} class="preview-frame"></iframe>
+                    </template>
+
+                    <template if:true={showUnsupportedPreview}>
+                        <p class="empty-state">Preview is not available for this file type.</p>
+                    </template>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Close" onclick={handleClosePreviewModal}></lightning-button>
+                    <lightning-button
+                        label="Download"
+                        variant="brand"
+                        onclick={handleDownloadPreview}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

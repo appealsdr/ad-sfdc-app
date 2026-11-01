@@ -1,0 +1,160 @@
+<template>
+    <lightning-card title={cardTitle} icon-name="standard:store">
+        <lightning-button-icon
+            slot="actions"
+            icon-name="utility:refresh"
+            alternative-text="Refresh"
+            title="Refresh"
+            size="small"
+            onclick={handleRefresh}
+        ></lightning-button-icon>
+
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={notConfigured}>
+                <p class="slds-text-color_weak">
+                    Pick the seller field in this component's properties in Lightning App Builder.
+                </p>
+            </template>
+
+            <template lwc:elseif={isLoading}>
+                <div class="spinner-holder">
+                    <lightning-spinner alternative-text="Loading Amazon seller" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <template lwc:elseif={isEmpty}>
+                <p class="slds-text-color_weak">No Amazon seller on this record.</p>
+            </template>
+
+            <template lwc:elseif={errorMessage}>
+                <p class="slds-text-color_error">{errorMessage}</p>
+            </template>
+
+            <template lwc:elseif={showSeller}>
+                <!-- Header -->
+                <div class="header">
+                    <template lwc:if={showLogo}>
+                        <img class="logo" src={seller.logoUrl} alt={displayName} onerror={handleLogoError} />
+                    </template>
+                    <template lwc:else>
+                        <div class="logo logo_placeholder" aria-hidden="true">
+                            <lightning-icon icon-name="utility:store" size="small" variant="inverse"></lightning-icon>
+                        </div>
+                    </template>
+                    <div class="header-text">
+                        <a class="name" href={seller.sellerUrl} target="_blank" rel="noopener noreferrer">{displayName}</a>
+                        <template lwc:if={hasRating}>
+                            <div class="rating-line">
+                                <span class="stars" title={seller.rating}>
+                                    <span class="stars-empty">★★★★★</span>
+                                    <span class="stars-full" style={starStyle}>★★★★★</span>
+                                </span>
+                                <span class="rating-value">{seller.rating}</span>
+                                <template lwc:if={seller.ratingCount}>
+                                    <span class="slds-text-color_weak">({seller.ratingCount} ratings)</span>
+                                </template>
+                            </div>
+                        </template>
+                        <template lwc:if={positiveText}>
+                            <span class="slds-badge slds-theme_success slds-m-top_xx-small">{positiveText}</span>
+                        </template>
+                        <div class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                            Seller ID: {seller.sellerId}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ratings by period -->
+                <template lwc:if={hasRatingPeriods}>
+                    <div class="periods slds-m-top_small">
+                        <template for:each={ratingPeriods} for:item="period">
+                            <div key={period.key} class="period">
+                                <div class="period-label">{period.label}</div>
+                                <div class="period-rating">{period.ratingText}</div>
+                                <div class="period-count">{period.count} ratings</div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Star histogram -->
+                <template lwc:if={hasHistogram}>
+                    <div class="histogram slds-m-top_small">
+                        <template for:each={histogram} for:item="bar">
+                            <div key={bar.key} class="hist-row">
+                                <span class="hist-label">{bar.label}</span>
+                                <span class="hist-track"><span class="hist-fill" style={bar.barStyle}></span></span>
+                                <span class="hist-pct">{bar.percent}%</span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- About -->
+                <template lwc:if={seller.about}>
+                    <h3 class="section-title">About Seller</h3>
+                    <p class={aboutClass}>{seller.about}</p>
+                    <template lwc:if={isLongAbout}>
+                        <lightning-button variant="base" label={aboutToggleLabel} onclick={toggleAbout}></lightning-button>
+                    </template>
+                </template>
+
+                <!-- Business details -->
+                <template lwc:if={hasDetails}>
+                    <h3 class="section-title">Detailed Seller Information</h3>
+                    <dl class="details">
+                        <template for:each={seller.details} for:item="detail">
+                            <div key={detail.key} class="detail">
+                                <dt>{detail.label}</dt>
+                                <dd class="multiline">{detail.value}</dd>
+                            </div>
+                        </template>
+                        <template lwc:if={seller.phone}>
+                            <div class="detail">
+                                <dt>Customer Service Phone</dt>
+                                <dd><lightning-formatted-phone value={seller.phone}></lightning-formatted-phone></dd>
+                            </div>
+                        </template>
+                    </dl>
+                </template>
+
+                <!-- Recent feedback -->
+                <template lwc:if={hasFeedback}>
+                    <h3 class="section-title">Recent Feedback</h3>
+                    <ul class="feedback-list">
+                        <template for:each={feedback} for:item="fb">
+                            <li key={fb.key} class="feedback-item">
+                                <span class={fb.starsClass}>{fb.starsText}</span>
+                                <template lwc:if={fb.text}>
+                                    <p class="fb-text">“{fb.text}”</p>
+                                </template>
+                                <p class="slds-text-body_small slds-text-color_weak">{fb.byLine}</p>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+
+                <template lwc:if={showFallbackNotice}>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_small">{seller.errorMessage}</p>
+                </template>
+
+                <div class="actions slds-m-top_small">
+                    <lightning-button
+                        label="Seller Profile"
+                        icon-name="utility:new_window"
+                        icon-position="right"
+                        data-url={seller.sellerUrl}
+                        onclick={openUrl}
+                    ></lightning-button>
+                    <lightning-button
+                        label="Storefront"
+                        icon-name="utility:new_window"
+                        icon-position="right"
+                        data-url={seller.storefrontUrl}
+                        onclick={openUrl}
+                    ></lightning-button>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

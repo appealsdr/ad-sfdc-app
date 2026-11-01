@@ -1,0 +1,89 @@
+.toolbar {
+    padding: 0 1rem 0.75rem;
+}
+
+.loading-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.empty-state {
+    padding: 1rem;
+    color: #706e6b;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.table-wrap {
+    padding: 0 1rem 1rem;
+    overflow-x: auto;
+}
+
+.file-link {
+    background: none;
+    border: 0;
+    color: #0176d3;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0;
+    text-align: left;
+    text-decoration: underline;
+}
+
+.file-link:hover,
+.file-link:focus {
+    color: #014486;
+}
+
+.file-text {
+    color: #181818;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.file-empty {
+    color: #706e6b;
+    font-size: 0.875rem;
+}
+
+.preview-modal-container {
+    max-width: 72rem;
+    width: 92vw;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.preview-content {
+    min-height: 60vh;
+    max-height: 75vh;
+    overflow: auto;
+}
+
+.preview-image {
+    display: block;
+    margin: 0 auto;
+    max-height: 68vh;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.preview-frame {
+    border: 0;
+    height: 68vh;
+    min-height: 68vh;
+    width: 100%;
+}
+
+.preview-video {
+    display: block;
+    margin: 0 auto;
+    max-height: 68vh;
+    max-width: 100%;
+}

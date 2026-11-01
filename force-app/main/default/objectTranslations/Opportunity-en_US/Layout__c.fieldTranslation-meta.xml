@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Layout --></label>
+    <name>Layout__c</name>
+    <picklistValues>
+        <masterLabel>picklist1</masterLabel>
+        <translation><!-- picklist1 --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>picklist2</masterLabel>
+        <translation><!-- picklist2 --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>picklist3</masterLabel>
+        <translation><!-- picklist3 --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>picklist4</masterLabel>
+        <translation><!-- picklist4 --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>picklist5</masterLabel>
+        <translation><!-- picklist5 --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

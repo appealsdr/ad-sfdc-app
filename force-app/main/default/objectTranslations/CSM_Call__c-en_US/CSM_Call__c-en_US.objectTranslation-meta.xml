@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>CSM Call</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>CSM Calls</value>
+    </caseValues>
+    <layouts>
+        <layout>CSM Call Layout</layout>
+        <sections>
+            <label><!-- Call Details --></label>
+            <section>Call Details</section>
+        </sections>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+        <sections>
+            <label><!-- Notes --></label>
+            <section>Notes</section>
+        </sections>
+    </layouts>
+    <startsWith>Consonant</startsWith>
+    <validationRules>
+        <errorMessage><!-- Please add notes when the answer is Yes. --></errorMessage>
+        <name>Q2_Yes_Requires_Notes</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- Please add notes when the client is not satisfied. --></errorMessage>
+        <name>Q3_No_Requires_Notes</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- Please add notes when the answer is Yes. --></errorMessage>
+        <name>Q4_Yes_Requires_Notes</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- Please add notes when the answer is Yes. --></errorMessage>
+        <name>Q5_Yes_Requires_Notes</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- Please add notes when the answer is Yes. --></errorMessage>
+        <name>Q6_Yes_Requires_Notes</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- Please add notes when the answer is Yes. --></errorMessage>
+        <name>Q7_Yes_Requires_Notes</name>
+    </validationRules>
+</CustomObjectTranslation>

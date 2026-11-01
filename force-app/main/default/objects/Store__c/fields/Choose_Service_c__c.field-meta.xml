@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Choose_Service_c__c</fullName>
+    <label>Choose Service</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Violations</fullName>
+                <default>false</default>
+                <label>Violations</label>
+            </value>
+            <value>
+                <fullName>Listing Issues</fullName>
+                <default>false</default>
+                <label>Listing Issues</label>
+            </value>
+            <value>
+                <fullName>A-Z Claims</fullName>
+                <default>false</default>
+                <label>A-Z Claims</label>
+            </value>
+            <value>
+                <fullName>Feedback Removal - FBM</fullName>
+                <default>false</default>
+                <label>Feedback Removal - FBM</label>
+            </value>
+            <value>
+                <fullName>Feedback Removal - FBA</fullName>
+                <default>false</default>
+                <label>Feedback Removal - FBA</label>
+            </value>
+            <value>
+                <fullName>Brand Registry</fullName>
+                <default>false</default>
+                <label>Brand Registry</label>
+            </value>
+            <value>
+                <fullName>ODR</fullName>
+                <default>false</default>
+                <label>ODR</label>
+            </value>
+            <value>
+                <fullName>LSR (Late Shipment Rate)</fullName>
+                <default>false</default>
+                <label>LSR (Late Shipment Rate)</label>
+            </value>
+            <value>
+                <fullName>PFCR (Pre-fulfillment Rate)</fullName>
+                <default>false</default>
+                <label>PFCR (Pre-fulfillment Rate)</label>
+            </value>
+            <value>
+                <fullName>VTR (Valid Tracking Rate)</fullName>
+                <default>false</default>
+                <label>VTR (Valid Tracking Rate)</label>
+            </value>
+            <value>
+                <fullName>Listing Advertising - PPC</fullName>
+                <default>false</default>
+                <label>Listing Advertising - PPC</label>
+            </value>
+            <value>
+                <fullName>Listing Creation/Optimization - Content creation</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization - Content creation</label>
+            </value>
+            <value>
+                <fullName>Listing Creation/Optimization - Image</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization - Image</label>
+            </value>
+            <value>
+                <fullName>Listing Creation/Optimization - Viedo Content</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization - Viedo Content</label>
+            </value>
+            <value>
+                <fullName>Seller Account Creation</fullName>
+                <default>false</default>
+                <label>Seller Account Creation</label>
+            </value>
+            <value>
+                <fullName>Private Label</fullName>
+                <default>false</default>
+                <label>Private Label</label>
+            </value>
+            <value>
+                <fullName>Brand Protection</fullName>
+                <default>false</default>
+                <label>Brand Protection</label>
+            </value>
+            <value>
+                <fullName>Storage Increase</fullName>
+                <default>false</default>
+                <label>Storage Increase</label>
+            </value>
+            <value>
+                <fullName>Trademark</fullName>
+                <default>false</default>
+                <label>Trademark</label>
+            </value>
+            <value>
+                <fullName>Suspended Account</fullName>
+                <default>false</default>
+                <label>Suspended Account</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

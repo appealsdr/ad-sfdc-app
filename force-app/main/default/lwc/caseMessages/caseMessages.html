@@ -1,0 +1,177 @@
+<template>
+    <lightning-card class="messages-card">
+        <header class="custom-header">
+            <h1 class="header-title">Messages</h1>
+        </header>
+
+        <div class="search-bar">
+            <div class="search-bar-input">
+                <lightning-input
+                    type="search"
+                    variant="label-hidden"
+                    placeholder="Search messages..."
+                    value={searchTerm}
+                    onchange={handleSearchChange}>
+                </lightning-input>
+            </div>
+            <lightning-button-icon
+                icon-name="utility:refresh"
+                alternative-text="Refresh messages"
+                title="Refresh messages"
+                variant="border-filled"
+                onclick={handleRefreshClick}
+                disabled={isRefreshing}>
+            </lightning-button-icon>
+        </div>
+
+        <div class="messages-container">
+            <template if:true={showLatestMessagesHint}>
+                <p class="messages-hint">{latestMessagesHintText}</p>
+            </template>
+
+            <template if:true={isLoading}>
+                <div class="loading-wrap">
+                    <lightning-spinner size="small" alternative-text="Loading messages"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:false={isLoading}>
+                <template for:each={visibleMessages} for:item="msg">
+                    <article
+                        key={msg.id}
+                        class={msg.rowClass}
+                        data-id={msg.id}
+                        role="button"
+                        tabindex="0"
+                        title="Open message"
+                        onclick={handleMessageClick}
+                        onkeydown={handleMessageKeyDown}>
+                        <div class="avatar" aria-hidden="true">{msg.senderInitials}</div>
+                        <div class="message-content">
+                            <div class="message-meta">
+                                <span class="sender-name">{msg.senderName}</span>
+                                <template if:true={msg.isInternal}>
+                                    <span class="type-badge type-badge-internal">Internal</span>
+                                </template>
+                                <template if:false={msg.isInternal}>
+                                    <span class="type-badge type-badge-external">External</span>
+                                </template>
+                                <span class="message-time">{msg.formattedDate}</span>
+                                <button
+                                    class="reply-link"
+                                    data-id={msg.id}
+                                    title="Reply to this message"
+                                    onclick={handleReplyClick}>
+                                    ↩ Reply
+                                </button>
+                            </div>
+                            <template if:true={msg.hasReply}>
+                                <div class="reply-quote">{msg.replySnippet}</div>
+                            </template>
+                            <div class="message-body">
+                                <lightning-formatted-rich-text value={msg.messageBody}></lightning-formatted-rich-text>
+                            </div>
+                            <template if:true={msg.readLabel}>
+                                <p class="read-receipt">{msg.readLabel}</p>
+                            </template>
+                        </div>
+                    </article>
+                </template>
+
+                <template if:true={noMessages}>
+                    <p class="empty-state">No messages yet.</p>
+                </template>
+
+                <template if:true={noSearchResults}>
+                    <p class="empty-state">No messages match your search.</p>
+                </template>
+            </template>
+        </div>
+
+        <div class="composer">
+            <template if:true={isReplying}>
+                <div class="reply-preview">
+                    <div class="reply-preview-text">
+                        <span class="reply-preview-label">Replying to {replyToMessage.senderName}</span>
+                        <span class="reply-preview-snippet">{replyToMessage.searchableText}</span>
+                    </div>
+                    <button class="reply-preview-cancel" title="Cancel reply" onclick={handleCancelReply}>✕</button>
+                </div>
+            </template>
+
+            <div onkeydown={handleComposerKeyDown}>
+                <lightning-input-rich-text
+                    class="message-input-rich-text"
+                    variant="bottom-toolbar"
+                    label="New Message"
+                    placeholder="Write a message..."
+                    value={newMessage}
+                    formats={richTextFormats}
+                    disabled-categories="FORMAT_FONT"
+                    onchange={handleInputChange}>
+                </lightning-input-rich-text>
+            </div>
+
+            <div class="composer-actions">
+                <span class="composer-hint">Enter to send · Shift+Enter for a new line</span>
+                <lightning-button
+                    label="Send"
+                    variant="brand"
+                    onclick={handleSendClick}
+                    disabled={isSaving}>
+                </lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+
+    <template if:true={showMessageModal}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open message-modal">
+            <div class="slds-modal__container message-modal-container">
+                <header class="slds-modal__header message-modal-header">
+                    <button
+                        class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close"
+                        onclick={handleCloseMessageModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="Close" size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="message-modal-title">Message</h2>
+                </header>
+
+                <div class="slds-modal__content message-modal-content">
+                    <template if:true={hasSelectedMessage}>
+                        <div class="message-modal-meta">
+                            <div class="avatar avatar-large" aria-hidden="true">{selectedMessage.senderInitials}</div>
+                            <div class="message-modal-meta-text">
+                                <div class="message-meta">
+                                    <span class="sender-name">{selectedMessage.senderName}</span>
+                                    <template if:true={selectedMessage.isInternal}>
+                                        <span class="type-badge type-badge-internal">Internal</span>
+                                    </template>
+                                    <template if:false={selectedMessage.isInternal}>
+                                        <span class="type-badge type-badge-external">External</span>
+                                    </template>
+                                </div>
+                                <p class="message-time">{selectedMessage.fullFormattedDate}</p>
+                            </div>
+                        </div>
+                        <template if:true={selectedMessage.hasReply}>
+                            <div class="reply-quote">{selectedMessage.replySnippet}</div>
+                        </template>
+                        <div class="message-detail-body">
+                            <lightning-formatted-rich-text value={selectedMessage.messageBody}></lightning-formatted-rich-text>
+                        </div>
+                        <template if:true={selectedMessage.readLabel}>
+                            <p class="read-receipt">{selectedMessage.readLabel}</p>
+                        </template>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Close" onclick={handleCloseMessageModal}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

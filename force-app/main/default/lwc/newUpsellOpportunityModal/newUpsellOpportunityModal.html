@@ -1,0 +1,186 @@
+<template>
+    <lightning-modal-header label="New Opportunity"></lightning-modal-header>
+
+    <lightning-modal-body>
+        <template lwc:if={loadError}>
+            <p class="slds-text-color_error">{loadError}</p>
+        </template>
+        <template lwc:elseif={isLoading}>
+            <div class="spinner-holder">
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </div>
+        </template>
+        <template lwc:else>
+            <!-- Prefilled Opportunity details -->
+            <div class="summary slds-box slds-theme_shade slds-var-m-bottom_medium">
+                <div class="name-store">
+                    <lightning-input
+                        label="Opportunity Name"
+                        value={opportunityName}
+                        max-length="120"
+                        required
+                        onchange={handleName}
+                    ></lightning-input>
+                    <div>
+                        <lightning-combobox
+                            label="Store"
+                            value={storeId}
+                            options={storeOptions}
+                            placeholder={storePlaceholder}
+                            required={hasStores}
+                            message-when-value-missing="Select a store for this Opportunity."
+                            disabled={noStoreChoice}
+                            field-level-help="Only stores that belong to this account are listed."
+                            onchange={handleStore}
+                        ></lightning-combobox>
+                        <template lwc:if={selectedStore}>
+                            <p class="store-meta slds-text-body_small slds-text-color_weak">
+                                <template lwc:if={selectedStore.sellerId}>Seller ID {selectedStore.sellerId}</template>
+                                <template lwc:if={selectedStore.marketplaces}> · {selectedStore.marketplaces}</template>
+                            </p>
+                        </template>
+                    </div>
+                </div>
+                <lightning-textarea
+                    class="slds-var-m-top_x-small"
+                    label="Description"
+                    value={description}
+                    max-length="32000"
+                    required
+                    placeholder="What does the client need and why?"
+                    message-when-value-missing="Enter a description for this Opportunity."
+                    onchange={handleDescription}
+                ></lightning-textarea>
+                <dl class="summary-grid slds-var-m-top_small">
+                    <div><dt>Account</dt><dd>{context.accountName}</dd></div>
+                    <div><dt>Source</dt><dd>{sourceLabel}</dd></div>
+                    <div><dt>Type</dt><dd>{context.opportunityType}</dd></div>
+                    <div><dt>Status</dt><dd>{context.stageName}</dd></div>
+                    <div>
+                        <dt>Start Date</dt>
+                        <dd><lightning-formatted-date-time value={context.startDate} time-zone="UTC"></lightning-formatted-date-time></dd>
+                    </div>
+                    <div><dt>Price Book</dt><dd>{context.pricebookName}</dd></div>
+                    <div><dt>Forecast Category</dt><dd>{context.forecastCategory}</dd></div>
+                </dl>
+                <template lwc:if={missingAccount}>
+                    <p class="slds-text-color_error slds-var-m-top_small">
+                        This {context.objectLabel} has no Account. Add an Account before creating an Opportunity.
+                    </p>
+                </template>
+            </div>
+
+            <!-- Step 1: select products -->
+            <template lwc:if={isSelectStep}>
+                <div class="step-header">
+                    <h2 class="slds-text-heading_small">1. Select products</h2>
+                    <span class="slds-badge">{selectedCount} selected</span>
+                </div>
+                <lightning-input
+                    type="search"
+                    label="Search products"
+                    variant="label-hidden"
+                    placeholder="Search by name, code or family"
+                    value={searchTerm}
+                    onchange={handleSearch}
+                    class="slds-var-m-bottom_small"
+                ></lightning-input>
+                <div class="product-table">
+                    <lightning-datatable
+                        key-field="pricebookEntryId"
+                        data={filteredProducts}
+                        columns={productColumns}
+                        selected-rows={selectedRowKeys}
+                        onrowselection={handleRowSelection}
+                    ></lightning-datatable>
+                </div>
+            </template>
+
+            <!-- Step 2: quantities -->
+            <template lwc:if={isQuantityStep}>
+                <div class="step-header">
+                    <h2 class="slds-text-heading_small">2. Set quantities</h2>
+                </div>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">Product</th>
+                            <th scope="col" class="num">Unit Price</th>
+                            <th scope="col" class="qty">Quantity</th>
+                            <th scope="col" class="num">Total</th>
+                            <th scope="col" class="remove"><span class="slds-assistive-text">Remove</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={lines} for:item="line">
+                            <tr key={line.pricebookEntryId}>
+                                <td class="slds-cell-wrap">{line.productName}</td>
+                                <td class="num">
+                                    <lightning-formatted-number value={line.unitPrice} format-style="currency"></lightning-formatted-number>
+                                </td>
+                                <td class="qty">
+                                    <lightning-input
+                                        type="number"
+                                        label="Quantity"
+                                        variant="label-hidden"
+                                        value={line.quantity}
+                                        min="1"
+                                        step="1"
+                                        required
+                                        message-when-range-underflow="Must be at least 1"
+                                        data-id={line.pricebookEntryId}
+                                        onchange={handleQuantity}
+                                    ></lightning-input>
+                                </td>
+                                <td class="num">
+                                    <lightning-formatted-number value={line.lineTotal} format-style="currency"></lightning-formatted-number>
+                                </td>
+                                <td class="remove">
+                                    <lightning-button-icon
+                                        icon-name="utility:delete"
+                                        variant="bare"
+                                        alternative-text="Remove product"
+                                        data-id={line.pricebookEntryId}
+                                        onclick={handleRemove}
+                                    ></lightning-button-icon>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row" colspan="3" class="num">Total</th>
+                            <td class="num total">
+                                <lightning-formatted-number value={grandTotal} format-style="currency"></lightning-formatted-number>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </template>
+        </template>
+    </lightning-modal-body>
+
+    <lightning-modal-footer>
+        <template lwc:if={isSelectStep}>
+            <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+            <lightning-button
+                class="slds-var-m-left_x-small"
+                variant="brand"
+                label="Next: Quantities"
+                disabled={nextDisabled}
+                onclick={handleNext}
+            ></lightning-button>
+        </template>
+        <template lwc:if={isQuantityStep}>
+            <lightning-button label="Back" icon-name="utility:back" onclick={handleBack}></lightning-button>
+            <lightning-button
+                class="slds-var-m-left_x-small"
+                variant="brand"
+                label="Save"
+                disabled={saveDisabled}
+                onclick={handleSave}
+            ></lightning-button>
+        </template>
+    </lightning-modal-footer>
+</template>

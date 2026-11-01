@@ -1,0 +1,145 @@
+.loading-wrap,
+.preview-loading {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.empty-state,
+.preview-empty {
+    padding: 1rem;
+    color: #706e6b;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.viewer-layout {
+    display: grid;
+    grid-template-columns: minmax(240px, 34%) 1fr;
+    min-height: 24rem;
+    border-top: 1px solid #e5e5e5;
+}
+
+.file-list-panel {
+    border-right: 1px solid #e5e5e5;
+    max-height: 32rem;
+    overflow-y: auto;
+}
+
+.file-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.file-row:hover,
+.file-row-selected {
+    background: #f3f6f9;
+}
+
+.file-row-selected {
+    border-left: 3px solid #0176d3;
+    padding-left: calc(0.75rem - 3px);
+}
+
+.file-name {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #181818;
+    word-break: break-word;
+}
+
+.file-meta,
+.file-description,
+.preview-subtitle {
+    margin: 0.2rem 0 0;
+    font-size: 0.75rem;
+    color: #706e6b;
+}
+
+.file-description {
+    margin-top: 0.35rem;
+}
+
+.type-badge {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    border-radius: 0.75rem;
+    background: #ecebea;
+    color: #444;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.preview-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 24rem;
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.preview-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.preview-content {
+    flex: 1;
+    padding: 1rem;
+    overflow: auto;
+}
+
+.preview-content-image,
+.preview-content-video {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 28rem;
+    object-fit: contain;
+}
+
+.preview-video {
+    max-width: 100%;
+    max-height: 28rem;
+}
+
+.preview-content-frame {
+    padding: 0;
+}
+
+.preview-frame {
+    width: 100%;
+    min-height: 28rem;
+    border: 0;
+}
+
+@media (max-width: 768px) {
+    .viewer-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .file-list-panel {
+        border-right: 0;
+        border-bottom: 1px solid #e5e5e5;
+        max-height: 14rem;
+    }
+}

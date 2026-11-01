@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Service</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Service</value>
+    </caseValues>
+    <layouts>
+        <layout>Service Layout</layout>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+    </layouts>
+    <recordTypes>
+        <label><!-- Service To Cold Leads --></label>
+        <name>Service_To_Cold_Leads</name>
+    </recordTypes>
+    <recordTypes>
+        <label><!-- Service To Past Clients --></label>
+        <name>Service_To_Past_Clients</name>
+    </recordTypes>
+    <startsWith>Consonant</startsWith>
+    <validationRules>
+        <errorMessage><!-- You cannot save this task because its dependent task is either Closed or Resolved and it has predecessors. --></errorMessage>
+        <name>RelatedTaskNotClosed</name>
+    </validationRules>
+</CustomObjectTranslation>

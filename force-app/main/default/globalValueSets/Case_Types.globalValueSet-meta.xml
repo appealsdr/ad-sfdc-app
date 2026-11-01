@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Account at Risk of Deactivation</fullName>
+        <default>false</default>
+        <label>Account at Risk of Deactivation</label>
+    </customValue>
+    <customValue>
+        <fullName>Expedited appeal within 48 hours</fullName>
+        <default>false</default>
+        <label>Expedited appeal within 48 hours</label>
+    </customValue>
+    <customValue>
+        <fullName>Brand Approval (For a Brand)</fullName>
+        <default>false</default>
+        <label>Brand Approval (For a Brand)</label>
+    </customValue>
+    <customValue>
+        <fullName>Blocked Listing - Reinstate Product Listing</fullName>
+        <default>false</default>
+        <label>Blocked Listing - Reinstate Product Listing</label>
+    </customValue>
+    <customValue>
+        <fullName>Brand Reinstatement / Ungating</fullName>
+        <default>false</default>
+        <label>Brand Reinstatement / Ungating</label>
+    </customValue>
+    <customValue>
+        <fullName>A-Z Claims</fullName>
+        <default>false</default>
+        <label>A-Z Claims</label>
+    </customValue>
+    <customValue>
+        <fullName>Arbitration</fullName>
+        <default>false</default>
+        <label>Arbitration</label>
+    </customValue>
+    <customValue>
+        <fullName>Account Ownership Transfer</fullName>
+        <default>false</default>
+        <label>Account Ownership Transfer</label>
+    </customValue>
+    <customValue>
+        <fullName>Chargeback</fullName>
+        <default>false</default>
+        <label>Chargeback</label>
+    </customValue>
+    <customValue>
+        <fullName>Ad Suspension</fullName>
+        <default>false</default>
+        <label>Ad Suspension</label>
+    </customValue>
+    <customValue>
+        <fullName>FBA Account Suspension</fullName>
+        <default>false</default>
+        <label>FBA Account Suspension</label>
+    </customValue>
+    <customValue>
+        <fullName>FBA Feedback Removal</fullName>
+        <default>false</default>
+        <label>FBA Feedback Removal</label>
+    </customValue>
+    <customValue>
+        <fullName>FBM Account Suspension</fullName>
+        <default>false</default>
+        <label>FBM Account Suspension</label>
+    </customValue>
+    <customValue>
+        <fullName>High critical violation</fullName>
+        <default>false</default>
+        <label>High critical violation</label>
+    </customValue>
+    <customValue>
+        <fullName>FBM Feedback Removal</fullName>
+        <default>false</default>
+        <label>FBM Feedback Removal</label>
+    </customValue>
+    <customValue>
+        <fullName>High repeat violation</fullName>
+        <default>false</default>
+        <label>High repeat violation</label>
+    </customValue>
+    <customValue>
+        <fullName>High impact violation</fullName>
+        <default>false</default>
+        <label>High impact violation</label>
+    </customValue>
+    <customValue>
+        <fullName>Medium repeat violation</fullName>
+        <default>false</default>
+        <label>Medium repeat violation</label>
+    </customValue>
+    <customValue>
+        <fullName>Low repeat violation</fullName>
+        <default>false</default>
+        <label>Low repeat violation</label>
+    </customValue>
+    <customValue>
+        <fullName>Medium impact violation</fullName>
+        <default>false</default>
+        <label>Medium impact violation</label>
+    </customValue>
+    <customValue>
+        <fullName>Low impact violation</fullName>
+        <default>false</default>
+        <label>Low impact violation</label>
+    </customValue>
+    <customValue>
+        <fullName>No Impact Violation</fullName>
+        <default>false</default>
+        <label>No Impact Violation</label>
+    </customValue>
+    <customValue>
+        <fullName>ODR (Order Defect Rate)</fullName>
+        <default>false</default>
+        <label>ODR (Order Defect Rate)</label>
+    </customValue>
+    <customValue>
+        <fullName>LSR (Late Shipment Rate)</fullName>
+        <default>false</default>
+        <label>LSR (Late Shipment Rate)</label>
+    </customValue>
+    <customValue>
+        <fullName>PFCR (Pre-fulfilment Cancel Rate)</fullName>
+        <default>false</default>
+        <label>PFCR (Pre-fulfilment Cancel Rate)</label>
+    </customValue>
+    <customValue>
+        <fullName>VTR (Valid Tracking Rate)</fullName>
+        <default>false</default>
+        <label>VTR (Valid Tracking Rate)</label>
+    </customValue>
+    <customValue>
+        <fullName>Seller Account Creation</fullName>
+        <default>false</default>
+        <label>Seller Account Creation</label>
+    </customValue>
+    <customValue>
+        <fullName>Suspended Account</fullName>
+        <default>false</default>
+        <label>Suspended Account</label>
+    </customValue>
+    <customValue>
+        <fullName>Storage Increase for FBA</fullName>
+        <default>false</default>
+        <label>Storage Increase for FBA</label>
+    </customValue>
+    <customValue>
+        <fullName>Trademark Application</fullName>
+        <default>false</default>
+        <label>Trademark Application</label>
+    </customValue>
+    <customValue>
+        <fullName>Vendor central account review</fullName>
+        <default>false</default>
+        <label>Vendor central account review</label>
+    </customValue>
+    <customValue>
+        <fullName>Brand Protection</fullName>
+        <default>false</default>
+        <label>Brand Protection</label>
+    </customValue>
+    <customValue>
+        <fullName>Listing Optimization</fullName>
+        <default>false</default>
+        <label>Listing Optimization</label>
+    </customValue>
+    <customValue>
+        <fullName>Listing Creation</fullName>
+        <default>false</default>
+        <label>Listing Creation</label>
+    </customValue>
+    <customValue>
+        <fullName>Private Label Launch</fullName>
+        <default>false</default>
+        <label>Private Label Launch</label>
+    </customValue>
+    <customValue>
+        <fullName>A+ Content</fullName>
+        <default>false</default>
+        <label>A+ Content</label>
+    </customValue>
+    <customValue>
+        <fullName>Video Content</fullName>
+        <default>false</default>
+        <label>Video Content</label>
+    </customValue>
+    <masterLabel>Case Types</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

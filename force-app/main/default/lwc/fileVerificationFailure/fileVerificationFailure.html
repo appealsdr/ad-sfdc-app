@@ -1,0 +1,28 @@
+<template>
+    <lightning-card>
+        <div>
+            <header class="slds-p-around_medium slds-text-align_center custom-header">
+                <h1 class="slds-text-heading_medium d-inline">Request File Again</h1>
+            </header>
+
+            <div class="slds-p-around_medium slds-text-align_center custom-header">
+                <lightning-record-edit-form object-api-name={objectApiName} record-id={recordId}>
+                    <div class="slds-grid slds-grid_vertical-align-center slds-p-around_small compact-inline">
+                        <label class="slds-col slds-size_1-of-4 slds-form-element__label">Info</label>
+                        <div class="slds-col slds-size_3-of-4">
+                            <lightning-input value={infoValue} type="text" onchange={handleInfoChange}
+                                variant="label-hidden">
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <div class="slds-m-around_medium">
+                        <lightning-button label="Request File Again" variant="brand"
+                            onclick={handleRequestFileAgainClick}>
+                        </lightning-button>
+                    </div>
+                </lightning-record-edit-form>
+            </div>
+        </div>
+    </lightning-card>
+</template>

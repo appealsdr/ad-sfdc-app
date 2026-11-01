@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Q7_Yes_Requires_Notes</fullName>
+    <active>true</active>
+    <description>Q7 (Anything Else to Help With): notes are required when the answer is Yes.</description>
+    <errorConditionFormula>AND(
+    ISPICKVAL(Q7_Response__c, &quot;Yes&quot;),
+    ISBLANK(Q7_Answer__c)
+)</errorConditionFormula>
+    <errorDisplayField>Q7_Answer__c</errorDisplayField>
+    <errorMessage>Please add notes when the answer is Yes.</errorMessage>
+</ValidationRule>

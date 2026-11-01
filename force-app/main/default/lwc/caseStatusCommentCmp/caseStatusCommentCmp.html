@@ -1,0 +1,162 @@
+<template>
+    <lightning-card>
+        <header class="slds-p-around_medium slds-text-align_center custom-header">
+            <span class="slds-text-heading_medium d-inline">Status Update</span>
+            <lightning-button-icon icon-name={sortIconName} alternative-text="Sort" onclick={handleSortClick}
+                class="slds-m-left_x-small"></lightning-button-icon>
+        </header>
+
+        <template if:true={recentComments}>
+            <div class="messages-container">
+                <template for:each={recentComments} for:item="msg">
+
+                    <!-- Internal messages -->
+                    <template if:false={msg.Incoming}>
+                        <div key={msg.id} class="slds-m-around_small slds-text-align_right">
+                            <div class="message-right">
+                                <div class="">
+                                    <div class="message-color slds-text-align_left">
+                                        {msg.comment}
+                                        <br />
+                                        <br />
+                                        <p><strong>Status:</strong> &nbsp;{msg.status}</p>
+                                        <p><strong>From:</strong> &nbsp;{msg.sender}</p>
+                                        <p><strong>SourceType:</strong> &nbsp;{msg.SourceType}</p>
+                                        <p><strong>Sent Date:</strong> &nbsp;{msg.formattedDate}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- External messages -->
+                    <template if:true={msg.Incoming}>
+                        <div key={msg.id} class="slds-m-around_small slds-text-align_left">
+                            <div class="message-left">
+                                <div class="message-color">
+                                    {msg.comment}
+                                    <br />
+                                    <br />
+                                    <p><strong>Status:</strong> &nbsp;{msg.status}</p>
+                                    <p><strong>From:</strong> &nbsp;{msg.sender}</p>
+                                    <p><strong>SourceType:</strong> &nbsp;{msg.SourceType}</p>
+                                    <p><strong>Sent Date:</strong> &nbsp;{msg.formattedDate}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+            </div>
+        </template>
+
+        <div class="slds-p-left_medium slds-p-right_medium slds-p-bottom_medium">
+
+            <!-- Status Picklist -->
+            <!-- <div>
+                <lightning-combobox label="Status" value={status} options={statusOptions} onchange={handleStatusChange}>
+                </lightning-combobox>
+                <br />
+            </div> -->
+            <!-- Status Picklis -->
+        <div class="slds-form-element">
+            <label class="slds-form-element__label">Status</label>
+
+            <div class="slds-combobox_container" data-id="status-combobox">
+                <div class={comboboxClass}
+                    role="combobox"
+                    aria-expanded={isDropdownOpen}
+                    aria-haspopup="listbox">
+
+            <!-- Search Input -->  
+            <lightning-input
+                type="search"
+                value={searchKey}
+                variant="label-hidden"
+                placeholder="Search Status"
+                onchange={handleSearch}
+                onclick={openDropdown}>
+            </lightning-input>
+
+            <!-- Dropdown -->
+            <template if:true={isDropdownOpen}>
+                <div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-5">
+                    <ul class="slds-listbox slds-listbox_vertical" role="listbox">
+
+                        <template for:each={filteredStatusOptions} for:item="item">
+                            <li key={item.value}
+                                role="presentation"
+                                class="slds-listbox__item"
+                                data-value={item.value}
+                                onclick={handleSelect}>
+
+                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small">
+                                    <span class="slds-media__figure">
+                                        <template if:true={item.selected}>
+                                            <lightning-icon
+                                                icon-name="utility:check"
+                                                size="x-small">
+                                            </lightning-icon>
+                                        </template>
+                                    </span>
+
+                                    <span class="slds-media__body">
+                                        <span class="slds-truncate">{item.label}</span>
+                                    </span>
+                                </div>
+
+                            </li>
+                        </template>
+
+                        <template if:true={noResult}>
+                            <li class="slds-listbox__item slds-text-color_weak slds-p-around_small">
+                                No results found
+                            </li>
+                        </template>
+
+                    </ul>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+
+
+            <!-- Comment Option -->
+            <template if:true={commentOptions.length}>
+                <lightning-radio-group label="Comment Option" options={commentOptions} value={commentOption}
+                    onchange={handleCommentOptionChange}>
+                </lightning-radio-group>
+                <br />
+            </template>
+
+            <!-- Default Comment Table -->
+            <template if:true={selectedDefault}>
+                <template if:true={commentTableData.length}>
+                    <lightning-datatable key-field="id" data={commentTableData} columns={commentTableColumns}
+                        onrowselection={handleRowSelection} selected-rows={selectedRowIds} max-row-selection="1">
+                    </lightning-datatable>
+                    <br />
+                </template>
+            </template>
+
+            <!-- Comment Textarea -->
+            <template if:true={commentOptions.length}>
+                <lightning-textarea label="Comment" value={comment} onchange={handleCommentChange}>
+                </lightning-textarea>
+                <br />
+            </template>
+
+            <!-- Internal Comment Checkbox -->
+            <lightning-input type="checkbox" label="Internal Comment (Don’t send to app)" checked={internalOnly}
+                onchange={handleInternalChange}>
+            </lightning-input>
+
+            <div class="slds-text-align_right slds-m-top_medium">
+                <lightning-button label="Create Comment" variant="brand" onclick={handleSave}>
+                </lightning-button>
+            </div>
+        </div>
+
+    </lightning-card>
+</template>

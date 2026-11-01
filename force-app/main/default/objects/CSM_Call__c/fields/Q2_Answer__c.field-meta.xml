@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Q2_Answer__c</fullName>
+    <description>Notes for question 2: Is there anything currently happening with the account that you feel needs more attention?</description>
+    <inlineHelpText>Is there anything currently happening with the account that you feel needs more attention?</inlineHelpText>
+    <label>Q2 Needs More Attention Notes</label>
+    <length>32768</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

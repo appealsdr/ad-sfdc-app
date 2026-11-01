@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stages__c</fullName>
+    <label>Stages</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>All Past clients</fullName>
+                <default>false</default>
+                <label>All Past clients</label>
+            </value>
+            <value>
+                <fullName>Called - no answer</fullName>
+                <default>false</default>
+                <label>Called - no answer</label>
+            </value>
+            <value>
+                <fullName>Follow up</fullName>
+                <default>false</default>
+                <label>Follow up</label>
+            </value>
+            <value>
+                <fullName>No interested</fullName>
+                <default>false</default>
+                <label>No interested</label>
+            </value>
+            <value>
+                <fullName>First meeting booked</fullName>
+                <default>false</default>
+                <label>First meeting booked</label>
+            </value>
+            <value>
+                <fullName>Second meeting</fullName>
+                <default>false</default>
+                <label>Second meeting</label>
+            </value>
+            <value>
+                <fullName>No show</fullName>
+                <default>false</default>
+                <label>No show</label>
+            </value>
+            <value>
+                <fullName>Cancelled</fullName>
+                <default>false</default>
+                <label>Cancelled</label>
+            </value>
+            <value>
+                <fullName>Not relevant (include reason)</fullName>
+                <default>false</default>
+                <label>Not relevant (include reason)</label>
+            </value>
+            <value>
+                <fullName>Long lead nurture (see if we can include a date to follow up)</fullName>
+                <default>false</default>
+                <label>Long lead nurture (see if we can include a date to follow up)</label>
+            </value>
+            <value>
+                <fullName>Won</fullName>
+                <default>false</default>
+                <label>Won</label>
+            </value>
+            <value>
+                <fullName>Lost (include reason)</fullName>
+                <default>false</default>
+                <label>Lost (include reason)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

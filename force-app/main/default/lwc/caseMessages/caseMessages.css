@@ -1,0 +1,330 @@
+.custom-header {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.header-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1d1c1d;
+    margin: 0;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.search-bar-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.messages-container {
+    max-height: 20rem;
+    min-height: 6rem;
+    overflow-y: auto;
+    padding: 0.25rem 0;
+}
+
+.messages-hint {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.6875rem;
+    color: #616061;
+    background: #f8f8f8;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.loading-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 0;
+}
+
+.message-row {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    align-items: flex-start;
+    cursor: pointer;
+}
+
+.message-row:hover,
+.message-row:focus {
+    background-color: #f8f8f8;
+    outline: none;
+}
+
+.message-row-internal {
+    background-color: #fafbfc;
+}
+
+.message-row-unread {
+    background-color: #fff7e0;
+}
+
+.message-row-unread::before {
+    content: '';
+    position: absolute;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: #e07800;
+    margin-left: -0.65rem;
+    margin-top: 0.4rem;
+}
+
+.message-row-fading {
+    background-color: #fafbfc;
+    transition: background-color 5s ease-out;
+}
+
+.message-row {
+    position: relative;
+}
+
+.reply-link {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: auto;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #1264a3;
+    cursor: pointer;
+    visibility: hidden;
+}
+
+.message-row:hover .reply-link,
+.message-row:focus .reply-link {
+    visibility: visible;
+}
+
+.reply-quote {
+    border-left: 2px solid #d1d1d1;
+    padding: 0.15rem 0.5rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    color: #616061;
+    background: #f8f8f8;
+}
+
+.read-receipt {
+    margin-top: 0.2rem;
+    font-size: 0.625rem;
+    color: #616061;
+    font-style: italic;
+}
+
+.avatar {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.25rem;
+    background: #611f69;
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.1rem;
+}
+
+.avatar-large {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.75rem;
+}
+
+.message-row-external .avatar {
+    background: #1264a3;
+}
+
+.message-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    line-height: 1.2;
+    margin-bottom: 0.1rem;
+}
+
+.sender-name {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #1d1c1d;
+}
+
+.message-time {
+    font-size: 0.6875rem;
+    color: #616061;
+    white-space: nowrap;
+}
+
+.type-badge {
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.type-badge-internal {
+    background: #ececf1;
+    color: #611f69;
+}
+
+.type-badge-external {
+    background: #e8f4fd;
+    color: #1264a3;
+}
+
+.message-body,
+.message-detail-body,
+.message-input-rich-text {
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: #1d1c1d;
+    word-break: break-word;
+}
+
+.message-body lightning-formatted-rich-text,
+.message-body lightning-formatted-rich-text * {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+}
+
+.message-detail-body {
+    padding-top: 0.75rem;
+    border-top: 1px solid #e8e8e8;
+}
+
+.message-detail-body lightning-formatted-rich-text,
+.message-detail-body lightning-formatted-rich-text * {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+}
+
+.empty-state {
+    padding: 1rem 0.75rem;
+    font-size: 0.8125rem;
+    color: #616061;
+    text-align: center;
+}
+
+.composer {
+    border-top: 1px solid #e8e8e8;
+    padding: 0.5rem 0.75rem 0.75rem;
+}
+
+.message-input-rich-text {
+    display: block;
+    min-height: 4.5rem;
+}
+
+.composer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+}
+
+.composer-hint {
+    font-size: 0.6875rem;
+    color: #616061;
+    margin-right: auto;
+}
+
+.reply-preview {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: #f8f8f8;
+    border-left: 3px solid #1264a3;
+    border-radius: 0.15rem;
+    padding: 0.35rem 0.5rem;
+    margin-bottom: 0.35rem;
+}
+
+.reply-preview-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.reply-preview-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #1264a3;
+}
+
+.reply-preview-snippet {
+    font-size: 0.75rem;
+    color: #616061;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reply-preview-cancel {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #616061;
+    font-size: 0.8125rem;
+    line-height: 1;
+    padding: 0.1rem;
+}
+
+.messages-card {
+    --slds-c-card-body-spacing-block-start: 0;
+    --slds-c-card-body-spacing-block-end: 0;
+    --slds-c-card-body-spacing-inline-start: 0;
+    --slds-c-card-body-spacing-inline-end: 0;
+}
+
+.message-modal-container {
+    max-width: 40rem;
+}
+
+.message-modal-header {
+    text-align: left;
+}
+
+.message-modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.message-modal-content {
+    padding: 1rem 1.25rem;
+}
+
+.message-modal-meta {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.message-modal-meta-text {
+    min-width: 0;
+}

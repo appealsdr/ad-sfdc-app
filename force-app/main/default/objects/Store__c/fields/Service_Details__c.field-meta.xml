@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Service_Details__c</fullName>
+    <label>Service Details</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Listing Creation/Optimization - Video Content</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization - Video Content</label>
+            </value>
+            <value>
+                <fullName>Listing Creation/Optimization - A+ Content</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization - A+ Content</label>
+            </value>
+            <value>
+                <fullName>Listing Creation/Optimization - Images</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization - Images</label>
+            </value>
+            <value>
+                <fullName>Listing Creation/Optimization - Content Creation</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization - Content Creation</label>
+            </value>
+            <value>
+                <fullName>Listing Creation</fullName>
+                <default>false</default>
+                <label>Listing Creation</label>
+            </value>
+            <value>
+                <fullName>Listing Advertising - PPC</fullName>
+                <default>false</default>
+                <label>Listing Advertising - PPC</label>
+            </value>
+            <value>
+                <fullName>VTR (Valid Tracking Rate)</fullName>
+                <default>false</default>
+                <label>VTR (Valid Tracking Rate)</label>
+            </value>
+            <value>
+                <fullName>PFCR (Pre-Fulfillment Cancel Rate)</fullName>
+                <default>false</default>
+                <label>PFCR (Pre-Fulfillment Cancel Rate)</label>
+            </value>
+            <value>
+                <fullName>LSR (Late Shipment Rate)</fullName>
+                <default>false</default>
+                <label>LSR (Late Shipment Rate)</label>
+            </value>
+            <value>
+                <fullName>ODR</fullName>
+                <default>false</default>
+                <label>ODR</label>
+            </value>
+            <value>
+                <fullName>Suspended Account</fullName>
+                <default>false</default>
+                <label>Suspended Account</label>
+            </value>
+            <value>
+                <fullName>Brand Registry</fullName>
+                <default>false</default>
+                <label>Brand Registry</label>
+            </value>
+            <value>
+                <fullName>Feedback Removal - FBA</fullName>
+                <default>false</default>
+                <label>Feedback Removal - FBA</label>
+            </value>
+            <value>
+                <fullName>Feedback Removal - FBM</fullName>
+                <default>false</default>
+                <label>Feedback Removal - FBM</label>
+            </value>
+            <value>
+                <fullName>Customer Messages</fullName>
+                <default>false</default>
+                <label>Customer Messages</label>
+            </value>
+            <value>
+                <fullName>A-Z Claims</fullName>
+                <default>false</default>
+                <label>A-Z Claims</label>
+            </value>
+            <value>
+                <fullName>Listings Issues</fullName>
+                <default>false</default>
+                <label>Listings Issues</label>
+            </value>
+            <value>
+                <fullName>Violations - High critical</fullName>
+                <default>false</default>
+                <label>Violations - High critical</label>
+            </value>
+            <value>
+                <fullName>Violations - High repeat</fullName>
+                <default>false</default>
+                <label>Violations - High repeat</label>
+            </value>
+            <value>
+                <fullName>Violations - High impact</fullName>
+                <default>false</default>
+                <label>Violations - High impact</label>
+            </value>
+            <value>
+                <fullName>Violations - Medium impact</fullName>
+                <default>false</default>
+                <label>Violations - Medium impact</label>
+            </value>
+            <value>
+                <fullName>Violations - Low impact</fullName>
+                <default>false</default>
+                <label>Violations - Low impact</label>
+            </value>
+            <value>
+                <fullName>Violations - No impact</fullName>
+                <default>false</default>
+                <label>Violations - No impact</label>
+            </value>
+            <value>
+                <fullName>All Violations</fullName>
+                <default>false</default>
+                <label>All Violations</label>
+            </value>
+            <value>
+                <fullName>Violations Removal</fullName>
+                <default>false</default>
+                <label>Violations Removal</label>
+            </value>
+            <value>
+                <fullName>Seller Account Creation</fullName>
+                <default>false</default>
+                <label>Seller Account Creation</label>
+            </value>
+            <value>
+                <fullName>Private Label</fullName>
+                <default>false</default>
+                <label>Private Label</label>
+            </value>
+            <value>
+                <fullName>Brand Protection</fullName>
+                <default>false</default>
+                <label>Brand Protection</label>
+            </value>
+            <value>
+                <fullName>Storage Increase</fullName>
+                <default>false</default>
+                <label>Storage Increase</label>
+            </value>
+            <value>
+                <fullName>Trademark</fullName>
+                <default>false</default>
+                <label>Trademark</label>
+            </value>
+            <value>
+                <fullName>Compliance</fullName>
+                <default>false</default>
+                <label>Compliance</label>
+            </value>
+            <value>
+                <fullName>Arbitration</fullName>
+                <default>false</default>
+                <label>Arbitration</label>
+            </value>
+            <value>
+                <fullName>Fund Disbursement</fullName>
+                <default>false</default>
+                <label>Fund Disbursement</label>
+            </value>
+            <value>
+                <fullName>Feedback Removal</fullName>
+                <default>false</default>
+                <label>Feedback Removal</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

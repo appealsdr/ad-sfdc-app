@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Choose Task Type --></label>
+    <name>Choose_Task_Type__c</name>
+    <picklistValues>
+        <masterLabel>Account Health Management</masterLabel>
+        <translation><!-- Account Health Management --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>General Task</masterLabel>
+        <translation><!-- General Task --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

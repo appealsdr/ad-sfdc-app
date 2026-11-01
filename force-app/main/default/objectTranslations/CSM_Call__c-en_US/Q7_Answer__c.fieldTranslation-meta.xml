@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- Is there anything else we can help you with right now? --></help>
+    <label><!-- Q7 Anything Else to Help With Notes --></label>
+    <name>Q7_Answer__c</name>
+</CustomFieldTranslation>

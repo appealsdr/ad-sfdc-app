@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Case File</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Case Files</value>
+    </caseValues>
+    <layouts>
+        <layout>Case File Layout</layout>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+        <sections>
+            <label><!-- File Info --></label>
+            <section>File Info</section>
+        </sections>
+    </layouts>
+    <quickActions>
+        <label><!-- Request File Again --></label>
+        <name>Request_File_Again</name>
+    </quickActions>
+    <quickActions>
+        <label><!-- Send Case File Data --></label>
+        <name>Send_Case_File_Data</name>
+    </quickActions>
+    <startsWith>Consonant</startsWith>
+    <validationRules>
+        <errorMessage><!-- You cannot change Status from &apos;Failed&apos; --></errorMessage>
+        <name>Prevent_Change_From_Failed_To_All</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- Mention the Status Reason --></errorMessage>
+        <name>Require_Status_Reason_When_Verif_Failed</name>
+    </validationRules>
+</CustomObjectTranslation>

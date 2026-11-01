@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Document Type --></label>
+    <name>Document_Type__c</name>
+    <picklistValues>
+        <masterLabel>Appeal</masterLabel>
+        <translation><!-- Appeal --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>BOL (Bill of Lading)</masterLabel>
+        <translation><!-- BOL (Bill of Lading) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>BOL.</masterLabel>
+        <translation><!-- BOL. --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Bank Information linked to the account</masterLabel>
+        <translation><!-- Bank Information linked to the account --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Bank Statement</masterLabel>
+        <translation><!-- Bank Statement --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Barcode / UPC / EAN</masterLabel>
+        <translation><!-- Barcode / UPC / EAN --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Registration Certificate</masterLabel>
+        <translation><!-- Brand Registration Certificate --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Business Registration</masterLabel>
+        <translation><!-- Business Registration --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>CPC Certificate</masterLabel>
+        <translation><!-- CPC Certificate --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Correct Pricing Information</masterLabel>
+        <translation><!-- Correct Pricing Information --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Correct Product Information</masterLabel>
+        <translation><!-- Correct Product Information --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Drivers license</masterLabel>
+        <translation><!-- Drivers license --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EIN Document</masterLabel>
+        <translation><!-- EIN Document --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>FDA Documentation</masterLabel>
+        <translation><!-- FDA Documentation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>File Upload</masterLabel>
+        <translation><!-- File Upload --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>GCC</masterLabel>
+        <translation><!-- GCC --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>GS1 Certificate</masterLabel>
+        <translation><!-- GS1 Certificate --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ISO Certificate</masterLabel>
+        <translation><!-- ISO Certificate --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Identification</masterLabel>
+        <translation><!-- Identification --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Image of Physical Product</masterLabel>
+        <translation><!-- Image of Physical Product --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Invoice</masterLabel>
+        <translation><!-- Invoice --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Letter of Authorization</masterLabel>
+        <translation><!-- Letter of Authorization --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Letter of Retraction</masterLabel>
+        <translation><!-- Letter of Retraction --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Letter or Acknowledgment of Violation</masterLabel>
+        <translation><!-- Letter or Acknowledgment of Violation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Images</masterLabel>
+        <translation><!-- Listing Images --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Payment Proof</masterLabel>
+        <translation><!-- Payment Proof --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Photo of Product Showing Ingredient</masterLabel>
+        <translation><!-- Photo of Product Showing Ingredient --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Safety Test Report</masterLabel>
+        <translation><!-- Safety Test Report --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Supplier Invoice</masterLabel>
+        <translation><!-- Supplier Invoice --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Supply Chain Proof</masterLabel>
+        <translation><!-- Supply Chain Proof --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Testing Report</masterLabel>
+        <translation><!-- Testing Report --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Trademark Certificate</masterLabel>
+        <translation><!-- Trademark Certificate --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Trademark Receipt</masterLabel>
+        <translation><!-- Trademark Receipt --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>purchase order</masterLabel>
+        <translation><!-- purchase order --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

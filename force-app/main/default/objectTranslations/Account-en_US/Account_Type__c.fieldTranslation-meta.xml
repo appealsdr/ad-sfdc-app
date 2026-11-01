@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Store Type --></label>
+    <name>Account_Type__c</name>
+    <picklistValues>
+        <masterLabel>A-La-Carte</masterLabel>
+        <translation><!-- A-La-Carte --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Account Management</masterLabel>
+        <translation><!-- Account Management --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Analyst</masterLabel>
+        <translation><!-- Analyst --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Competitor</masterLabel>
+        <translation><!-- Competitor --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Customer</masterLabel>
+        <translation><!-- Customer --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Distributor</masterLabel>
+        <translation><!-- Distributor --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Integrator</masterLabel>
+        <translation><!-- Integrator --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Investor</masterLabel>
+        <translation><!-- Investor --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Other</masterLabel>
+        <translation><!-- Other --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Partner</masterLabel>
+        <translation><!-- Partner --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Press</masterLabel>
+        <translation><!-- Press --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Prospect</masterLabel>
+        <translation><!-- Prospect --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Reseller</masterLabel>
+        <translation><!-- Reseller --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Supplier</masterLabel>
+        <translation><!-- Supplier --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Vendor</masterLabel>
+        <translation><!-- Vendor --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

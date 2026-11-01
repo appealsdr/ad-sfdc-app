@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Closed - Amazon Denied 1</label>
+    <protected>false</protected>
+    <values>
+        <field>Case_Status__c</field>
+        <value xsi:type="xsd:string">Closed - Amazon Denied</value>
+    </values>
+    <values>
+        <field>Default_Comment__c</field>
+        <value xsi:type="xsd:string">Unfortunately, Amazon has denied the final appeal for this case. We have exhausted all available options and are closing the case.</value>
+    </values>
+</CustomMetadata>

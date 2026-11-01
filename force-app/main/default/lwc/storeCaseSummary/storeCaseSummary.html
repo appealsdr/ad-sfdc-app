@@ -1,0 +1,25 @@
+<template>
+    <lightning-card title="Cases" icon-name="standard:case">
+        <lightning-button
+            slot="actions"
+            label="New Case"
+            onclick={handleNewCase}>
+        </lightning-button>
+
+        <template if:true={showError}>
+            <div class="slds-p-horizontal_medium slds-p-bottom_small">
+                <div class="slds-text-color_error">Unable to load case counts.</div>
+            </div>
+        </template>
+
+        <div class="summary-grid slds-p-horizontal_medium slds-p-bottom_medium">
+            <template for:each={caseGroups} for:item="group">
+                <div key={group.label} class={group.className}>
+                    <div class="summary-value">{group.value}</div>
+                    <div class="summary-label">{group.label}</div>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+
+</template>

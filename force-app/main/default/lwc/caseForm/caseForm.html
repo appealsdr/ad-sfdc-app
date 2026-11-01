@@ -1,0 +1,64 @@
+<template>
+    <template if:true={showSpinner}>
+        <div style="z-index: 10000 !important;">
+            <lightning-spinner alternative-text="Uploading......" size="medium"
+                style="z-index: 10000 !important;"></lightning-spinner>
+        </div>
+    </template>
+    <!-- <div class="slds-section slds-is-open">
+        <h3 class="slds-section__title">
+            <lightning-icon icon-name="standard:case" size="small" class="slds-m-right_x-small"></lightning-icon>
+            <span class="slds-text-heading_medium">Create Case</span>
+        </h3>
+    </div> -->
+
+    <template if:true={showOpportunityLookup}>
+        <lightning-layout multiple-rows>
+            <lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="6"
+                class="slds-p-around_x-small">
+                <lightning-record-picker class="slds-form-element__control validate" placeholder="Search Opportunity..."
+                    object-api-name="Opportunity" label="Opportunity" value={oppId} required
+                    onchange={handleRecordPicker} disabled={isDisabledVisit}>
+                </lightning-record-picker>
+            </lightning-layout-item>
+        </lightning-layout>
+    </template>
+    
+    <template if:true={showStoreScreen}>
+         
+        <c-store-form record-id={getRecordId} store-creation-source="OppCase"
+            selected-store-records={selectedStoreRecords} selected-store-ids={selectedStoreIds}
+            onstoredata={handleStoreData}
+            selection-mode={Store_Form_Config_LABEL.table_Record_Selection_Mode}></c-store-form>
+    </template>
+
+
+    <template if:true={showCaseScreen}>
+        <c-case-create-edit-form action-for={actionFor} selected-store-records={selectedStoreRecords}
+            list-wrap-cases-copy={listWrapCases} record-type-options={recordTypeOptions}
+            case-field-set-wrap={caseFieldSetWrap} map-rt-id-and-name={mapRtIdAndName}
+            map-r-t-name-and-id={mapRTNameAndId} map-service-type-price={mapServiceTypePrice}>
+        </c-case-create-edit-form>
+    </template>
+
+    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="12"
+        class="slds-p-around_x-small">
+        <div class="" style="float:right;padding-right: 20px;"> <!--slds-align_absolute-centert-->
+            <template if:true={showBackBtn}>
+                <lightning-button variant="brand-outline" label="Back" name="Back"
+                    onclick={handleNextBack}></lightning-button>
+            </template>
+            <template if:true={showNextBtn}>
+                <lightning-button variant="brand-outline" name="Next" label="Next" class="slds-m-left_small"
+                    disabled={isDisabledNextBtn} onclick={handleNextBack}></lightning-button>
+            </template>
+            <template if:true={showCreateUpdateBtn}>
+                <lightning-button variant="brand" label={labelForAction} name="upsertCases" class="slds-m-left_small"
+                    onclick={handleUpsertCases}></lightning-button>
+            </template>
+        </div>
+    </lightning-layout-item>
+    <div style="height:50px;"> </div> <!--slds-align_absolute-centert-->
+
+
+</template>

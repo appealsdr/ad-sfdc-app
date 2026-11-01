@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Account Type --></label>
+    <name>Account_Type__c</name>
+    <picklistValues>
+        <masterLabel>A-La-Carte</masterLabel>
+        <translation><!-- A-La-Carte --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Full Account Management</masterLabel>
+        <translation><!-- Full Account Management --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Managed Account Health</masterLabel>
+        <translation><!-- Managed Account Health --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Managed Amazon Marketing</masterLabel>
+        <translation><!-- Managed Amazon Marketing --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

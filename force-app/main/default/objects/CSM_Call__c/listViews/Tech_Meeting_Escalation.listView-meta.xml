@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tech_Meeting_Escalation</fullName>
+    <booleanFilter>1 AND (2 OR 3 OR 4) AND 5</booleanFilter>
+    <columns>NAME</columns>
+    <columns>Account__c</columns>
+    <columns>Call_Date__c</columns>
+    <columns>Assigned_Tech__c</columns>
+    <columns>Client_Health__c</columns>
+    <columns>Priority__c</columns>
+    <columns>Tech_Action_Required__c</columns>
+    <columns>Tech_Action_Description__c</columns>
+    <columns>Tech_Action_Resolved__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Assigned_To_Current_User__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>Client_Health__c</field>
+        <operation>equals</operation>
+        <value>Red,Yellow</value>
+    </filters>
+    <filters>
+        <field>Priority__c</field>
+        <operation>equals</operation>
+        <value>High</value>
+    </filters>
+    <filters>
+        <field>Tech_Action_Required__c</field>
+        <operation>equals</operation>
+        <value>1</value>
+    </filters>
+    <filters>
+        <field>Tech_Action_Resolved__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <label>Tech Meeting/Escalation</label>
+</ListView>

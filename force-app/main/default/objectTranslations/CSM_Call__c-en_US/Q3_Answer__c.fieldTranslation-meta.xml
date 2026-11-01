@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- Are you satisfied with the communication and updates from your assigned tech? --></help>
+    <label><!-- Q3 Satisfied With Tech Updates Notes --></label>
+    <name>Q3_Answer__c</name>
+</CustomFieldTranslation>

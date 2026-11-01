@@ -1,0 +1,7 @@
+.compact-inline {
+    margin-bottom: 0.5rem;
+}
+
+.compact-inline lightning-input {
+    margin: 0 !important;
+}

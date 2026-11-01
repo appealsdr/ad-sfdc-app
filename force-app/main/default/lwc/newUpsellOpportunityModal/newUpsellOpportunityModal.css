@@ -1,0 +1,58 @@
+.spinner-holder {
+    position: relative;
+    min-height: 6rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 0.5rem 1rem;
+}
+
+.summary-grid dt {
+    font-size: 0.75rem;
+    color: var(--slds-g-color-neutral-base-50, #747474);
+}
+
+.summary-grid dd {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.product-table {
+    height: 22rem;
+}
+
+.num {
+    text-align: right;
+}
+
+.qty {
+    width: 8rem;
+}
+
+.remove {
+    width: 2.5rem;
+}
+
+.total {
+    font-weight: 700;
+}
+
+.name-store {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.5rem 1rem;
+    align-items: start;
+}
+
+.store-meta {
+    margin-top: 0.125rem;
+}

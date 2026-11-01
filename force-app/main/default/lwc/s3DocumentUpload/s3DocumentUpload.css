@@ -1,0 +1,58 @@
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.loading-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.upload-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0 1rem 1rem;
+}
+
+.path-description {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #181818;
+}
+
+.context-message,
+.accepted-formats,
+.upload-status {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #706e6b;
+    word-break: break-word;
+}
+
+.error-message {
+    margin: 0;
+    padding: 0 1rem 1rem;
+    color: #ba0517;
+    font-size: 0.875rem;
+}
+
+.file-input-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.file-input-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #444;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-start;
+}

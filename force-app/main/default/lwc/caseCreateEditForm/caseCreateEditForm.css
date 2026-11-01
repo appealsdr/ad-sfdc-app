@@ -1,0 +1,11 @@
+@import "c/sharedCss";
+
+.float-right {
+    margin-left: auto;   /* pushes delete button to the right */
+    display: flex;
+    align-items: center;
+}
+
+/* .marginTopInMinus {
+    margin-top: -10px;
+} */

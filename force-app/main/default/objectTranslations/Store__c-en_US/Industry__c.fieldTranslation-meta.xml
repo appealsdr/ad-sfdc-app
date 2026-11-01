@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Industry --></label>
+    <name>Industry__c</name>
+    <picklistValues>
+        <masterLabel>Alexa Skills</masterLabel>
+        <translation><!-- Alexa Skills --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Amazon Autos</masterLabel>
+        <translation><!-- Amazon Autos --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Amazon Devices</masterLabel>
+        <translation><!-- Amazon Devices --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Amazon Global Store</masterLabel>
+        <translation><!-- Amazon Global Store --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Amazon One Medical</masterLabel>
+        <translation><!-- Amazon One Medical --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Amazon Pharmacy</masterLabel>
+        <translation><!-- Amazon Pharmacy --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Amazon Resale</masterLabel>
+        <translation><!-- Amazon Resale --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Appliances</masterLabel>
+        <translation><!-- Appliances --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Apps &amp; Games</masterLabel>
+        <translation><!-- Apps &amp; Games --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Arts, Crafts &amp; Sewing</masterLabel>
+        <translation><!-- Arts, Crafts &amp; Sewing --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Audible Books &amp; Originals</masterLabel>
+        <translation><!-- Audible Books &amp; Originals --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Automotive Parts &amp; Accessories</masterLabel>
+        <translation><!-- Automotive Parts &amp; Accessories --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Baby</masterLabel>
+        <translation><!-- Baby --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Baby Clothing, Shoes &amp; Jewelry</masterLabel>
+        <translation><!-- Baby Clothing, Shoes &amp; Jewelry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Beauty &amp; Personal Care</masterLabel>
+        <translation><!-- Beauty &amp; Personal Care --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Books</masterLabel>
+        <translation><!-- Books --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Boy&apos;s Clothing, Shoes &amp; Jewelry</masterLabel>
+        <translation><!-- Boy&apos;s Clothing, Shoes &amp; Jewelry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>CDs &amp; Vinyl</masterLabel>
+        <translation><!-- CDs &amp; Vinyl --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Cell Phones &amp; Accessories</masterLabel>
+        <translation><!-- Cell Phones &amp; Accessories --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Clothing, Shoes &amp; Jewelry</masterLabel>
+        <translation><!-- Clothing, Shoes &amp; Jewelry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Collectibles &amp; Fine Art</masterLabel>
+        <translation><!-- Collectibles &amp; Fine Art --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Computers</masterLabel>
+        <translation><!-- Computers --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Credit and Payment Cards</masterLabel>
+        <translation><!-- Credit and Payment Cards --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Digital Music</masterLabel>
+        <translation><!-- Digital Music --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Garden &amp; Outdoor</masterLabel>
+        <translation><!-- Garden &amp; Outdoor --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Gift Cards</masterLabel>
+        <translation><!-- Gift Cards --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Girl&apos;s Clothing, Shoes &amp; Jewelry</masterLabel>
+        <translation><!-- Girl&apos;s Clothing, Shoes &amp; Jewelry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Grocery &amp; Gourmet Food</masterLabel>
+        <translation><!-- Grocery &amp; Gourmet Food --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Handmade</masterLabel>
+        <translation><!-- Handmade --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Health, Household &amp; Baby Care</masterLabel>
+        <translation><!-- Health, Household &amp; Baby Care --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Home &amp; Business Services</masterLabel>
+        <translation><!-- Home &amp; Business Services --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Home &amp; Kitchen</masterLabel>
+        <translation><!-- Home &amp; Kitchen --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Industrial &amp; Scientific</masterLabel>
+        <translation><!-- Industrial &amp; Scientific --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Just for Prime</masterLabel>
+        <translation><!-- Just for Prime --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Kindle Store</masterLabel>
+        <translation><!-- Kindle Store --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Luggage &amp; Travel Gear</masterLabel>
+        <translation><!-- Luggage &amp; Travel Gear --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Luxury Stores</masterLabel>
+        <translation><!-- Luxury Stores --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Magazine Subscriptions</masterLabel>
+        <translation><!-- Magazine Subscriptions --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Men&apos;s Clothing, Shoes &amp; Jewelry</masterLabel>
+        <translation><!-- Men&apos;s Clothing, Shoes &amp; Jewelry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Movies &amp; TV</masterLabel>
+        <translation><!-- Movies &amp; TV --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Musical Instruments</masterLabel>
+        <translation><!-- Musical Instruments --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Office Products</masterLabel>
+        <translation><!-- Office Products --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Pet Supplies</masterLabel>
+        <translation><!-- Pet Supplies --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Premium Beauty</masterLabel>
+        <translation><!-- Premium Beauty --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Prime Video</masterLabel>
+        <translation><!-- Prime Video --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Smart Home</masterLabel>
+        <translation><!-- Smart Home --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Software</masterLabel>
+        <translation><!-- Software --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Sports &amp; Outdoors</masterLabel>
+        <translation><!-- Sports &amp; Outdoors --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Subscribe &amp; Save</masterLabel>
+        <translation><!-- Subscribe &amp; Save --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Subscription Boxes</masterLabel>
+        <translation><!-- Subscription Boxes --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Tools &amp; Home Improvement</masterLabel>
+        <translation><!-- Tools &amp; Home Improvement --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Toys &amp; Games</masterLabel>
+        <translation><!-- Toys &amp; Games --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Under $10</masterLabel>
+        <translation><!-- Under $10 --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Video Games</masterLabel>
+        <translation><!-- Video Games --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Whole Foods Market</masterLabel>
+        <translation><!-- Whole Foods Market --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Women&apos;s Clothing, Shoes &amp; Jewelry</masterLabel>
+        <translation><!-- Women&apos;s Clothing, Shoes &amp; Jewelry --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

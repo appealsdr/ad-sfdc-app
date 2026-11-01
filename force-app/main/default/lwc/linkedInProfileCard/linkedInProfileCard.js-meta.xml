@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>LinkedIn Profile Card</masterLabel>
+    <description>Shows public LinkedIn company or profile info for the URL stored in a field on the record.</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="urlField" type="String" label="LinkedIn URL Field"
+                datasource="apex://LinkedInUrlFieldPicklist"
+                description="Field on this object that holds the LinkedIn URL (e.g. https://www.linkedin.com/company/ewc-group-inc/)."/>
+            <property name="fieldPath" type="String" label="Related Field Path (optional)"
+                description="Overrides the field above to read a related record's field, e.g. Account.LinkedIn_URL__c on Contact."/>
+            <property name="cardTitle" type="String" label="Card Title" default="LinkedIn"/>
+            <supportedFormFactors>
+                <supportedFormFactor type="Small"/>
+                <supportedFormFactor type="Large"/>
+            </supportedFormFactors>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

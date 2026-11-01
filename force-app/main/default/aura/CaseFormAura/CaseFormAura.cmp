@@ -1,0 +1,6 @@
+<aura:component implements="force:hasRecordId,lightning:isUrlAddressable,lightning:actionOverride,force:lightningQuickActionWithoutHeader,flexipage:availableForAllPageTypes"
+        access="global">
+     <!-- <c:caseForm recordId="{!v.recordId}" /> -->
+      <c:caseForm pageReference="{!v.pageReference}" />
+     
+</aura:component>

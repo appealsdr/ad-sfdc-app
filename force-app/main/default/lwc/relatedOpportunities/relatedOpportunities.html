@@ -1,0 +1,33 @@
+<template>
+    <lightning-card title={cardTitle} icon-name="standard:opportunity">
+        <lightning-button
+            slot="actions"
+            label="New Opportunity"
+            icon-name="utility:add"
+            onclick={handleNew}
+        ></lightning-button>
+
+        <div class="slds-var-p-horizontal_small">
+            <template lwc:if={isLoading}>
+                <div class="spinner-holder">
+                    <lightning-spinner alternative-text="Loading opportunities" size="small"></lightning-spinner>
+                </div>
+            </template>
+            <template lwc:elseif={error}>
+                <p class="slds-text-color_error">{error}</p>
+            </template>
+            <template lwc:elseif={hasOpportunities}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={opportunities}
+                    columns={columns}
+                    hide-checkbox-column
+                    column-widths-mode="auto"
+                ></lightning-datatable>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak slds-var-p-vertical_small">No opportunities yet. Use New Opportunity to create one.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

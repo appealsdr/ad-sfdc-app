@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Waiting on Amazon 2</label>
+    <protected>false</protected>
+    <values>
+        <field>Case_Status__c</field>
+        <value xsi:type="xsd:string">Waiting on Amazon</value>
+    </values>
+    <values>
+        <field>Default_Comment__c</field>
+        <value xsi:type="xsd:string">Your case has been submitted to Amazon. Response times can vary — we will follow up and keep you informed as soon as we hear back.</value>
+    </values>
+</CustomMetadata>

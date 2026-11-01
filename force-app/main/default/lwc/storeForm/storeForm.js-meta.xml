@@ -1,0 +1,32 @@
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>61.0</apiVersion>
+	<isExposed>true</isExposed>
+	<masterLabel>Store form</masterLabel>
+	<targets>
+		<target>lightning__AppPage</target>
+		<target>lightning__HomePage</target>
+		<target>lightning__RecordPage</target>
+		<target>lightning__Tab</target>
+	</targets>
+	<targetConfigs>
+		<targetConfig targets="lightning__AppPage">
+			<supportedFormFactors>
+				<supportedFormFactor type="Small"/>
+				<supportedFormFactor type="Large"/>
+			</supportedFormFactors>
+		</targetConfig>
+		<targetConfig targets="lightning__HomePage">
+			<supportedFormFactors>
+				<supportedFormFactor type="Large"/>
+			</supportedFormFactors>
+		</targetConfig>
+		<targetConfig targets="lightning__RecordPage">
+			<supportedFormFactors>
+				<supportedFormFactor type="Small"/>
+				<supportedFormFactor type="Large"/>
+			</supportedFormFactors>
+			<property name="storeCreationSource" type="String" label="Store Creation Source" default="OppStore"
+                description="Purpose of this component to attach with Opportunity or not (e.g. OppStore,OppCase,OppService)" />
+		</targetConfig>
+	</targetConfigs>
+</LightningComponentBundle>

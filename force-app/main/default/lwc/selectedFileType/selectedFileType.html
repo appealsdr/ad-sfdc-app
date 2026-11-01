@@ -1,0 +1,19 @@
+<template>
+    <lightning-card>
+        <header class="slds-p-around_medium slds-text-align_center custom-header">
+            <h1 class="slds-text-heading_medium">Documents</h1>
+        </header>
+        <br />
+        <div class="slds-p-around_medium">
+            <div style="height: 300px;">
+                <lightning-datatable key-field="Id" data={CaseDocTypeListsData} columns={columns}
+                    draft-values={draftValues} onsave={handleSaveInlineEdit} onrowselection={handleRowSelection} show-row-number-column="false">
+                </lightning-datatable>
+            </div>
+            <div class="slds-m-around_medium slds-grid slds-grid_align-end">
+                <lightning-button variant="brand" label="Request Document" onclick={handleSave}>
+                </lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- S3 bucket name used for case file uploads and store file uploads. --></help>
+    <label><!-- AWS S3 Bucket --></label>
+    <name>AWS_S3_Bucket__c</name>
+</CustomFieldTranslation>

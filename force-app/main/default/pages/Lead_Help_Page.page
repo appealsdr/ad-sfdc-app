@@ -1,0 +1,246 @@
+<apex:page standardController="Lead" showHeader="true" sidebar="false"
+           title="Lead Status Migration Guide" applyHtmlTag="true" docType="html-5.0">
+
+
+  <style type="text/css">
+    .lsm-wrap { font-family: "Salesforce Sans", Arial, sans-serif; font-size: 13px;
+                color: #16325c; padding: 16px; background: #f4f6f9; }
+    .lsm-card { background:#fff; border:1px solid #d8dde6; border-radius:4px;
+                padding:16px 20px; margin-bottom:16px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+    .lsm-wrap h1 { font-size:20px; margin:0 0 4px; font-weight:600; }
+    .lsm-wrap h2 { font-size:16px; margin:0 0 12px; font-weight:600;
+                   border-bottom:2px solid #0070d2; display:inline-block; padding-bottom:3px; }
+    .lsm-sub { color:#54698d; font-size:12px; margin:0 0 16px; }
+    .lsm-tbl { width:100%; border-collapse:collapse; margin-top:8px; }
+    .lsm-tbl th { background:#f3f3f3; text-align:left; padding:8px 10px; font-size:12px;
+                  text-transform:uppercase; letter-spacing:.4px; color:#54698d;
+                  border-bottom:2px solid #d8dde6; vertical-align:bottom; }
+    .lsm-tbl td { padding:8px 10px; border-bottom:1px solid #e0e5ee; vertical-align:top; }
+    .lsm-tbl tr:nth-child(even) td { background:#fafbfc; }
+    .lsm-def { margin:0; padding:0; list-style:none; }
+    .lsm-def li { padding:8px 0 8px 12px; border-left:3px solid #d8dde6; margin-bottom:8px; }
+    .lsm-def li.st-new     { border-left-color:#0070d2; }
+    .lsm-def li.st-work    { border-left-color:#ffb75d; }
+    .lsm-def li.st-nurt    { border-left-color:#9050e9; }
+    .lsm-def li.st-qual    { border-left-color:#04844b; }
+    .lsm-def li.st-conv    { border-left-color:#16325c; }
+    .lsm-def li.st-unqual  { border-left-color:#c23934; }
+    .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px;
+             font-weight:700; color:#fff; white-space:nowrap; }
+    .b-new{background:#0070d2;} .b-work{background:#e09400;} .b-nurt{background:#9050e9;}
+    .b-qual{background:#04844b;} .b-conv{background:#16325c;} .b-unqual{background:#c23934;}
+    .b-none{background:#54698d;}
+    code { background:#f3f3f3; padding:1px 4px; border-radius:3px; font-size:12px; color:#c23934; }
+    .warn { color:#e09400; font-weight:700; }
+    .lsm-note { background:#fef8e7; border-left:3px solid #ffb75d; padding:10px 12px;
+                font-size:12px; margin-top:12px; border-radius:0 3px 3px 0; }
+    .lsm-ctx { font-size:12px; color:#54698d; }
+    @media (max-width:600px){ .lsm-tbl, .lsm-tbl tbody, .lsm-tbl tr, .lsm-tbl td { display:block; width:100%; }
+      .lsm-tbl thead { display:none; }
+      .lsm-tbl tr { border:1px solid #d8dde6; margin-bottom:10px; padding:6px; }
+      .lsm-tbl td { border:none; border-bottom:1px dashed #e0e5ee; } }
+  </style>
+
+  <div class="lsm-wrap">
+
+    <div class="lsm-card">
+      <h1>Lead Status Definitions After Migration</h1>
+      <p class="lsm-sub">Reference for spreadsheet&nbsp;&rarr;&nbsp;Salesforce Lead migration, disposition mapping and nurture cadence.</p>
+      <apex:outputPanel rendered="{!NOT(ISBLANK(Lead.Id))}" layout="block">
+        <p class="lsm-ctx">
+          Current record: <strong><apex:outputField value="{!Lead.Name}"/></strong>
+          &nbsp;&middot;&nbsp; Company: <apex:outputField value="{!Lead.Company}"/>
+          &nbsp;&middot;&nbsp; Status: <strong><apex:outputField value="{!Lead.Status}"/></strong>
+          &nbsp;&middot;&nbsp; Rating: <apex:outputField value="{!Lead.Rating}"/>
+        </p>
+      </apex:outputPanel>
+    </div>
+
+    <!-- ============ STATUS DEFINITIONS ============ -->
+    <div class="lsm-card">
+      <h2>Status definitions</h2>
+      <ul class="lsm-def">
+        <li class="st-new">
+          <span class="badge b-new">New</span>
+          &nbsp;Imported/created, zero touches. <strong>SLA:</strong> first call within 1 business day.
+        </li>
+        <li class="st-work">
+          <span class="badge b-work">Working</span>
+          &nbsp;Actively being called (attempts 1&ndash;4, busy, dropped, hot). Lead stays here max ~2 weeks.
+        </li>
+        <li class="st-nurt">
+          <span class="badge b-nurt">Nurturing</span>
+          &nbsp;Alive but not now: long-term nurture, &ldquo;too small today&rdquo;, timing-based not-interested,
+          4+ no-answers. Always has a cadence + next follow-up date. This is the marketing re-engagement pool.
+        </li>
+        <li class="st-qual">
+          <span class="badge b-qual">Qualified</span>
+          &nbsp;Meets criteria (Amazon seller, &gt;$1M) and meeting booked/showed. Next step: convert.
+        </li>
+        <li class="st-conv">
+          <span class="badge b-conv">Converted</span>
+          &nbsp;Standard; set by lead conversion only (<strong>never manually</strong>).
+        </li>
+        <li class="st-unqual">
+          <span class="badge b-unqual">Unqualified</span>
+          &nbsp;Dead: bad number, no longer selling, below threshold (hard), not an Amazon seller, hard no.
+          Always carries a <code>Disqualification_Reason</code>. Bad Number / Not Qualified flow into the
+          weekly replacement export.
+        </li>
+      </ul>
+    </div>
+
+    <!-- ============ 1. STATUS MAPPING TABLE ============ -->
+    <div class="lsm-card">
+      <h2>1. Status mapping table</h2>
+      <table class="lsm-tbl">
+        <thead>
+          <tr>
+            <th style="width:18%">Spreadsheet status</th>
+            <th style="width:14%">&rarr; Lead Status</th>
+            <th style="width:16%">Call_Disposition__c</th>
+            <th style="width:52%">Extra fields set on migration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Called no answer</td>
+            <td><span class="badge b-work">Working</span></td>
+            <td>No Answer</td>
+            <td>Call_Attempts = 1; Next Follow-Up = +2 days</td>
+          </tr>
+          <tr>
+            <td>2nd Called no answer</td>
+            <td><span class="badge b-work">Working</span></td>
+            <td>No Answer</td>
+            <td>Call_Attempts = 2; Next Follow-Up = +3 days</td>
+          </tr>
+          <tr>
+            <td>Called 3 times</td>
+            <td><span class="badge b-work">Working</span></td>
+            <td>No Answer</td>
+            <td>Call_Attempts = 3; Next Follow-Up = +1 week; candidate for Nurturing if no answer on 4th</td>
+          </tr>
+          <tr>
+            <td>Not interested (include reason)</td>
+            <td><span class="badge b-nurt">Nurturing</span> <span class="warn">&#9888;</span>
+                or <span class="badge b-unqual">Unqualified</span></td>
+            <td>Not Interested</td>
+            <td>If reason = timing/budget &rarr; Nurturing, cadence 2&ndash;3 Months; if hard no &rarr; Unqualified,
+                Disqualification_Reason = Not Interested. Migrate the free-text reason into Description.</td>
+          </tr>
+          <tr>
+            <td>Hot Lead!!</td>
+            <td><span class="badge b-work">Working</span></td>
+            <td>Interested &mdash; Hot</td>
+            <td><code>Rating = Hot</code>; Next Follow-Up = same/next day; priority task</td>
+          </tr>
+          <tr>
+            <td>Follow up was busy</td>
+            <td><span class="badge b-work">Working</span></td>
+            <td>Busy &mdash; Call Back</td>
+            <td>Next Follow-Up = +1&ndash;2 days</td>
+          </tr>
+          <tr>
+            <td>Long lead Nurture (include note)</td>
+            <td><span class="badge b-nurt">Nurturing</span></td>
+            <td>Long-Term Nurture</td>
+            <td>Nurture_Cadence per note (default 1 Month); note &rarr; Description</td>
+          </tr>
+          <tr>
+            <td>Meeting booked</td>
+            <td><span class="badge b-qual">Qualified</span></td>
+            <td>Meeting Booked</td>
+            <td><code>Meeting_Booked__c = True</code>; convert to Opportunity after meeting shows</td>
+          </tr>
+          <tr>
+            <td>Duplicate lead</td>
+            <td><em>merge, don't map</em></td>
+            <td>&mdash;</td>
+            <td>Run duplicate rules / merge into master record; don't import as a live status</td>
+          </tr>
+          <tr>
+            <td>No longer selling</td>
+            <td><span class="badge b-unqual">Unqualified</span></td>
+            <td>&mdash;</td>
+            <td>Disqualification_Reason = No Longer Selling (permanent &mdash; exclude from all campaigns)</td>
+          </tr>
+          <tr>
+            <td>Number not going through</td>
+            <td><span class="badge b-unqual">Unqualified</span></td>
+            <td>Bad Number</td>
+            <td><code>Bad_Number__c = True</code> &rarr; feeds the Friday replacement CSV export (SR-4)</td>
+          </tr>
+          <tr>
+            <td>Lead not qualified (include reason)</td>
+            <td><span class="badge b-unqual">Unqualified</span></td>
+            <td>&mdash;</td>
+            <td>Disqualification_Reason from the noted reason (Below Revenue / Not Amazon Seller / Other);
+                reason text &rarr; Description</td>
+          </tr>
+          <tr>
+            <td>Too small</td>
+            <td><span class="badge b-unqual">Unqualified</span></td>
+            <td>&mdash;</td>
+            <td>Disqualification_Reason = Below Revenue Threshold.
+                <span class="warn">&#9888;</span> Consider Nurturing instead &mdash; &ldquo;too small today&rdquo; can grow;
+                suggested: Nurturing with 3-Month cadence unless clearly hobby-scale</td>
+          </tr>
+          <tr>
+            <td>Refferal partner</td>
+            <td><em>not a lead</em></td>
+            <td>&mdash;</td>
+            <td>Better as Account (record type: Referral Partner) or Contact; if kept as Lead &rarr;
+                Nurturing + <code>Lead_Type__c = Referral Partner</code>, excluded from sales funnel metrics</td>
+          </tr>
+          <tr>
+            <td>Selling Amazon account</td>
+            <td><span class="badge b-unqual">Unqualified</span></td>
+            <td>&mdash;</td>
+            <td>Disqualification_Reason = Exiting Amazon. Optional: Nurturing 1-Month cadence &mdash;
+                sellers exiting sometimes need account-health help to sell at a better price</td>
+          </tr>
+          <tr>
+            <td>Dropped call</td>
+            <td><span class="badge b-work">Working</span></td>
+            <td>Dropped Call</td>
+            <td>Next Follow-Up = same day/next day</td>
+          </tr>
+          <tr>
+            <td><em>(no status / blank)</em></td>
+            <td><span class="badge b-new">New</span></td>
+            <td>&mdash;</td>
+            <td>Untouched leads</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="lsm-note">
+        <span class="warn">&#9888;</span> Rows marked with a warning need a judgement call per record before load &mdash;
+        don't bulk-map them.
+      </div>
+    </div>
+
+    <!-- ============ 2. DEFAULT CADENCE ============ -->
+    <div class="lsm-card">
+      <h2>2. Default cadence assignment</h2>
+      <table class="lsm-tbl">
+        <thead>
+          <tr>
+            <th style="width:46%">Segment</th>
+            <th style="width:26%">Cadence</th>
+            <th style="width:28%">Channel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Hot but unresponsive (was interested, went dark)</td><td>1 Week</td><td>Call + email</td></tr>
+          <tr><td>Busy / call back later</td><td>1&ndash;2 Weeks</td><td>Call</td></tr>
+          <tr><td>4+ no-answers</td><td>2 Weeks</td><td>Email sequence, then call</td></tr>
+          <tr><td>Considering options / not now</td><td>3 Weeks&ndash;1 Month</td><td>Call + case-study email</td></tr>
+          <tr><td>Long lead nurture</td><td>1&ndash;2 Months</td><td>Marketing emails</td></tr>
+          <tr><td>Too small today</td><td>3 Months</td><td>Newsletter/marketing only</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</apex:page>

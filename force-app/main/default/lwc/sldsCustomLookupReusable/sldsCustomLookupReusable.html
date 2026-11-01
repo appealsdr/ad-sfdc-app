@@ -1,0 +1,39 @@
+<template>
+    <div style="position: relative; width: 100%;"
+        onkeydown={handleKeyDown}
+        onfocusout={close}
+        onclick={open}
+        onfocus={open}
+        title={selectedItem}
+    
+    >
+        <lightning-input type="search" class="validate"  variant="label-hidden" label={label} placeholder={placeholder}
+            value={selectedItem} onchange={handleSearchInput} required={required} disabled={isDisabled}>
+        </lightning-input>
+
+        <template if:true={isOpen}>
+            <div class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-5 slds-m-top_xx-small">
+                <ul class="slds-dropdown__list" role="menu" onfocus={open} onmousedown={stopClose}>
+                        <template if:true={options.length}>
+                            <template for:each={options} for:item="opt">
+                                <li key={opt.value} class="slds-dropdown__item" role="presentation">
+                                    <a href="javascript:void(0);" role="menuitem" class="slds-truncate"
+                                        title={opt.label} data-value={opt.value}
+                                        onclick={handleOptionClick}>
+                                        {opt.label}
+                                    </a>
+                                </li>
+                            </template>
+                        </template>
+                        <template if:true={noResults}>
+                            <li class="slds-dropdown__item" role="presentation">
+                                <div class="slds-listbox__option_plain slds-text-title slds-p-left_small">
+                                    No results
+                                </div>
+                            </li>
+                        </template>
+                </ul>
+            </div>
+        </template>                       
+    </div>
+</template>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Layout__c</fullName>
+    <label>Layout</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Layout 1</fullName>
+                <default>false</default>
+                <label>Layout 1</label>
+            </value>
+            <value>
+                <fullName>Layout 2</fullName>
+                <default>false</default>
+                <label>Layout 2</label>
+            </value>
+            <value>
+                <fullName>Standard Layout</fullName>
+                <default>false</default>
+                <label>Standard Layout</label>
+            </value>
+            <value>
+                <fullName>Appeals Doctor - Client</fullName>
+                <default>false</default>
+                <label>Appeals Doctor - Client</label>
+            </value>
+            <value>
+                <fullName>Managed Accounts</fullName>
+                <default>false</default>
+                <label>Managed Accounts</label>
+            </value>
+            <value>
+                <fullName>Suspended Account SOP</fullName>
+                <default>false</default>
+                <label>Suspended Account SOP</label>
+            </value>
+            <value>
+                <fullName>A-La-Carte Client</fullName>
+                <default>false</default>
+                <label>A-La-Carte Client</label>
+            </value>
+            <value>
+                <fullName>Suspended Account</fullName>
+                <default>false</default>
+                <label>Suspended Account</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

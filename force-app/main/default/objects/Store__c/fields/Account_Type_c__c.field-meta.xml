@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Account_Type_c__c</fullName>
+    <label>Account Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Managed Account Health</fullName>
+                <default>false</default>
+                <label>Managed Account Health</label>
+            </value>
+            <value>
+                <fullName>A-La-Carte</fullName>
+                <default>false</default>
+                <label>A-La-Carte</label>
+            </value>
+            <value>
+                <fullName>Managed Amazon Marketing</fullName>
+                <default>false</default>
+                <label>Managed Amazon Marketing</label>
+            </value>
+            <value>
+                <fullName>Full Account Management</fullName>
+                <default>false</default>
+                <label>Full Account Management</label>
+            </value>
+            <value>
+                <fullName>Marketing - PPC</fullName>
+                <default>false</default>
+                <label>Marketing - PPC</label>
+            </value>
+            <value>
+                <fullName>Suspended Account</fullName>
+                <default>false</default>
+                <label>Suspended Account</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

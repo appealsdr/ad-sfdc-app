@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Notify Juan of the new signup.</description>
+        <name>Email_Juan</name>
+        <label>Email Juan</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <faultConnector>
+            <targetReference>Log_Email_Error</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>Get_Juan.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>fxTaskSubject</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>ttSignupDetails</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <actionCalls>
+        <description>If routing fails, tell Juan so he can assign the signup by hand. The signup itself still saves.</description>
+        <name>Send_Failure_Alert</name>
+        <label>Send Failure Alert</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <faultConnector>
+            <targetReference>Log_Email_Error</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>juan@appealsdoctor.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>fxFailureSubject</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>ttFailureDetails</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>68.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Email could not be sent; the owner change and task (if reached) are already saved.</description>
+        <name>Log_Email_Error</name>
+        <label>Log Email Error</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varEmailError</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.FaultMessage</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Juan_Found</name>
+        <label>Juan Found?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Send_Failure_Alert</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Not Found</defaultConnectorLabel>
+        <rules>
+            <name>Juan_Is_Active</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Juan.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Contact</targetReference>
+            </connector>
+            <label>Juan Is Active</label>
+        </rules>
+    </decisions>
+    <description>When the Appeals Dr app (ad-saas integration user) creates a new Contact from a self-serve signup, assign the Contact and its Client to Juan Velasco, set Lead Source to App Signup, create an onboarding task, and email Juan. Staff (@appealsdoctor.com) signups are skipped. Built Oct 27, 2026; applies to new signups only.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>fxFailureSubject</name>
+        <dataType>String</dataType>
+        <expression>&quot;App signup routing failed: &quot; &amp; {!$Record.Email}</expression>
+    </formulas>
+    <formulas>
+        <name>fxTaskSubject</name>
+        <dataType>String</dataType>
+        <expression>&quot;Onboard new app signup: &quot; &amp; IF(ISBLANK({!$Record.Account.Name}), {!$Record.FirstName} &amp; &quot; &quot; &amp; {!$Record.LastName}, {!$Record.Account.Name})</expression>
+    </formulas>
+    <interviewLabel>App Signup Route {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>App Signup: Route to Juan</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>High-priority onboarding task for Juan, due the day of signup.</description>
+        <name>Create_Onboarding_Task</name>
+        <label>Create Onboarding Task</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Email_Juan</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Send_Failure_Alert</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>ttSignupDetails</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>Get_Juan.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Open</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <elementReference>fxTaskSubject</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordLookups>
+        <description>Find Juan Velasco&apos;s active Salesforce user.</description>
+        <name>Get_Juan</name>
+        <label>Get Juan</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Juan_Found</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Send_Failure_Alert</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Username</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>juan@appealsdoctor.com</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>IsActive</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>User</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Email</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Reassign the Contact&apos;s Client to Juan only if the app integration user still owns it.</description>
+        <name>Update_Client</name>
+        <label>Assign Client to Juan</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Create_Onboarding_Task</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Send_Failure_Alert</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>OwnerId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.CreatedById</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>Get_Juan.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Set owner to Juan and Lead Source to App Signup on the new Contact.</description>
+        <name>Update_Contact</name>
+        <label>Assign Contact to Juan</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_Client</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Send_Failure_Alert</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>LeadSource</field>
+            <value>
+                <stringValue>App Signup</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>Get_Juan.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Juan</targetReference>
+        </connector>
+        <filterFormula>AND({!$Record.CreatedBy.Username} = &quot;ad-saas.integration@appealsdoctor.com&quot;, NOT(CONTAINS(LOWER({!$Record.Email}), &quot;@appealsdoctor.com&quot;)))</filterFormula>
+        <object>Contact</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <name>ttFailureDetails</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>The App Signup: Route to Juan automation could not finish for {!$Record.FirstName} {!$Record.LastName} ({!$Record.Email}). The signup is saved; please assign it and create the onboarding task by hand.
+
+Error: {!$Flow.FaultMessage}
+
+Open in Salesforce: https://appealsdoctor.lightning.force.com/lightning/r/Contact/{!$Record.Id}/view</text>
+    </textTemplates>
+    <textTemplates>
+        <name>ttSignupDetails</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>New app signup assigned to you for onboarding.
+
+Name: {!$Record.FirstName} {!$Record.LastName}
+Company: {!$Record.Account.Name}
+Email: {!$Record.Email}
+Phone: {!$Record.Phone}
+Website: {!$Record.Account.Website}
+Lead Source: App Signup
+
+Open in Salesforce: https://appealsdoctor.lightning.force.com/lightning/r/Contact/{!$Record.Id}/view</text>
+    </textTemplates>
+    <variables>
+        <name>varEmailError</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

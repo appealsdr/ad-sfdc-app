@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Service_Type__c</fullName>
+    <label>Service Type</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Suspended Account</fullName>
+                <default>false</default>
+                <label>Suspended Account</label>
+            </value>
+            <value>
+                <fullName>Seller Account Creation</fullName>
+                <default>false</default>
+                <label>Seller Account Creation</label>
+            </value>
+            <value>
+                <fullName>Seller Change of Ownership</fullName>
+                <default>false</default>
+                <label>Seller Change of Ownership</label>
+            </value>
+            <value>
+                <fullName>Brand Reinstatement</fullName>
+                <default>false</default>
+                <label>Brand Reinstatement</label>
+            </value>
+            <value>
+                <fullName>CSM Brand Ungating/Brand Approval</fullName>
+                <default>false</default>
+                <label>CSM Brand Ungating/Brand Approval</label>
+            </value>
+            <value>
+                <fullName>Brand Protection</fullName>
+                <default>false</default>
+                <label>Brand Protection</label>
+            </value>
+            <value>
+                <fullName>Private Label Launch per Listing</fullName>
+                <default>false</default>
+                <label>Private Label Launch per Listing</label>
+            </value>
+            <value>
+                <fullName>Brand Registry Enrollment</fullName>
+                <default>false</default>
+                <label>Brand Registry Enrollment</label>
+            </value>
+            <value>
+                <fullName>Brand Registry Suspension</fullName>
+                <default>false</default>
+                <label>Brand Registry Suspension</label>
+            </value>
+            <value>
+                <fullName>Account at Risk of Deactivation</fullName>
+                <default>false</default>
+                <label>Account at Risk of Deactivation</label>
+            </value>
+            <value>
+                <fullName>Inventory Appeals - At Risk of Disposal</fullName>
+                <default>false</default>
+                <label>Inventory Appeals - At Risk of Disposal</label>
+            </value>
+            <value>
+                <fullName>FBA Feedback Removal</fullName>
+                <default>false</default>
+                <label>FBA Feedback Removal</label>
+            </value>
+            <value>
+                <fullName>FBM Feedback Removal</fullName>
+                <default>false</default>
+                <label>FBM Feedback Removal</label>
+            </value>
+            <value>
+                <fullName>Storage Increase</fullName>
+                <default>false</default>
+                <label>Storage Increase</label>
+            </value>
+            <value>
+                <fullName>Trademark Application</fullName>
+                <default>false</default>
+                <label>Trademark Application</label>
+            </value>
+            <value>
+                <fullName>Reinstate Listing</fullName>
+                <default>false</default>
+                <label>Reinstate Listing</label>
+            </value>
+            <value>
+                <fullName>A+ Content</fullName>
+                <default>false</default>
+                <label>A+ Content</label>
+            </value>
+            <value>
+                <fullName>Content Creation</fullName>
+                <default>false</default>
+                <label>Content Creation</label>
+            </value>
+            <value>
+                <fullName>Images</fullName>
+                <default>false</default>
+                <label>Images</label>
+            </value>
+            <value>
+                <fullName>Listing Advertising</fullName>
+                <default>false</default>
+                <label>Listing Advertising</label>
+            </value>
+            <value>
+                <fullName>Listing Creation/Optimization Package</fullName>
+                <default>false</default>
+                <label>Listing Creation/Optimization Package</label>
+            </value>
+            <value>
+                <fullName>Listing Variation</fullName>
+                <default>false</default>
+                <label>Listing Variation</label>
+            </value>
+            <value>
+                <fullName>Video Content</fullName>
+                <default>false</default>
+                <label>Video Content</label>
+            </value>
+            <value>
+                <fullName>LSR (Late Shipment Rate)</fullName>
+                <default>false</default>
+                <label>LSR (Late Shipment Rate)</label>
+            </value>
+            <value>
+                <fullName>ODR (Order Defect Rate)</fullName>
+                <default>false</default>
+                <label>ODR (Order Defect Rate)</label>
+            </value>
+            <value>
+                <fullName>PFCR (Pre-fulfilment Cancel Rate)</fullName>
+                <default>false</default>
+                <label>PFCR (Pre-fulfilment Cancel Rate)</label>
+            </value>
+            <value>
+                <fullName>VTR (Valid Tracking Rate)</fullName>
+                <default>false</default>
+                <label>VTR (Valid Tracking Rate)</label>
+            </value>
+            <value>
+                <fullName>Store Front</fullName>
+                <default>false</default>
+                <label>Store Front</label>
+            </value>
+            <value>
+                <fullName>High critical violation</fullName>
+                <default>false</default>
+                <label>High critical violation</label>
+            </value>
+            <value>
+                <fullName>High impact violation</fullName>
+                <default>false</default>
+                <label>High impact violation</label>
+            </value>
+            <value>
+                <fullName>High repeat violation</fullName>
+                <default>false</default>
+                <label>High repeat violation</label>
+            </value>
+            <value>
+                <fullName>Low impact violation</fullName>
+                <default>false</default>
+                <label>Low impact violation</label>
+            </value>
+            <value>
+                <fullName>Medium impact violation</fullName>
+                <default>false</default>
+                <label>Medium impact violation</label>
+            </value>
+            <value>
+                <fullName>No impact violation</fullName>
+                <default>false</default>
+                <label>No impact violation</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

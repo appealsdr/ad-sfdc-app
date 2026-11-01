@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Project Group --></label>
+    <name>Project_Group__c</name>
+    <picklistValues>
+        <masterLabel>A-La-Carte Accounts</masterLabel>
+        <translation><!-- A-La-Carte Accounts --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ARB Accounts</masterLabel>
+        <translation><!-- ARB Accounts --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Amazon Marketing Accounts</masterLabel>
+        <translation><!-- Amazon Marketing Accounts --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Legal Services Accounts</masterLabel>
+        <translation><!-- Legal Services Accounts --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Managed Accounts</masterLabel>
+        <translation><!-- Managed Accounts --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Organizational</masterLabel>
+        <translation><!-- Organizational --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Suspended Accounts</masterLabel>
+        <translation><!-- Suspended Accounts --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Ungrouped Projects</masterLabel>
+        <translation><!-- Ungrouped Projects --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Marketplaces --></label>
+    <name>Marketplaces__c</name>
+    <picklistValues>
+        <masterLabel>AU</masterLabel>
+        <translation><!-- AU --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>CA</masterLabel>
+        <translation><!-- CA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>DE</masterLabel>
+        <translation><!-- DE --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>FR</masterLabel>
+        <translation><!-- FR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>IT</masterLabel>
+        <translation><!-- IT --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>MX</masterLabel>
+        <translation><!-- MX --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>TR</masterLabel>
+        <translation><!-- TR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>UK</masterLabel>
+        <translation><!-- UK --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>US</masterLabel>
+        <translation><!-- US --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

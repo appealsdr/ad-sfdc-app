@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Q6_Answer__c</fullName>
+    <description>Notes for question 6: Is there anything new happening with your Amazon account that we should know about?</description>
+    <inlineHelpText>Is there anything new happening with your Amazon account that we should know about?</inlineHelpText>
+    <label>Q6 New on Amazon Account Notes</label>
+    <length>32768</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

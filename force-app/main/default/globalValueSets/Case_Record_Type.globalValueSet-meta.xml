@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Suspended Accounts</fullName>
+        <default>false</default>
+        <label>Suspended Accounts</label>
+    </customValue>
+    <customValue>
+        <fullName>Account At Risk of Deactivation</fullName>
+        <default>false</default>
+        <label>Account At Risk of Deactivation</label>
+    </customValue>
+    <customValue>
+        <fullName>Account Ownership Transfer</fullName>
+        <default>false</default>
+        <label>Account Ownership Transfer</label>
+    </customValue>
+    <customValue>
+        <fullName>Account Review</fullName>
+        <default>false</default>
+        <label>Account Review</label>
+    </customValue>
+    <customValue>
+        <fullName>Advertising</fullName>
+        <default>false</default>
+        <label>Advertising</label>
+    </customValue>
+    <customValue>
+        <fullName>Amazon Response</fullName>
+        <default>false</default>
+        <label>Amazon Response</label>
+    </customValue>
+    <customValue>
+        <fullName>Arbitration</fullName>
+        <default>false</default>
+        <label>Arbitration</label>
+    </customValue>
+    <customValue>
+        <fullName>A-Z Claims</fullName>
+        <default>false</default>
+        <label>A-Z Claims</label>
+    </customValue>
+    <customValue>
+        <fullName>Brand Approval</fullName>
+        <default>false</default>
+        <label>Brand Approval</label>
+    </customValue>
+    <customValue>
+        <fullName>Brand Registry</fullName>
+        <default>false</default>
+        <label>Brand Registry</label>
+    </customValue>
+    <customValue>
+        <fullName>Brand Registry Issues</fullName>
+        <default>false</default>
+        <label>Brand Registry Issues</label>
+    </customValue>
+    <customValue>
+        <fullName>Chargeback</fullName>
+        <default>false</default>
+        <label>Chargeback</label>
+    </customValue>
+    <customValue>
+        <fullName>Custom</fullName>
+        <default>false</default>
+        <label>Custom</label>
+    </customValue>
+    <customValue>
+        <fullName>Customer Service Management</fullName>
+        <default>false</default>
+        <label>Customer Service Management</label>
+    </customValue>
+    <customValue>
+        <fullName>FBA Storage Increase</fullName>
+        <default>false</default>
+        <label>FBA Storage Increase</label>
+    </customValue>
+    <customValue>
+        <fullName>FBM Account Suspension</fullName>
+        <default>false</default>
+        <label>FBM Account Suspension</label>
+    </customValue>
+    <customValue>
+        <fullName>Feedback Removal</fullName>
+        <default>false</default>
+        <label>Feedback Removal</label>
+    </customValue>
+    <customValue>
+        <fullName>Find Verified Suppliers</fullName>
+        <default>false</default>
+        <label>Find Verified Suppliers</label>
+    </customValue>
+    <customValue>
+        <fullName>General</fullName>
+        <default>false</default>
+        <label>General</label>
+    </customValue>
+    <customValue>
+        <fullName>Late Shipment Rate</fullName>
+        <default>false</default>
+        <label>Late Shipment Rate</label>
+    </customValue>
+    <customValue>
+        <fullName>Listing Creation and Optimization</fullName>
+        <default>false</default>
+        <label>Listing Creation and Optimization</label>
+    </customValue>
+    <customValue>
+        <fullName>Listing Issue</fullName>
+        <default>false</default>
+        <label>Listing Issue</label>
+    </customValue>
+    <customValue>
+        <fullName>Order Defect Rate</fullName>
+        <default>false</default>
+        <label>Order Defect Rate</label>
+    </customValue>
+    <customValue>
+        <fullName>Pre Fulfillment Cancel Rate</fullName>
+        <default>false</default>
+        <label>Pre Fulfillment Cancel Rate</label>
+    </customValue>
+    <customValue>
+        <fullName>Premium Shipping Eligibility</fullName>
+        <default>false</default>
+        <label>Premium Shipping Eligibility</label>
+    </customValue>
+    <customValue>
+        <fullName>Trademark Application</fullName>
+        <default>false</default>
+        <label>Trademark Application</label>
+    </customValue>
+    <customValue>
+        <fullName>Valid Tracking Rate</fullName>
+        <default>false</default>
+        <label>Valid Tracking Rate</label>
+    </customValue>
+    <customValue>
+        <fullName>Violation</fullName>
+        <default>false</default>
+        <label>Violation</label>
+    </customValue>
+    <masterLabel>Case Record Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

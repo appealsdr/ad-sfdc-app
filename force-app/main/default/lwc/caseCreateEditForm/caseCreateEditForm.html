@@ -1,0 +1,196 @@
+<template>
+    <template if:true={showSpinner}>
+        <div style="z-index: 10000 !important;">
+            <lightning-spinner alternative-text="Uploading......" size="small" style="z-index: 10000 !important;"></lightning-spinner>
+        </div>
+    </template>
+    <template if:true={listWrapCases} for:each={listWrapCases} for:item="objWrap" for:index="indexMain">
+        <div key={objWrap.storeId} class="">
+            <div  class="slds-box sectionHeader headerBox  slds-grid slds-grid_vertical-align-center">
+                <template if:true={objWrap.swithStoreSection}>
+                    <p><lightning-icon icon-name='utility:switch'  class="white-icon" name="swithStoreSection" data-index={indexMain} alternative-text='switch' size='x-small' title='switch'  onclick={switchSection}></lightning-icon></p>
+                </template>
+                <template if:false={objWrap.swithStoreSection}>
+                    <p><lightning-icon icon-name='utility:chevronright'  class="white-icon" name="swithStoreSection" data-index={indexMain} alternative-text='switch' size='x-small' title='switch'  onclick={switchSection}></lightning-icon></p>
+                </template>
+                <p>&nbsp;&nbsp;{objWrap.index}. Store Name - <b>{objWrap.storeName}</b></p>
+            </div>
+            <div if:true={objWrap.swithStoreSection} class="marginTopInMinus">
+                <template for:each={objWrap.cases} for:item="caseRec" for:index="indexCase">
+                    <div key={caseRec.id} class="slds-box">
+
+                    <!-- <lightning-combobox
+                        label="Case Record Type"
+                        options={recordTypeOptions}
+                        data-index={index}
+                        onchange={handleRecordTypeChange}>
+                    </lightning-combobox> -->
+                    <!-- index, Case record Type and remove button section -->
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item size="2" small-device-size="2" medium-device-size="1" large-device-size="1" class="">
+                           <div style="margin-top:10px;">
+                               <span style="background:#f3f3f3; padding:2px 8px; font-weight:500; border-radius:12px; font-size:18px; color:#444;">
+                                # {caseRec.index}
+                               </span>
+                           </div>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="10" small-device-size="10" medium-device-size="6" large-device-size="6" class="">
+                            <div style="margin-top: -1rem;">
+                                  <label class="slds-form-element__label">
+                                    <abbr class="slds-required" lwc-2fb3f2nu4or="" title="required">*</abbr>
+                                    Case Record Type 
+                                  </label>
+                                <c-slds-custom-lookup-reusable
+                                    placeholder="Search Case Record Type..." 
+                                    onselectionchange={handleLookupSelectionChange} 
+                                    onsearch={handleLookupServerSearch}
+                                    class-name={caseRec.uniqueId} 
+                                    class={caseRec.uniqueId}
+                                    is-disabled={caseRec.disabled}>
+                                </c-slds-custom-lookup-reusable>
+                            </div>
+                            <div if:true={caseRec.showCaseRecTypeReqErr} class="slds-text-color_error slds-m-top_xx-small">
+                                Case Record Type is required.
+                            </div>
+                        </lightning-layout-item>
+                        <template if:true={caseRec.showDeleteButton}>
+                            <lightning-layout-item size="2" small-device-size="2" medium-device-size="1" large-device-size="1" class="">
+                                <div style="padding:10px 8px;">
+                                    <lightning-button-icon icon-name="utility:close" alternative-text="Delete" 
+                                        data-index={indexMain} data-indexcase={indexCase}
+                                        title="Delete" 
+                                        onclick={handleRemoveCase}  
+                                        disabled={caseRec.disabled}>
+                                    </lightning-button-icon>
+                                </div>
+                            </lightning-layout-item>
+                        </template>
+                    </lightning-layout>
+
+                    <!-- Cases Fields and Price Fields section -->
+                    <template if:true={caseRec.recordTypeId}>
+                        <lightning-record-edit-form
+                            object-api-name="Case"
+                            record-type-id={caseRec.recordTypeId}
+                            >
+    
+                            <lightning-layout  multiple-rows class="slds-m-top_x-small">
+                                <template for:each={caseRec.fields} for:item="field" for:index="indexField">
+                                    <lightning-layout-item  key={field.id} size="12" small-device-size="12" medium-device-size="6" large-device-size="6" class="slds-p-around_xx-small">
+                                        <lightning-input-field
+                                            field-name={field.apiName}
+                                            value={field.value}
+                                            class={caseRec.cssClass}
+                                            data-index={indexMain}
+                                            data-indexcase={indexCase}
+                                            data-indexfield={indexField}
+                                            data-fieldfor="fields"
+                                            required={field.required}
+                                            variant="label-stacked"
+                                            onchange={handleFieldChange}>
+                                        </lightning-input-field>
+                                        <div if:true={field.showError} class="slds-text-color_error slds-m-top_xx-small">
+                                            {field.errorMsg}
+                                        </div>
+                                    </lightning-layout-item>  
+                                </template>
+
+                                 <lightning-layout-item size="12" small-device-size="12" medium-device-size="6" large-device-size="6" class="slds-p-around_x-small">
+                                       
+                                      <template if:false={caseRec.isPricingReq}>
+                                          <label class="slds-form-element__label slds-m-bottom_none">
+                                           Owner 
+                                          </label>
+                                          <template if:true={caseRec.isBrandRegistry}>
+                                              <lightning-input
+                                                  type="text"
+                                                  variant="label-hidden"
+                                                  placeholder="Enter owner name..."
+                                                  value={caseRec.ownerName}
+                                                  data-index={indexMain}
+                                                  data-indexcase={indexCase}
+                                                  data-fieldname="ownerName"
+                                                  onchange={handleOwnerNameChange}>
+                                              </lightning-input>
+                                          </template>
+                                          <template if:false={caseRec.isBrandRegistry}>
+                                              <lightning-record-picker 
+                                                  class="slds-form-element__control validate" 
+                                                  placeholder="Search User..." 
+                                                  object-api-name="User" 
+                                                  variant="label-hidden" 
+                                                  label="User" 
+                                                  value={caseRec.ownerId}
+                                                  data-index={indexMain}
+                                                  data-indexcase={indexCase}
+                                                  data-fieldname="ownerId" 
+                                                  onchange={handleRecordPicker} 
+                                                  >
+                                             </lightning-record-picker>
+                                          </template>
+                                      </template>  
+                                        
+                                    </lightning-layout-item> 
+                            </lightning-layout>
+                            <template if:true={caseRec.isPricingReq}>
+                                <lightning-layout multiple-rows>
+                                    <template for:each={caseRec.priceFields} for:item="pricefield" for:index="indexPrice">
+                                        <lightning-layout-item key={pricefield.id} size="12" small-device-size="12" medium-device-size="6" large-device-size="6" class="slds-p-around_xx-small">
+                                            <lightning-input-field
+                                                field-name={pricefield.apiName}
+                                                value={pricefield.value}
+                                                class={pricefield.cssClass}
+                                                data-index={indexMain}
+                                                data-indexcase={indexCase}
+                                                data-indexfield={indexPrice}
+                                                data-fieldfor="priceFields"
+                                                variant="label-stacked"
+                                                required={pricefield.required}
+                                                onchange={handleFieldChange}>
+                                            </lightning-input-field>
+                                            <div if:true={pricefield.showError} class="slds-text-color_error slds-m-top_xx-small">
+                                                {pricefield.errorMsg}
+                                            </div>
+                                        </lightning-layout-item>
+                                    </template>
+                                </lightning-layout>
+                                <lightning-layout multiple-rows class="slds-m-top_x-small">
+                                    <lightning-layout-item size="12" class="slds-p-around_xx-small">
+                                        <div style="border: 1px solid #dddbda; border-radius: 4px; padding: 10px 14px; background: #fafaf9;">
+                                            <lightning-input
+                                                type="checkbox"
+                                                label="Rush Fee (+$900) — Expedited handling, case will be prioritized"
+                                                checked={caseRec.rushFee}
+                                                data-index={indexMain}
+                                                data-indexcase={indexCase}
+                                                onchange={handleRushFeeChange}>
+                                            </lightning-input>
+                                        </div>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </template>
+
+    
+                        </lightning-record-edit-form>
+                    </template>
+
+                    </div>
+                </template>
+
+                <lightning-layout multiple-rows>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="12" class="slds-p-around_x-small">
+                        <div if:false={disabled} style="float:right;">
+                           <lightning-button
+                                icon-name="utility:add_above"
+                                label="Add Case"
+                                data-index={indexMain}
+                                onclick={handleAddCase}>
+                            </lightning-button>
+                            <!-- <lightning-icon icon-name='utility:add_above' alternative-text='add_above' size='large' title='add_above'></lightning-icon> -->
+                        </div>
+                    </lightning-layout-item>
+                 </lightning-layout>
+            </div>
+        </div>
+    </template>
+</template>

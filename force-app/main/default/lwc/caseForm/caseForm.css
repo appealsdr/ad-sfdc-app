@@ -1,0 +1,16 @@
+h1 {}
+.marginTopInMinus {
+    margin-top: -10px;
+}
+.indicatorPosition {
+    position: relative;
+    top: 2rem;
+    margin-left: 10%;
+}
+
+.float-right {
+    float: right;
+}
+.bodyMain {
+    background-color: white;
+}

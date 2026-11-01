@@ -1,0 +1,19 @@
+<template>
+    <lightning-modal-header label={heading}></lightning-modal-header>
+    <lightning-modal-body>
+        <div class="case-list">
+            <template lwc:if={loading}><lightning-spinner alternative-text="Loading cases" size="small"></lightning-spinner></template>
+            <p class="slds-m-bottom_small" aria-live="polite">{countLabel}</p>
+            <template lwc:if={error}>
+                <p role="alert" class="slds-text-color_error">{error}</p>
+                <lightning-button label="Retry" onclick={loadCases} disabled={loading}></lightning-button>
+            </template>
+            <template lwc:if={empty}><p>No cases match this count.</p></template>
+            <lightning-datatable key-field="Id" data={rows} columns={columns} hide-checkbox-column></lightning-datatable>
+            <template lwc:if={hasMore}>
+                <lightning-button class="slds-m-top_medium" label="Load more" onclick={loadCases} disabled={loading}></lightning-button>
+            </template>
+        </div>
+    </lightning-modal-body>
+    <lightning-modal-footer><lightning-button label="Close" onclick={handleClose}></lightning-button></lightning-modal-footer>
+</template>

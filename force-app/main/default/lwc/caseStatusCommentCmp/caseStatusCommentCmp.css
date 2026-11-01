@@ -1,0 +1,113 @@
+/*.card-title-center .slds-card__header {
+    justify-content: center;
+}
+
+.card-title-center .slds-card__header-title {
+    text-align: center;
+    width: 100%;
+} */
+
+.custom-header {
+    background-color: #f3f6f9;
+    /* Light gray-blue, similar to SLDS cards */
+    border-radius: 0.5rem;
+    color: #16325c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Start    */
+.message-color {
+    display: inline-block;
+    background-color: #d2efe0;
+    color: black;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+}
+.custom-width{
+    width: 50%;
+}
+
+.custom-header {
+    background-color: #f3f6f9;
+    /* Light gray-blue, similar to SLDS cards */
+    border-radius: 0.5rem;
+    color: #16325c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+
+.message-right {
+    margin-left: 20%;
+    margin-right: 2%;
+}
+.message-left {
+    margin-left: 1%;
+    margin-right: 20%;
+}
+
+/*.messages-container {
+    max-height: 400px;  
+    overflow-y: auto;   
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fafafa;
+}*/
+.messages-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fafafa;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;  
+}
+
+
+/* Optional: internal/external messages */
+.internal-msg {
+    text-align: right;
+    background-color: #e3f2fd;
+    border-left: 4px solid #1976d2;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.external-msg {
+    text-align: left;
+    background-color: #f1f1f1;
+    border-left: 4px solid #999;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.custom-header .header-content {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.header-title {
+    flex-grow: 1;                    
+    text-align: center;           
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.sort-icon {
+    position: absolute;
+    right: 0;                        
+}
+.slds-dropdown {
+    max-height: 200px;
+    overflow-y: auto;
+}

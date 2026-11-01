@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Update_opp</name>
+        <label>Update opp</label>
+        <locationX>1090</locationX>
+        <locationY>342</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Opportunity__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Case__r.Opportunity__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Store_Is_Not_Null</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Update_Store</name>
+        <label>Update Store</label>
+        <locationX>1086</locationX>
+        <locationY>572</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Store__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Case__r.Store__c</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Opp_Is_Not_Null</name>
+        <label>Opp Is Not Null</label>
+        <locationX>774</locationX>
+        <locationY>340</locationY>
+        <defaultConnector>
+            <targetReference>Store_Is_Not_Null</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>YES</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Case__r.Opportunity__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_opp</targetReference>
+            </connector>
+            <label>YES</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Store_Is_Not_Null</name>
+        <label>Store Is Not Null</label>
+        <locationX>778</locationX>
+        <locationY>561</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Yess</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Case__r.Store__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Store</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <environments>Default</environments>
+    <interviewLabel>Case File - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Case File - Before Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>650</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Opp_Is_Not_Null</targetReference>
+        </connector>
+        <object>Case_File__c</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

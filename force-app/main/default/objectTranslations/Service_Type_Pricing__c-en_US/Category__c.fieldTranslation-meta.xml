@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Category --></label>
+    <name>Category__c</name>
+    <picklistValues>
+        <masterLabel>Account</masterLabel>
+        <translation><!-- Account --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Account Setup</masterLabel>
+        <translation><!-- Account Setup --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand</masterLabel>
+        <translation><!-- Brand --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Development</masterLabel>
+        <translation><!-- Brand Development --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Registry</masterLabel>
+        <translation><!-- Brand Registry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Compliance</masterLabel>
+        <translation><!-- Compliance --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Feedback</masterLabel>
+        <translation><!-- Feedback --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Inventory</masterLabel>
+        <translation><!-- Inventory --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Legal</masterLabel>
+        <translation><!-- Legal --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing</masterLabel>
+        <translation><!-- Listing --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Optimization</masterLabel>
+        <translation><!-- Listing Optimization --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Metrics</masterLabel>
+        <translation><!-- Metrics --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Store</masterLabel>
+        <translation><!-- Store --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Trademark</masterLabel>
+        <translation><!-- Trademark --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violation</masterLabel>
+        <translation><!-- Violation --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- Documents: .pdf, .doc, .docx, .txt, .log, .rtf. Images: .jpeg, .jpg, .png, .gif, .bmp. --></help>
+    <label><!-- Accepted Format --></label>
+    <name>Accepted_Format__c</name>
+</CustomFieldTranslation>

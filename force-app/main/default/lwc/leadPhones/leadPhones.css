@@ -1,0 +1,58 @@
+/* Compact rows: the output field already draws its own underline, so no extra row border. */
+lightning-output-field {
+    margin: 0;
+    padding: 0;
+}
+
+.phone-row {
+    padding: 0.125rem 0;
+}
+
+.phone-row_empty lightning-output-field {
+    opacity: 0.6;
+}
+
+/* Number flagged as not valid: crossed out in red. */
+.phone-row_invalid lightning-output-field {
+    color: #ba0517;
+    text-decoration: line-through;
+}
+
+/* Fixed blue / red via button styling hooks (both hook prefixes for older and newer SLDS). */
+.status-btn_blue {
+    --slds-c-button-brand-color-background: #0176d3;
+    --slds-c-button-brand-color-border: #0176d3;
+    --slds-c-button-brand-color-background-hover: #014486;
+    --slds-c-button-brand-color-border-hover: #014486;
+    --slds-c-button-brand-color-background-active: #014486;
+    --slds-c-button-brand-color-border-active: #014486;
+    --slds-c-button-brand-text-color: #fff;
+    --slds-c-button-brand-text-color-hover: #fff;
+    --sds-c-button-brand-color-background: #0176d3;
+    --sds-c-button-brand-color-border: #0176d3;
+    --sds-c-button-brand-color-background-hover: #014486;
+    --sds-c-button-brand-color-border-hover: #014486;
+    --sds-c-button-brand-color-background-active: #014486;
+    --sds-c-button-brand-color-border-active: #014486;
+    --sds-c-button-brand-text-color: #fff;
+    --sds-c-button-brand-text-color-hover: #fff;
+}
+
+.status-btn_red {
+    --slds-c-button-brand-color-background: #ba0517;
+    --slds-c-button-brand-color-border: #ba0517;
+    --slds-c-button-brand-color-background-hover: #8e030f;
+    --slds-c-button-brand-color-border-hover: #8e030f;
+    --slds-c-button-brand-color-background-active: #8e030f;
+    --slds-c-button-brand-color-border-active: #8e030f;
+    --slds-c-button-brand-text-color: #fff;
+    --slds-c-button-brand-text-color-hover: #fff;
+    --sds-c-button-brand-color-background: #ba0517;
+    --sds-c-button-brand-color-border: #ba0517;
+    --sds-c-button-brand-color-background-hover: #8e030f;
+    --sds-c-button-brand-color-border-hover: #8e030f;
+    --sds-c-button-brand-color-background-active: #8e030f;
+    --sds-c-button-brand-color-border-active: #8e030f;
+    --sds-c-button-brand-text-color: #fff;
+    --sds-c-button-brand-text-color-hover: #fff;
+}

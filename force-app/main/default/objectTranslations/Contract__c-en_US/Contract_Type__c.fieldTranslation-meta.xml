@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Contract Type --></label>
+    <name>Contract_Type__c</name>
+    <picklistValues>
+        <masterLabel>CC Auth</masterLabel>
+        <translation><!-- CC Auth --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>NDA</masterLabel>
+        <translation><!-- NDA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>On-Demand - Consulting</masterLabel>
+        <translation><!-- On-Demand - Consulting --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>On-Demand - Suspended Account</masterLabel>
+        <translation><!-- On-Demand - Suspended Account --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>White Glove - Retainer</masterLabel>
+        <translation><!-- White Glove - Retainer --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

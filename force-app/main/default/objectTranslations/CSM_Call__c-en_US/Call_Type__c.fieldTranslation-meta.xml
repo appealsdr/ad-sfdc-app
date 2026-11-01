@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Call Type --></label>
+    <name>Call_Type__c</name>
+    <picklistValues>
+        <masterLabel>Cancellation / Retention Call</masterLabel>
+        <translation><!-- Cancellation / Retention Call --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Escalation</masterLabel>
+        <translation><!-- Escalation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Kickoff / Introduction Call</masterLabel>
+        <translation><!-- Kickoff / Introduction Call --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Monthly Retainer Call</masterLabel>
+        <translation><!-- Monthly Retainer Call --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>On-Demand Contact</masterLabel>
+        <translation><!-- On-Demand Contact --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

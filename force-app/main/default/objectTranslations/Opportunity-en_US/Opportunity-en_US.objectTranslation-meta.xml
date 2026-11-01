@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <layouts>
+        <layout>Opportunity Layout</layout>
+        <sections>
+            <label><!-- Parties Involved --></label>
+            <section>Parties Involved</section>
+        </sections>
+    </layouts>
+    <quickActions>
+        <label><!-- Request Store Access --></label>
+        <name>Request_Store_Access</name>
+    </quickActions>
+    <quickActions>
+        <label><!-- Send Invoice --></label>
+        <name>Resend_Invoice</name>
+    </quickActions>
+    <quickActions>
+        <label><!-- Create New Case --></label>
+        <name>create_new_case</name>
+    </quickActions>
+</CustomObjectTranslation>

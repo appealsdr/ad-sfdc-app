@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Assign_Store_Fields_Value</name>
+        <label>Assign Store Fields Value</label>
+        <locationX>375</locationX>
+        <locationY>923</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.White_Glove__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.Account__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>storeOppAccountId_f</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Update_the_Account</name>
+        <label>Update the Account</label>
+        <locationX>745</locationX>
+        <locationY>548</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Account__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>storeOppAccountId_f</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.White_Glove__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>whiteGloveCheckbox</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Check_RT_Present</name>
+        <label>Check Record Type Name</label>
+        <locationX>362</locationX>
+        <locationY>726</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>White_Glove</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Record_Type.Name</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>White Glove</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Record_Type</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Store_Fields_Value</targetReference>
+            </connector>
+            <label>White Glove</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>ISNEW_OR_ISCHANGED</name>
+        <label>check Event Type</label>
+        <locationX>546</locationX>
+        <locationY>367</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Is_Insert</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>ISNEW1</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Record_Type</targetReference>
+            </connector>
+            <label>Is Insert</label>
+        </rules>
+        <rules>
+            <name>Is_Update</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>ISNEW1</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_the_Account</targetReference>
+            </connector>
+            <label>Is Update</label>
+        </rules>
+    </decisions>
+    <description>V3: To Make The White Glove true for White Glove Record Type
+V2: running earlier</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>ISNEW1</name>
+        <dataType>Boolean</dataType>
+        <expression>ISNEW()</expression>
+    </formulas>
+    <formulas>
+        <name>storeOppAccountId_f</name>
+        <dataType>String</dataType>
+        <expression>if ( ISBLANK({!$Record.Opportunity__r.AccountId})
+, {!$Record.Account__c}
+, {!$Record.Opportunity__r.AccountId}
+)</expression>
+    </formulas>
+    <formulas>
+        <name>whiteGloveCheckbox</name>
+        <dataType>Boolean</dataType>
+        <expression>IF (
+ ISCHANGED({!$Record.RecordTypeId}) &amp;&amp; {!$Record.RecordType.Name}  &lt;&gt; &apos;White Glove&apos;
+,  false
+, {!$Record.White_Glove__c}
+ )</expression>
+    </formulas>
+    <interviewLabel>Store  - Before Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Store  - Before Save</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Record_Type</name>
+        <label>Get Record Type</label>
+        <locationX>369</locationX>
+        <locationY>550</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_RT_Present</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.RecordTypeId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>425</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>ISNEW_OR_ISCHANGED</targetReference>
+        </connector>
+        <object>Store__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Obsolete</status>
+</Flow>

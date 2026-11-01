@@ -1,0 +1,10 @@
+.custom-header {
+    background-color: #f3f6f9;
+    /* Light gray-blue, similar to SLDS cards */
+    border-radius: 0.5rem;
+    color: #16325c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}

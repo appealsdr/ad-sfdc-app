@@ -1,0 +1,110 @@
+<template>
+    <lightning-card title="Documents" icon-name="standard:document">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefreshClick}>
+            </lightning-button>
+        </div>
+
+        <template if:true={isLoading}>
+            <div class="loading-wrap">
+                <lightning-spinner size="medium" alternative-text="Loading documents"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:true={noDocuments}>
+                <p class="empty-state">No documents found for this record.</p>
+            </template>
+
+            <template if:true={hasDocuments}>
+                <div class="viewer-layout">
+                    <div class="file-list-panel">
+                        <template for:each={documents} for:item="doc">
+                            <article
+                                key={doc.id}
+                                class={doc.rowClass}
+                                data-id={doc.id}
+                                role="button"
+                                tabindex="0"
+                                onclick={handleDocumentSelect}>
+                                <div class="file-row-main">
+                                    <p class="file-name">{doc.fileName}</p>
+                                    <p class="file-meta">
+                                        {doc.formattedFileSize}
+                                        <template if:true={doc.formattedUploadedDate}>
+                                            · {doc.formattedUploadedDate}
+                                        </template>
+                                    </p>
+                                    <template if:true={doc.description}>
+                                        <p class="file-description">{doc.description}</p>
+                                    </template>
+                                </div>
+                                <div class="file-badges">
+                                    <span class="type-badge">{doc.previewType}</span>
+                                </div>
+                            </article>
+                        </template>
+                    </div>
+
+                    <div class="preview-panel">
+                        <template if:true={showPreviewPanel}>
+                            <div class="preview-header">
+                                <div>
+                                    <h2 class="preview-title">{selectedFileName}</h2>
+                                    <p class="preview-subtitle">{selectedContentType}</p>
+                                </div>
+                                <lightning-button
+                                    label="Download"
+                                    variant="brand"
+                                    icon-name="utility:download"
+                                    onclick={handleDownloadClick}
+                                    disabled={isDownloading}>
+                                </lightning-button>
+                            </div>
+
+                            <template if:true={isPreviewLoading}>
+                                <div class="preview-loading">
+                                    <lightning-spinner size="small" alternative-text="Loading preview"></lightning-spinner>
+                                </div>
+                            </template>
+
+                            <template if:true={showImagePreview}>
+                                <div class="preview-content preview-content-image">
+                                    <img src={previewUrl} alt={selectedFileName} class="preview-image" />
+                                </div>
+                            </template>
+
+                            <template if:true={showPdfPreview}>
+                                <div class="preview-content preview-content-frame">
+                                    <iframe src={previewUrl} title={selectedFileName} class="preview-frame"></iframe>
+                                </div>
+                            </template>
+
+                            <template if:true={showVideoPreview}>
+                                <div class="preview-content preview-content-video">
+                                    <video controls src={previewUrl} class="preview-video"></video>
+                                </div>
+                            </template>
+
+                            <template if:true={showTextPreview}>
+                                <div class="preview-content preview-content-frame">
+                                    <iframe src={previewUrl} title={selectedFileName} class="preview-frame"></iframe>
+                                </div>
+                            </template>
+
+                            <template if:true={showUnsupportedPreview}>
+                                <div class="preview-empty">
+                                    <p>Preview is not available for this file type.</p>
+                                    <p>Use Download to open the file.</p>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </lightning-card>
+</template>

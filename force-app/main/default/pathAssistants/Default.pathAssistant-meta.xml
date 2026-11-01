@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Lead</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Default</masterLabel>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;&lt;strong&gt;Converted: set by standard Lead conversion only; never manually.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Continue work on the resulting Account, Contact and Opportunity. Qualified leads should be converted after the meeting is attended.&lt;/p&gt;</info>
+        <picklistValueName>Converted</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Company</fieldNames>
+        <fieldNames>Phone</fieldNames>
+        <fieldNames>LeadSource</fieldNames>
+        <fieldNames>Call_Attempts__c</fieldNames>
+        <fieldNames>Next_Follow_Up__c</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;New: imported or created; zero touches.&lt;/strong&gt; First call is due within 1 business day.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Confirm owner and contact details, keep Call Attempts at 0 until outreach starts, and plan the first call.&lt;/li&gt;&lt;li&gt;Blank spreadsheet status maps to New. After the first call, record the disposition, attempts and next follow-up, then select the appropriate status.&lt;/li&gt;&lt;li&gt;Duplicate lead: run duplicate rules and merge into the master record; do not import as a live status.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Nurture_Cadence__c</fieldNames>
+        <fieldNames>Next_Follow_Up__c</fieldNames>
+        <fieldNames>Call_Disposition__c</fieldNames>
+        <fieldNames>Lead_Type__c</fieldNames>
+        <fieldNames>Description</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Alive, but not now.&lt;/strong&gt; Marketing re-engagement pool: long-term nurture, too small today, timing objections, 4+ no-answers. Always set Nurture Cadence + Next Follow Up.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Long lead Nurture: disposition = Long-Term Nurture; cadence per note (default 1 Month); note to Description.&lt;/li&gt;&lt;li&gt;Not interested: timing/budget → Not Interested disposition, 2–3 Months; reason to Description. Hard no → Unqualified.&lt;/li&gt;&lt;li&gt;Too small today: consider 3 Months unless clearly hobby-scale. Review individually before load; do not bulk-map.&lt;/li&gt;&lt;li&gt;Referral partner: prefer Account (Referral Partner record type) or Contact. If kept as Lead: Nurturing + Lead Type = Referral Partner; exclude from sales funnel metrics.&lt;/li&gt;&lt;li&gt;Selling Amazon account: normally Unqualified / Exiting Amazon; individually consider 1 Month if account-health help could support a sale.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Nurturing</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Amazon_Seller_Page__c</fieldNames>
+        <fieldNames>Amazon_Est_Annual_Revenue_Bracket__c</fieldNames>
+        <fieldNames>Meeting_Booked__c</fieldNames>
+        <fieldNames>Call_Disposition__c</fieldNames>
+        <fieldNames>Description</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Qualified: Amazon seller with revenue greater than $1M and a meeting booked or attended.&lt;/strong&gt; Next step: convert.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Confirm Amazon seller evidence and revenue above $1M; document qualification and meeting details in Description.&lt;/li&gt;&lt;li&gt;Meeting booked: set Call Disposition = Meeting Booked and Meeting Booked = true.&lt;/li&gt;&lt;li&gt;Convert to an Opportunity after the meeting is attended. Use the standard Convert action; never manually set Converted.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Qualified</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Disqualification_Reason__c</fieldNames>
+        <fieldNames>Bad_Number__c</fieldNames>
+        <fieldNames>Not_Qualified__c</fieldNames>
+        <fieldNames>Call_Disposition__c</fieldNames>
+        <fieldNames>Description</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Dead/permanently ineligible.&lt;/strong&gt; Always set Disqualification Reason; details to Description.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Number not going through: disposition + reason = Bad Number; Bad Number = true. Bad Number / Not Qualified flags feed Friday replacement CSV (SR-4); set applicable flag.&lt;/li&gt;&lt;li&gt;No longer selling: No Longer Selling; permanently exclude from all campaigns.&lt;/li&gt;&lt;li&gt;Lead not qualified: Not Qualified = true; reason = Below Revenue Threshold / Not Amazon Seller / Other; original reason to Description.&lt;/li&gt;&lt;li&gt;Hard no: disposition + reason = Not Interested. Timing/budget → Nurturing, 2–3 Months.&lt;/li&gt;&lt;li&gt;Too small: Below Revenue Threshold if hard; otherwise consider Nurturing, 3 Months. Review individually; do not bulk-map.&lt;/li&gt;&lt;li&gt;Selling Amazon account: Exiting Amazon; optionally Nurturing, 1 Month if account-health help could support sale.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Unqualified</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Call_Disposition__c</fieldNames>
+        <fieldNames>Call_Attempts__c</fieldNames>
+        <fieldNames>Next_Follow_Up__c</fieldNames>
+        <fieldNames>Rating</fieldNames>
+        <fieldNames>Description</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Working: active calling, attempts 1–4, busy, dropped or hot.&lt;/strong&gt; Keep here no more than approximately 2 weeks. Record disposition, attempts and Next Follow Up.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Called no answer: No Answer; attempt 1; follow up +2 days. Second no answer: attempt 2; +3 days. Called 3 times: attempt 3; +1 week. Review for Nurturing after the fourth unanswered call.&lt;/li&gt;&lt;li&gt;Hot Lead!!: Interested — Hot; Rating = Hot; follow up the same or next day and create a priority task.&lt;/li&gt;&lt;li&gt;Follow up was busy: Busy — Call Back; follow up +1–2 days.&lt;/li&gt;&lt;li&gt;Dropped call: Dropped Call; follow up the same or next day.&lt;/li&gt;&lt;li&gt;Preserve notes in Description. Timing/budget objections go to Nurturing; a hard no goes to Unqualified.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Working</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>__MASTER__</recordTypeName>
+</PathAssistant>

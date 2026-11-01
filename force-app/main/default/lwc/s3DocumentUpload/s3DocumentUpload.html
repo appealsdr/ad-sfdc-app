@@ -1,0 +1,67 @@
+<template>
+    <div class="upload-container">
+        <lightning-card title="Upload Documents" icon-name="utility:upload">
+            <template if:true={isContextLoading}>
+                <div class="loading-wrap">
+                    <lightning-spinner size="small" alternative-text="Loading upload settings"></lightning-spinner>
+                </div>
+            </template>
+
+            <template if:false={isContextLoading}>
+                <div class="upload-body">
+                    <template if:true={uploadAllowed}>
+                        <p class="path-description">{pathDescription}</p>
+                        <p class="context-message">{contextMessage}</p>
+
+                        <template if:true={hasAcceptedFormats}>
+                            <p class="accepted-formats">
+                                Accepted formats: {acceptedFormatsLabel}
+                            </p>
+                        </template>
+
+                        <lightning-textarea
+                            label="Description"
+                            value={description}
+                            onchange={handleDescriptionChange}
+                            placeholder="Optional description for uploaded files">
+                        </lightning-textarea>
+
+                        <div class="file-input-wrap">
+                            <label class="file-input-label" for="file-input">Select files</label>
+                            <input
+                                id="file-input"
+                                type="file"
+                                multiple
+                                onchange={handleFileChange}
+                                disabled={isUploading}>
+                        </div>
+
+                        <template if:true={uploadStatusMessage}>
+                            <p class="upload-status">{uploadStatusMessage}</p>
+                        </template>
+
+                        <template if:true={showProgress}>
+                            <lightning-progress-bar value={uploadProgress} size="medium"></lightning-progress-bar>
+                        </template>
+
+                        <div class="actions">
+                            <lightning-button
+                                label="Upload to S3"
+                                variant="brand"
+                                icon-name="utility:upload"
+                                onclick={handleUploadClick}
+                                disabled={uploadDisabled}>
+                            </lightning-button>
+                        </div>
+                    </template>
+
+                    <template if:false={uploadAllowed}>
+                        <p class="error-message">{contextMessage}</p>
+                    </template>
+                </div>
+            </template>
+        </lightning-card>
+
+        <c-s3-document-viewer record-id={recordId}></c-s3-document-viewer>
+    </div>
+</template>

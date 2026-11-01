@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Amazon Seller Card</masterLabel>
+    <description>Shows the public Amazon seller profile (ratings, feedback, business details) for the seller URL or Seller ID stored on the record.</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="sellerField" type="String" label="Seller Field"
+                datasource="apex://AmazonSellerFieldPicklist"
+                description="Field holding the Amazon seller page URL (https://www.amazon.com/sp?seller=...), storefront URL, or Seller ID."/>
+            <property name="fieldPath" type="String" label="Related Field Path (optional)"
+                description="Overrides the field above to read a related record's field, e.g. Store__c.Seller_ID__c."/>
+            <property name="cardTitle" type="String" label="Card Title" default="Amazon Seller"/>
+            <property name="showFeedback" type="Boolean" label="Show Recent Feedback" default="true"/>
+            <property name="feedbackCount" type="Integer" label="Feedback Entries" default="5" min="1" max="10"/>
+            <supportedFormFactors>
+                <supportedFormFactor type="Small"/>
+                <supportedFormFactor type="Large"/>
+            </supportedFormFactors>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

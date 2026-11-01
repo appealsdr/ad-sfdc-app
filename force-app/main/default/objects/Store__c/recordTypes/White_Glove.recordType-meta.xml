@@ -1,0 +1,721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>White_Glove</fullName>
+    <active>true</active>
+    <label>White Glove</label>
+    <picklistValues>
+        <picklist>Account_Type_c__c</picklist>
+        <values>
+            <fullName>A-La-Carte</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Full Account Management</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Managed Account Health</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Managed Amazon Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marketing - PPC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspended Account</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Choose_Service_c__c</picklist>
+        <values>
+            <fullName>A-Z Claims</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brand Protection</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brand Registry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback Removal - FBA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback Removal - FBM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LSR %28Late Shipment Rate%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Advertising - PPC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation%2FOptimization - Content creation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation%2FOptimization - Image</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation%2FOptimization - Viedo Content</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Issues</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ODR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PFCR %28Pre-fulfillment Rate%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Private Label</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seller Account Creation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Storage Increase</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspended Account</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trademark</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VTR %28Valid Tracking Rate%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Forecast_Category__c</picklist>
+        <values>
+            <fullName>Best Case</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Closed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Commit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Omitted</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pipeline</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Industry__c</picklist>
+        <values>
+            <fullName>Alexa Skills</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amazon Autos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amazon Devices</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amazon Global Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amazon One Medical</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amazon Pharmacy</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amazon Resale</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Appliances</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Apps %26 Games</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Arts%2C Crafts %26 Sewing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Audible Books %26 Originals</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Automotive Parts %26 Accessories</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Baby</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Baby Clothing%2C Shoes %26 Jewelry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Beauty %26 Personal Care</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Books</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Boy%27s Clothing%2C Shoes %26 Jewelry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CDs %26 Vinyl</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cell Phones %26 Accessories</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Clothing%2C Shoes %26 Jewelry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Collectibles %26 Fine Art</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Computers</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Credit and Payment Cards</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Digital Music</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Garden %26 Outdoor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gift Cards</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Girl%27s Clothing%2C Shoes %26 Jewelry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Grocery %26 Gourmet Food</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Handmade</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Health%2C Household %26 Baby Care</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Home %26 Business Services</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Home %26 Kitchen</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Industrial %26 Scientific</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Just for Prime</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Kindle Store</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Luggage %26 Travel Gear</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Luxury Stores</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Magazine Subscriptions</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Men%27s Clothing%2C Shoes %26 Jewelry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Movies %26 TV</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Musical Instruments</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Office Products</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pet Supplies</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Premium Beauty</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prime Video</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Smart Home</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Software</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sports %26 Outdoors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Subscribe %26 Save</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Subscription Boxes</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tools %26 Home Improvement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Toys %26 Games</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Under %2410</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Video Games</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Whole Foods Market</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Women%27s Clothing%2C Shoes %26 Jewelry</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Layout__c</picklist>
+        <values>
+            <fullName>A-La-Carte Client</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Appeals Doctor - Client</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Layout 1</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Layout 2</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Managed Accounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Standard Layout</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspended Account</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspended Account SOP</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Lead_Source__c</picklist>
+        <values>
+            <fullName>Advertisement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Event</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Employee Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>External Referral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Google AdWords</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Partner</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Purchased List</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trade Show</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Webinar</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Website</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Loss_Reason__c</picklist>
+        <values>
+            <fullName>Lost to Competitor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No Budget %2F Lost Funding</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No Decision %2F Non-Responsive</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Price</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Marketplaces__c</picklist>
+        <values>
+            <fullName>AU</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>DE</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>FR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>IT</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>MX</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>TR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>UK</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>US</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Project_Group__c</picklist>
+        <values>
+            <fullName>A-La-Carte Accounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ARB Accounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Amazon Marketing Accounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Legal Services Accounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Managed Accounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Organizational</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspended Account SOP</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspended Accounts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ungrouped Projects</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Service_Details__c</picklist>
+        <values>
+            <fullName>A-Z Claims</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>All Violations</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Arbitration</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brand Protection</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Brand Registry</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Compliance</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Customer Messages</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback Removal</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback Removal - FBA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Feedback Removal - FBM</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fund Disbursement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>LSR %28Late Shipment Rate%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Advertising - PPC</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation%2FOptimization - A%2B Content</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation%2FOptimization - Content Creation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation%2FOptimization - Images</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listing Creation%2FOptimization - Video Content</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Listings Issues</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>ODR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>PFCR %28Pre-Fulfillment Cancel Rate%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Private Label</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Seller Account Creation</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Storage Increase</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Suspended Account</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trademark</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>VTR %28Valid Tracking Rate%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations - High critical</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations - High impact</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations - High repeat</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations - Low impact</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations - Medium impact</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations - No impact</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Violations Removal</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status__c</picklist>
+        <values>
+            <fullName>Active</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Archived</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Store_Type__c</picklist>
+        <values>
+            <fullName>Private Label</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reseller</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Type__c</picklist>
+        <values>
+            <fullName>Existing Business</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Business</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

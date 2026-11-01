@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RelatedTaskNotClosed</fullName>
+    <active>false</active>
+    <errorConditionFormula>IF(
+    ISBLANK(preceding__c),
+    False,
+    IF(
+        OR(
+            ISPICKVAL(preceding__r.Status__c, &quot;Closed&quot;),
+            ISPICKVAL(preceding__r.Status__c, &quot;Resolved&quot;)
+        ),
+        FALSE,
+        TRUE
+    )
+)</errorConditionFormula>
+    <errorMessage>You cannot save this task because its dependent task is either Closed or Resolved and it has predecessors.</errorMessage>
+</ValidationRule>

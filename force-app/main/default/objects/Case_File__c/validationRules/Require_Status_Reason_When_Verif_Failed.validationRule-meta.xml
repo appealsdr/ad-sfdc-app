@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Status_Reason_When_Verif_Failed</fullName>
+    <active>true</active>
+    <description>This validation rule ensures that when the Verification Status is set to &quot;Failed&quot;, the user must provide a corresponding Status Reason before the record can be saved.</description>
+    <errorConditionFormula>AND(
+    ISPICKVAL( Verification_Status__c , &quot;Failed&quot;),
+    ISBLANK( Status_Reason__c )
+)</errorConditionFormula>
+    <errorDisplayField>Status_Reason__c</errorDisplayField>
+    <errorMessage>Mention the Status Reason</errorMessage>
+</ValidationRule>

@@ -1,0 +1,38 @@
+<template>
+    <lightning-card title="Lead Emails" icon-name="standard:email">
+        <lightning-button
+            slot="actions"
+            variant="brand"
+            label={emailOptOutButton.label}
+            icon-name={emailOptOutButton.icon}
+            title={emailOptOutButton.title}
+            class={emailOptOutButton.cssClass}
+            onclick={handleEmailOptOut}
+        ></lightning-button>
+
+        <div class="slds-var-p-horizontal_small">
+            <lightning-record-view-form record-id={recordId} object-api-name="Lead">
+                <template for:each={rows} for:item="row">
+                    <lightning-layout key={row.key} vertical-align="center" class={row.rowClass}>
+                        <lightning-layout-item size="9">
+                            <lightning-output-field field-name={row.emailField}></lightning-output-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="3" class="slds-text-align_right slds-p-left_x-small">
+                            <template lwc:if={row.hasEmail}>
+                                <lightning-button
+                                    variant="brand"
+                                    label={row.label}
+                                    icon-name={row.icon}
+                                    title={row.title}
+                                    class={row.buttonClass}
+                                    data-field={row.notValidField}
+                                    onclick={handleNotValid}
+                                ></lightning-button>
+                            </template>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </template>
+            </lightning-record-view-form>
+        </div>
+    </lightning-card>
+</template>

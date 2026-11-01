@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AWS_Region__c</fullName>
+    <defaultValue>&quot;us-east-1&quot;</defaultValue>
+    <description>AWS region where the S3 bucket is located.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The S3 bucket region (for example, us-east-1).</inlineHelpText>
+    <label>AWS Region</label>
+    <length>64</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

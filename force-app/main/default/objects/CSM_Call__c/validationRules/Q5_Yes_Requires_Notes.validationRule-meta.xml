@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Q5_Yes_Requires_Notes</fullName>
+    <active>true</active>
+    <description>Q5 (Expectations Not Addressed): notes are required when the answer is Yes.</description>
+    <errorConditionFormula>AND(
+    ISPICKVAL(Q5_Response__c, &quot;Yes&quot;),
+    ISBLANK(Q5_Answer__c)
+)</errorConditionFormula>
+    <errorDisplayField>Q5_Answer__c</errorDisplayField>
+    <errorMessage>Please add notes when the answer is Yes.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Service Discussed --></label>
+    <name>Service_Discussed__c</name>
+    <picklistValues>
+        <masterLabel>A-Z Claims</masterLabel>
+        <translation><!-- A-Z Claims --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Account Health Management</masterLabel>
+        <translation><!-- Account Health Management --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Account Marketing Management</masterLabel>
+        <translation><!-- Account Marketing Management --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Protection</masterLabel>
+        <translation><!-- Brand Protection --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Registry -  enrolling a brand to Amazon</masterLabel>
+        <translation><!-- Brand Registry -  enrolling a brand to Amazon --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Complete Amazon Account Management</masterLabel>
+        <translation><!-- Complete Amazon Account Management --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>FBA Feedback Removal FBA</masterLabel>
+        <translation><!-- FBA Feedback Removal FBA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>FBM Feedback Removal</masterLabel>
+        <translation><!-- FBM Feedback Removal --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>LSR (Late Shipment rate)</masterLabel>
+        <translation><!-- LSR (Late Shipment rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Legal - Arbitration</masterLabel>
+        <translation><!-- Legal - Arbitration --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Legal - Compliance</masterLabel>
+        <translation><!-- Legal - Compliance --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Legal - Trademark</masterLabel>
+        <translation><!-- Legal - Trademark --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Advertising</masterLabel>
+        <translation><!-- Listing Advertising --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation - A+ Content</masterLabel>
+        <translation><!-- Listing Creation - A+ Content --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation - Content Creation</masterLabel>
+        <translation><!-- Listing Creation - Content Creation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation - Each Listing Variation</masterLabel>
+        <translation><!-- Listing Creation - Each Listing Variation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation - Images</masterLabel>
+        <translation><!-- Listing Creation - Images --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation - Video Content (not included in package)</masterLabel>
+        <translation><!-- Listing Creation - Video Content (not included in package) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization Package  (includes Each Listing Variation, Content Creation, Images, A+ Content)</masterLabel>
+        <translation><!-- Listing Creation/Optimization Package  (includes Each Listing Variation, Content Creation, Images, A+ Content) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listings Issues - Reinstate Listing</masterLabel>
+        <translation><!-- Listings Issues - Reinstate Listing --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ODR</masterLabel>
+        <translation><!-- ODR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>PFCR (Pre-fulfillment cancel rate)</masterLabel>
+        <translation><!-- PFCR (Pre-fulfillment cancel rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Private Label Launch</masterLabel>
+        <translation><!-- Private Label Launch --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Seller Account Creation</masterLabel>
+        <translation><!-- Seller Account Creation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Storage Increase</masterLabel>
+        <translation><!-- Storage Increase --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Suspended Account</masterLabel>
+        <translation><!-- Suspended Account --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>VTR (Valid Tracking Rate)</masterLabel>
+        <translation><!-- VTR (Valid Tracking Rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations</masterLabel>
+        <translation><!-- Violations --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - High Impact</masterLabel>
+        <translation><!-- Violations - High Impact --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - High critical</masterLabel>
+        <translation><!-- Violations - High critical --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - High repeat</masterLabel>
+        <translation><!-- Violations - High repeat --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - Low impact</masterLabel>
+        <translation><!-- Violations - Low impact --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - Medium impact</masterLabel>
+        <translation><!-- Violations - Medium impact --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations - No impact</masterLabel>
+        <translation><!-- Violations - No impact --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

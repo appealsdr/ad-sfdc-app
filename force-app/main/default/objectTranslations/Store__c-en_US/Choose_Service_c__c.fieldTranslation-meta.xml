@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Choose Service --></label>
+    <name>Choose_Service_c__c</name>
+    <picklistValues>
+        <masterLabel>A-Z Claims</masterLabel>
+        <translation><!-- A-Z Claims --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Protection</masterLabel>
+        <translation><!-- Brand Protection --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Registry</masterLabel>
+        <translation><!-- Brand Registry --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Feedback Removal - FBA</masterLabel>
+        <translation><!-- Feedback Removal - FBA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Feedback Removal - FBM</masterLabel>
+        <translation><!-- Feedback Removal - FBM --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>LSR (Late Shipment Rate)</masterLabel>
+        <translation><!-- LSR (Late Shipment Rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Advertising - PPC</masterLabel>
+        <translation><!-- Listing Advertising - PPC --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization - Content creation</masterLabel>
+        <translation><!-- Listing Creation/Optimization - Content creation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization - Image</masterLabel>
+        <translation><!-- Listing Creation/Optimization - Image --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Creation/Optimization - Viedo Content</masterLabel>
+        <translation><!-- Listing Creation/Optimization - Viedo Content --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Issues</masterLabel>
+        <translation><!-- Listing Issues --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ODR</masterLabel>
+        <translation><!-- ODR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>PFCR (Pre-fulfillment Rate)</masterLabel>
+        <translation><!-- PFCR (Pre-fulfillment Rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Private Label</masterLabel>
+        <translation><!-- Private Label --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Seller Account Creation</masterLabel>
+        <translation><!-- Seller Account Creation --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Storage Increase</masterLabel>
+        <translation><!-- Storage Increase --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Suspended Account</masterLabel>
+        <translation><!-- Suspended Account --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Trademark</masterLabel>
+        <translation><!-- Trademark --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>VTR (Valid Tracking Rate)</masterLabel>
+        <translation><!-- VTR (Valid Tracking Rate) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violations</masterLabel>
+        <translation><!-- Violations --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

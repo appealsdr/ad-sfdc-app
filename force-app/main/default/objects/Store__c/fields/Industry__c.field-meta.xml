@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Industry__c</fullName>
+    <label>Industry</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Alexa Skills</fullName>
+                <default>false</default>
+                <label>Alexa Skills</label>
+            </value>
+            <value>
+                <fullName>Amazon Autos</fullName>
+                <default>false</default>
+                <label>Amazon Autos</label>
+            </value>
+            <value>
+                <fullName>Amazon Devices</fullName>
+                <default>false</default>
+                <label>Amazon Devices</label>
+            </value>
+            <value>
+                <fullName>Amazon Global Store</fullName>
+                <default>false</default>
+                <label>Amazon Global Store</label>
+            </value>
+            <value>
+                <fullName>Amazon One Medical</fullName>
+                <default>false</default>
+                <label>Amazon One Medical</label>
+            </value>
+            <value>
+                <fullName>Amazon Pharmacy</fullName>
+                <default>false</default>
+                <label>Amazon Pharmacy</label>
+            </value>
+            <value>
+                <fullName>Amazon Resale</fullName>
+                <default>false</default>
+                <label>Amazon Resale</label>
+            </value>
+            <value>
+                <fullName>Appliances</fullName>
+                <default>false</default>
+                <label>Appliances</label>
+            </value>
+            <value>
+                <fullName>Apps &amp; Games</fullName>
+                <default>false</default>
+                <label>Apps &amp; Games</label>
+            </value>
+            <value>
+                <fullName>Arts, Crafts &amp; Sewing</fullName>
+                <default>false</default>
+                <label>Arts, Crafts &amp; Sewing</label>
+            </value>
+            <value>
+                <fullName>Audible Books &amp; Originals</fullName>
+                <default>false</default>
+                <label>Audible Books &amp; Originals</label>
+            </value>
+            <value>
+                <fullName>Automotive Parts &amp; Accessories</fullName>
+                <default>false</default>
+                <label>Automotive Parts &amp; Accessories</label>
+            </value>
+            <value>
+                <fullName>Baby</fullName>
+                <default>false</default>
+                <label>Baby</label>
+            </value>
+            <value>
+                <fullName>Beauty &amp; Personal Care</fullName>
+                <default>false</default>
+                <label>Beauty &amp; Personal Care</label>
+            </value>
+            <value>
+                <fullName>Books</fullName>
+                <default>false</default>
+                <label>Books</label>
+            </value>
+            <value>
+                <fullName>CDs &amp; Vinyl</fullName>
+                <default>false</default>
+                <label>CDs &amp; Vinyl</label>
+            </value>
+            <value>
+                <fullName>Cell Phones &amp; Accessories</fullName>
+                <default>false</default>
+                <label>Cell Phones &amp; Accessories</label>
+            </value>
+            <value>
+                <fullName>Clothing, Shoes &amp; Jewelry</fullName>
+                <default>false</default>
+                <label>Clothing, Shoes &amp; Jewelry</label>
+            </value>
+            <value>
+                <fullName>Women&apos;s Clothing, Shoes &amp; Jewelry</fullName>
+                <default>false</default>
+                <label>Women&apos;s Clothing, Shoes &amp; Jewelry</label>
+            </value>
+            <value>
+                <fullName>Men&apos;s Clothing, Shoes &amp; Jewelry</fullName>
+                <default>false</default>
+                <label>Men&apos;s Clothing, Shoes &amp; Jewelry</label>
+            </value>
+            <value>
+                <fullName>Girl&apos;s Clothing, Shoes &amp; Jewelry</fullName>
+                <default>false</default>
+                <label>Girl&apos;s Clothing, Shoes &amp; Jewelry</label>
+            </value>
+            <value>
+                <fullName>Boy&apos;s Clothing, Shoes &amp; Jewelry</fullName>
+                <default>false</default>
+                <label>Boy&apos;s Clothing, Shoes &amp; Jewelry</label>
+            </value>
+            <value>
+                <fullName>Baby Clothing, Shoes &amp; Jewelry</fullName>
+                <default>false</default>
+                <label>Baby Clothing, Shoes &amp; Jewelry</label>
+            </value>
+            <value>
+                <fullName>Collectibles &amp; Fine Art</fullName>
+                <default>false</default>
+                <label>Collectibles &amp; Fine Art</label>
+            </value>
+            <value>
+                <fullName>Computers</fullName>
+                <default>false</default>
+                <label>Computers</label>
+            </value>
+            <value>
+                <fullName>Credit and Payment Cards</fullName>
+                <default>false</default>
+                <label>Credit and Payment Cards</label>
+            </value>
+            <value>
+                <fullName>Digital Music</fullName>
+                <default>false</default>
+                <label>Digital Music</label>
+            </value>
+            <value>
+                <fullName>Garden &amp; Outdoor</fullName>
+                <default>false</default>
+                <label>Garden &amp; Outdoor</label>
+            </value>
+            <value>
+                <fullName>Gift Cards</fullName>
+                <default>false</default>
+                <label>Gift Cards</label>
+            </value>
+            <value>
+                <fullName>Grocery &amp; Gourmet Food</fullName>
+                <default>false</default>
+                <label>Grocery &amp; Gourmet Food</label>
+            </value>
+            <value>
+                <fullName>Handmade</fullName>
+                <default>false</default>
+                <label>Handmade</label>
+            </value>
+            <value>
+                <fullName>Health, Household &amp; Baby Care</fullName>
+                <default>false</default>
+                <label>Health, Household &amp; Baby Care</label>
+            </value>
+            <value>
+                <fullName>Home &amp; Business Services</fullName>
+                <default>false</default>
+                <label>Home &amp; Business Services</label>
+            </value>
+            <value>
+                <fullName>Home &amp; Kitchen</fullName>
+                <default>false</default>
+                <label>Home &amp; Kitchen</label>
+            </value>
+            <value>
+                <fullName>Industrial &amp; Scientific</fullName>
+                <default>false</default>
+                <label>Industrial &amp; Scientific</label>
+            </value>
+            <value>
+                <fullName>Just for Prime</fullName>
+                <default>false</default>
+                <label>Just for Prime</label>
+            </value>
+            <value>
+                <fullName>Kindle Store</fullName>
+                <default>false</default>
+                <label>Kindle Store</label>
+            </value>
+            <value>
+                <fullName>Luggage &amp; Travel Gear</fullName>
+                <default>false</default>
+                <label>Luggage &amp; Travel Gear</label>
+            </value>
+            <value>
+                <fullName>Luxury Stores</fullName>
+                <default>false</default>
+                <label>Luxury Stores</label>
+            </value>
+            <value>
+                <fullName>Magazine Subscriptions</fullName>
+                <default>false</default>
+                <label>Magazine Subscriptions</label>
+            </value>
+            <value>
+                <fullName>Movies &amp; TV</fullName>
+                <default>false</default>
+                <label>Movies &amp; TV</label>
+            </value>
+            <value>
+                <fullName>Musical Instruments</fullName>
+                <default>false</default>
+                <label>Musical Instruments</label>
+            </value>
+            <value>
+                <fullName>Office Products</fullName>
+                <default>false</default>
+                <label>Office Products</label>
+            </value>
+            <value>
+                <fullName>Pet Supplies</fullName>
+                <default>false</default>
+                <label>Pet Supplies</label>
+            </value>
+            <value>
+                <fullName>Premium Beauty</fullName>
+                <default>false</default>
+                <label>Premium Beauty</label>
+            </value>
+            <value>
+                <fullName>Prime Video</fullName>
+                <default>false</default>
+                <label>Prime Video</label>
+            </value>
+            <value>
+                <fullName>Smart Home</fullName>
+                <default>false</default>
+                <label>Smart Home</label>
+            </value>
+            <value>
+                <fullName>Software</fullName>
+                <default>false</default>
+                <label>Software</label>
+            </value>
+            <value>
+                <fullName>Sports &amp; Outdoors</fullName>
+                <default>false</default>
+                <label>Sports &amp; Outdoors</label>
+            </value>
+            <value>
+                <fullName>Subscribe &amp; Save</fullName>
+                <default>false</default>
+                <label>Subscribe &amp; Save</label>
+            </value>
+            <value>
+                <fullName>Subscription Boxes</fullName>
+                <default>false</default>
+                <label>Subscription Boxes</label>
+            </value>
+            <value>
+                <fullName>Tools &amp; Home Improvement</fullName>
+                <default>false</default>
+                <label>Tools &amp; Home Improvement</label>
+            </value>
+            <value>
+                <fullName>Toys &amp; Games</fullName>
+                <default>false</default>
+                <label>Toys &amp; Games</label>
+            </value>
+            <value>
+                <fullName>Under $10</fullName>
+                <default>false</default>
+                <label>Under $10</label>
+            </value>
+            <value>
+                <fullName>Video Games</fullName>
+                <default>false</default>
+                <label>Video Games</label>
+            </value>
+            <value>
+                <fullName>Whole Foods Market</fullName>
+                <default>false</default>
+                <label>Whole Foods Market</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

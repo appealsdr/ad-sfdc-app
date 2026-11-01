@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Case Message</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Case Message</value>
+    </caseValues>
+    <layouts>
+        <layout>Case Message Layout</layout>
+        <sections>
+            <label><!-- Case Information --></label>
+            <section>Case Information</section>
+        </sections>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+        <sections>
+            <label><!-- Message Details --></label>
+            <section>Message Details</section>
+        </sections>
+        <sections>
+            <label><!-- Sender Information --></label>
+            <section>Sender Information</section>
+        </sections>
+    </layouts>
+    <startsWith>Consonant</startsWith>
+</CustomObjectTranslation>

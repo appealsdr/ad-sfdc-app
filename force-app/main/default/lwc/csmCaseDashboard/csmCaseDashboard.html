@@ -1,0 +1,85 @@
+<template>
+    <lightning-card title="Cases by Store" icon-name="standard:case">
+        <lightning-button slot="actions" label="Refresh" icon-name="utility:refresh" onclick={handleRefresh} disabled={loading}></lightning-button>
+        <div class="dashboard slds-p-horizontal_medium slds-p-bottom_medium">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text="Loading case dashboard" size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={error}>
+                <p role="alert" class="slds-text-color_error">{error}</p>
+            </template>
+            <template lwc:if={data}>
+                <p class="intro">Live cases for this call’s account, grouped by store · All time</p>
+                <div class="metrics">
+                    <template for:each={metrics} for:item="metric">
+                        <button key={metric.label} class={metric.className} type="button" data-metric={metric.key} onclick={handleCountClick}>
+                            <span class="metric-value">{metric.value}</span>
+                            <span class="metric-label">{metric.label}</span>
+                        </button>
+                    </template>
+                </div>
+                <p class="note">Aging is measured from case creation and includes only open cases. Over 14 days is included in over 7 days; both are included in Open cases.</p>
+                <div class="legend" aria-label="Chart legend">
+                    <span><i class="dot recent"></i>Open · 7 days or less</span>
+                    <span><i class="dot aged"></i>Open · over 7 days</span>
+                    <span><i class="dot resolved"></i>Closed / resolved</span>
+                </div>
+                <template lwc:if={empty}>
+                    <p class="empty">No cases found for this account or its stores.</p>
+                </template>
+                <template lwc:if={contractsLoading}><p class="note">Loading service contracts and purchased products…</p></template>
+                <template lwc:if={contractsError}><p role="alert" class="slds-text-color_error">Service contracts: {contractsError}</p></template>
+                <template for:each={stores} for:item="store">
+                    <section key={store.key} class="store">
+                        <div class="store-heading">
+                            <h3>{store.storeName}</h3>
+                            <button type="button" class="count-link" data-store={store.key} data-metric="all" onclick={handleCountClick}>{store.total} cases</button>
+                        </div>
+                        <div class="bar" role="img" aria-label={store.chartLabel}>
+                            <template for:each={store.segments} for:item="segment">
+                                <span key={segment.key} class={segment.className} style={segment.style} title={segment.title}></span>
+                            </template>
+                        </div>
+                        <div class="store-counts">
+                            <button type="button" class="count-link" data-store={store.key} data-metric="open" onclick={handleCountClick}>Open <strong>{store.openCount}</strong></button>
+                            <button type="button" class="count-link" data-store={store.key} data-metric="closed" onclick={handleCountClick}>Closed / resolved <strong>{store.closedCount}</strong></button>
+                            <button type="button" class="count-link" data-store={store.key} data-metric="aging" onclick={handleCountClick}>Over 7 days <strong>{store.agingCount}</strong></button>
+                            <button type="button" class="count-link" data-store={store.key} data-metric="overdue" onclick={handleCountClick}>Over 14 days <strong>{store.overdueCount}</strong></button>
+                        </div>
+                        <template lwc:if={store.total}>
+                            <details>
+                                <summary>Case types and categories</summary>
+                                <div class="table-scroll">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <caption class="slds-assistive-text">Case types and categories for {store.storeName}</caption>
+                                        <thead><tr>
+                                            <th scope="col">Type</th><th scope="col">Category</th>
+                                            <th scope="col">Open</th><th scope="col">Closed / resolved</th><th scope="col">Total</th>
+                                        </tr></thead>
+                                        <tbody>
+                                            <template for:each={store.breakdowns} for:item="row">
+                                                <tr key={row.key}>
+                                                    <th scope="row">{row.caseType}</th><td>{row.category}</td>
+                                                    <td><button type="button" class="count-link" data-store={store.key} data-row={row.key} data-metric="open" title="Open cases" onclick={handleCountClick}>{row.openCount}</button></td><td><button type="button" class="count-link" data-store={store.key} data-row={row.key} data-metric="closed" title="Closed / resolved cases" onclick={handleCountClick}>{row.closedCount}</button></td><td><button type="button" class="count-link" data-store={store.key} data-row={row.key} data-metric="all" title="All cases" onclick={handleCountClick}>{row.total}</button></td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+                        </template>
+                        <template lwc:if={store.showContracts}>
+                            <c-csm-store-contracts contracts={store.contracts}></c-csm-store-contracts>
+                        </template>
+                    </section>
+                </template>
+                <template for:each={additionalContractGroups} for:item="group">
+                    <section key={group.key} class="store">
+                        <h3 class="slds-text-title_bold">{group.storeName}</h3>
+                        <c-csm-store-contracts contracts={group.contracts}></c-csm-store-contracts>
+                    </section>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

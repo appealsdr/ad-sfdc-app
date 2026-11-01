@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Previewable__c</fullName>
+    <formula>OR(
+    BEGINS(LOWER(Content_Type__c), &quot;image/&quot;),
+    LOWER(Content_Type__c) = &quot;application/pdf&quot;,
+    BEGINS(LOWER(Content_Type__c), &quot;video/&quot;),
+    LOWER(Content_Type__c) = &quot;text/plain&quot;
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Is Previewable</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,31 @@
+.dashboard { position: relative; min-height: 6rem; }
+.intro, .note { color: #444; font-size: 0.75rem; }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+.metric { display: flex; flex-direction: column; border: 1px solid #ddd; border-top: 4px solid #0176d3; border-radius: 0.5rem; padding: 1rem; background: #fff; }
+.metric.closed { border-top-color: #2e844a; }
+.metric.aging { border-top-color: #b85d00; }
+.metric.overdue { border-top-color: #ba0517; }
+.metric-value { font-size: 1.8rem; font-weight: 700; line-height: 1.2; color: #181818; }
+.metric-label { font-size: 0.75rem; margin-top: 0.35rem; }
+.legend, .store-counts { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; font-size: 0.75rem; }
+.legend { margin: 1rem 0; }
+.dot { display: inline-block; width: 0.65rem; height: 0.65rem; margin-right: 0.35rem; border-radius: 50%; }
+.recent { background: #0176d3; }
+.aged { background: #b85d00; }
+.resolved { background: #2e844a; }
+.store { border: 1px solid #ddd; border-radius: 0.5rem; padding: 1rem; margin-top: 0.75rem; }
+.store-heading { display: flex; justify-content: space-between; gap: 1rem; }
+.store-heading h3 { font-weight: 700; overflow-wrap: anywhere; }
+.store-heading > span { white-space: nowrap; color: #444; font-size: 0.75rem; }
+.bar { display: flex; height: 1rem; overflow: hidden; border-radius: 0.25rem; background: #f3f3f3; margin: 0.75rem 0; }
+.segment { height: 100%; }
+.store-counts strong { margin-left: 0.25rem; }
+summary { cursor: pointer; color: #014486; font-weight: 600; margin-top: 1rem; }
+.table-scroll { overflow-x: auto; margin-top: 0.5rem; }
+.empty { padding: 1rem 0; color: #444; }
+@media (max-width: 650px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.metric { cursor: pointer; text-align: left; font-family: inherit; }
+.metric:hover { background: #f3f8fc; }
+.count-link { border: 0; padding: 0; background: none; font: inherit; color: #014486; cursor: pointer; text-decoration: underline; }
+.metric:focus-visible, .count-link:focus-visible { outline: 2px solid #0176d3; outline-offset: 3px; }

@@ -1,0 +1,268 @@
+<template>
+   
+        <!-- <div class="slds-section slds-is-open">
+            <h3 class="slds-section__title">
+                <lightning-icon icon-name="standard:service_contract" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <span class="slds-text-heading_medium">{getHeader}</span>
+            </h3>
+        </div> -->
+
+        <!-- Add to All Feature ____ start -->
+        <template if:true={isActionForCreate}>
+
+            <div  class="slds-box serviceHeader headerBox  slds-grid slds-grid_vertical-align-center">
+                <template if:true={swithServiceHeader}>
+                    <p><lightning-icon icon-name='utility:switch'  class="white-icon" name="swithServiceHeader" alternative-text='switch' size='x-small' title='switch'  onclick={switchSectionServHeader}></lightning-icon></p>
+                </template>
+                <template if:false={swithServiceHeader}>
+                    <p><lightning-icon icon-name='utility:chevronright'  class="white-icon" name="swithServiceHeader"  alternative-text='switch' size='x-small' title='switch'  onclick={switchSectionServHeader}></lightning-icon></p>
+                </template>
+                <p>&nbsp;&nbsp; <b>Apply Common Service to all stores.</b></p>
+            </div>
+
+            <template if:true={swithServiceHeader}>
+                <lightning-layout multiple-rows>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                        <lightning-input type="date" label="Contract Start Date" name="startDate" class="validateRsHeader" value={serviceHeader.startDate} required onchange={handleInputChangeServiceHeader}></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                        <lightning-input type="number" label="Months"  name="contractForMonth" value={serviceHeader.contractForMonth} class="validateRsHeader" step="0.1" 
+                        onkeydown={restrictNumberUpto1Decimal} 
+                        onchange={handleInputChangeServiceHeader}></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                        <lightning-input type="date" label="Contract End Date" name="endDate" class="validateRsHeader" value={serviceHeader.endDate}  required onchange={handleInputChangeServiceHeader}></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                        <lightning-input type="number" label="Amount Per Month"  name="price" value={serviceHeader.price} class="validateRsHeader" required onchange={handleInputChangeServiceHeader}></lightning-input>
+                    </lightning-layout-item>
+                </lightning-layout>
+                <div class="retainerServiceTable slds-p-around_medium">
+                    <table class="slds-table  slds-table_bordered">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col" width="7%">S.NO</th> 
+                                <th scope="col" width="30%"><abbr class="slds-required" lwc-2fb3f2nu4or="" title="required">*</abbr>Case Record Type</th> 
+                                <th scope="col" width="15%"><abbr class="slds-required" lwc-2fb3f2nu4or="" title="required">*</abbr>Quantity</th> 
+                                <th scope="col" width="6%"></th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={retainerServicesHeader} for:item="objWrapRS" for:index="indexRS">
+                                <tr key={objWrapRS.index}> 
+                                    <td>
+                                        <span style="font-size:20"><b> {objWrapRS.index}</b> </span>
+                                    </td>
+                                    <td>
+                                        <div class="caserecordType">
+                                            <lightning-combobox label="Case Record Type" name="caseRecordType" variant="label-hidden" value={objWrapRS.caseRecordType} class="validateRsHeader" 
+                                                options={caseRecordType__options} data-indexrs={indexRS} 
+                                                required onchange={handleInputChangeRSHeader}>
+                                            </lightning-combobox>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <lightning-input type="number" label="Quantity" 
+                                            name="numberOfCasesAllowedPerPeriod" 
+                                            variant="label-hidden" class="validateRsHeader" 
+                                            data-index={indexService} 
+                                            data-indexrs={indexRS} 
+                                            value={objWrapRS.numberOfCasesAllowedPerPeriod}  required 
+                                            onkeydown={restrictInvalidKeyForNo} 
+                                            onchange={handleInputChangeRSHeader}>
+                                        </lightning-input>
+                                    </td>
+                                    <td>
+                                        <template if:true={showDeleteButtonForRsHeader}>
+                                            <lightning-button-icon  icon-name="utility:close" alternative-text="Delete"
+                                            data-index={indexService} data-indexrs={indexRS}     
+                                            title="Delete" onclick={handleRemoveRsHeader}>
+                                            </lightning-button-icon>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="12" class="slds-p-around_x-small">
+                            <div if:false={disabled} style="float:right;">
+                                <lightning-button variant="brand" 
+                                label="+ Add Row" 
+                                data-index={indexRS}
+                                onclick={handleAddRsHeader}
+                                ></lightning-button>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+    
+                    <!-- Copy Services to All Store-->
+                   
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="12" class="slds-p-around_x-small">
+                            <div class="" style="float:right;">
+                                <lightning-button variant="brand" label="Apply to Stores"  name="applyToStores" disabled={isDisbleApplyToAllBtn}  onclick={handleApplyToStores} ></lightning-button>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+            </template>
+        </template>
+        <!-- Add to All Feature ____ end -->
+
+        <template if:true={listWrapServices} for:each={listWrapServices} for:item="objWS" for:index="indexService">
+            <div key={objWS.storeId} class="">
+                <div  class="slds-box sectionHeader headerBox  slds-grid slds-grid_vertical-align-center">
+                    <template if:true={objWS.swithStoreSection}>
+                        <p><lightning-icon icon-name='utility:switch'  class="white-icon" name="swithStoreSection" data-index={indexService} alternative-text='switch' size='x-small' title='switch'  onclick={switchSection}></lightning-icon></p>
+                    </template>
+                    <template if:false={objWS.swithStoreSection}>
+                        <p><lightning-icon icon-name='utility:chevronright'  class="white-icon" name="swithStoreSection" data-index={indexService} alternative-text='switch' size='x-small' title='switch'  onclick={switchSection}></lightning-icon></p>
+                    </template>
+                    <p>&nbsp;&nbsp;{objWS.index}. Store Name: <b>{objWS.storeName}</b></p>
+
+                    <template if:false={isActionForCreate}>
+                        <span class="delete-right">
+                            <lightning-button
+                                label="Cancel Service"
+                                name="serviceId"
+                                variant="destructive-text"
+                                class="slds-float_right delete-icon slds-float_right"
+                                data-index={indexService} 
+                                onclick={handleCancelService}>
+                            </lightning-button>
+                        </span>
+                    </template>
+                    
+                </div>
+                <div if:true={objWS.swithStoreSection} class="marginTopInMinus">
+                    <lightning-layout multiple-rows>
+                        <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                            <lightning-input type="date" label="Contract Start Date" name="startDate" class="validate" value={objWS.startDate} data-index={indexService} required onchange={handleInputChange}></lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                           <lightning-input type="number" label="Months"  name="contractForMonth" value={objWS.contractForMonth} data-index={indexService} class="validate" step="0.1" 
+                           onkeydown={restrictNumberUpto1Decimal} 
+                           onchange={handleInputChange}></lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                            <lightning-input type="date" label="Contract End Date" name="endDate" class="validate" value={objWS.endDate} data-index={indexService} required onchange={handleInputChange}></lightning-input>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" small-device-size="12" medium-device-size="3" large-device-size="3" class="slds-p-around_x-small">
+                           <lightning-input type="number" label="Amount Per Month"  name="price" value={objWS.price} data-index={indexService} class="validate" required onchange={handleInputChange}></lightning-input>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                    <div class="retainerServiceTable slds-p-around_medium">
+                        <table class="slds-table  slds-table_bordered">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col" width="6%">S.NO</th> 
+                                    <th scope="col" width="28%"><abbr class="slds-required" lwc-2fb3f2nu4or="" title="required">*</abbr>Case Record Type</th> 
+                                    <th scope="col" width="13%"><abbr class="slds-required" lwc-2fb3f2nu4or="" title="required">*</abbr>Quantity</th> 
+                                    <th scope="col" width="12%"><abbr class="slds-required" lwc-2fb3f2nu4or="" title="required">*</abbr>Amount</th> 
+                                    <template if:false={isActionForCreate}>
+                                        <th scope="col" width="21%"> Start Date</th>
+                                        <th scope="col" width="23%"> End Date</th>
+                                    </template>
+                                   <!-- <template if:false={isActionForCreate}>
+                                       <th scope="col" width="15%">Month</th> 
+                                    </template>  -->
+                                    <th scope="col" width="6%"></th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template if:true={objWS.retainerServices} for:each={objWS.retainerServices} for:item="objWrapRS" for:index="indexRS">
+                                    <tr key={objWS.index}> 
+                                        <td>
+                                            <span style="font-size:20"><b> {objWrapRS.index}</b> </span>
+                                        </td>
+                                        <td>
+                                            <div class="caserecordType">
+                                                <lightning-combobox label="Case Record Type" name="caseRecordType" variant="label-hidden" value={objWrapRS.caseRecordType} class="validate" 
+                                                    options={caseRecordType__options} data-index={indexService} data-indexrs={indexRS} 
+                                                    required onchange={handleInputChangeRS}>
+                                                </lightning-combobox>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <lightning-input type="number" label="Quantity" 
+                                                name="numberOfCasesAllowedPerPeriod" 
+                                                variant="label-hidden" class="validate" 
+                                                data-index={indexService} 
+                                                data-indexrs={indexRS} 
+                                                value={objWrapRS.numberOfCasesAllowedPerPeriod}  required 
+                                                onkeydown={restrictInvalidKeyForNo} 
+                                                onchange={handleInputChangeRS}>
+                                            </lightning-input>
+                                        </td>
+                                        <td>
+                                            <lightning-input type="number" label="Amount" 
+                                                name="amountPerMonth" 
+                                                variant="label-hidden" class="validate" 
+                                                data-index={indexService} 
+                                                data-indexrs={indexRS} 
+                                                value={objWrapRS.amountPerMonth}  
+                                                required 
+                                                onkeydown={restrictInvalidKeyForNo} 
+                                                onchange={handleInputChangeRS}>
+                                            </lightning-input>
+                                        </td>
+                                        <!-- <template if:false={isActionForCreate}>
+                                            <td>
+                                                {objWrapRS.year}-{objWrapRS.month}
+                                            </td>
+                                        </template>  -->
+                                        <template if:false={isActionForCreate}>
+                                            <td>
+                                                <lightning-input type="date" label="Start Date" 
+                                                    name="startDate" 
+                                                    variant="label-hidden" 
+                                                    class="validate" 
+                                                    value={objWrapRS.startDate} 
+                                                    data-index={indexService} 
+                                                    data-indexrs={indexRS}  
+                                                    required 
+                                                    onchange={handleInputChangeRS}>
+                                                </lightning-input>
+                                            </td>
+                                            <td>
+                                                <lightning-input type="date" label="End Date" 
+                                                    name="endDate" 
+                                                    variant="label-hidden" 
+                                                    class="validate" 
+                                                    value={objWrapRS.endDate} 
+                                                    data-index={indexService} 
+                                                    data-indexrs={indexRS}  
+                                                    required 
+                                                    onchange={handleInputChangeRS}>
+                                                </lightning-input>
+                                            </td>
+                                        </template>
+                                        <td>
+                                            <template if:true={objWrapRS.showDeleteButton}>
+                                                <lightning-button-icon  icon-name="utility:close" alternative-text="Delete"
+                                                data-index={indexService} data-indexrs={indexRS}     
+                                                title="Delete" onclick={handleRemoveRetainerService}>
+                                                </lightning-button-icon>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                        <lightning-layout multiple-rows>
+                            <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="12" class="slds-p-around_x-small">
+                                <div if:false={disabled} style="float:right;">
+                                   <lightning-button variant="brand" 
+                                    label="+ Add Row" 
+                                    data-index={indexService}
+                                    onclick={handleAddRetainerService}
+                                   ></lightning-button>
+                               </div>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </div>
+                </div>
+            </div>
+        </template>
+</template>

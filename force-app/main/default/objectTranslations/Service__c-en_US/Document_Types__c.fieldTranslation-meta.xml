@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Document Types --></label>
+    <name>Document_Types__c</name>
+    <picklistValues>
+        <masterLabel>Business Registration</masterLabel>
+        <translation><!-- Business Registration --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>GS1 Proof</masterLabel>
+        <translation><!-- GS1 Proof --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Letter of Authorization(LOA)</masterLabel>
+        <translation><!-- Letter of Authorization(LOA) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Other</masterLabel>
+        <translation><!-- Other --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Previous submission docs</masterLabel>
+        <translation><!-- Previous submission docs --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Purchasing(e.g. Invoicing, Bank Statement, Credit Card Statement, Receipts)</masterLabel>
+        <translation><!-- Purchasing(e.g. Invoicing, Bank Statement, Credit Card Statement, Receipts) --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>product images</masterLabel>
+        <translation><!-- product images --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

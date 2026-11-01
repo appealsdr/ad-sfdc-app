@@ -1,0 +1,172 @@
+<template>
+    <lightning-card title={cardTitle} icon-name="custom:custom15">
+        <lightning-button-icon
+            slot="actions"
+            icon-name="utility:refresh"
+            alternative-text="Refresh"
+            title="Refresh"
+            size="small"
+            onclick={handleRefresh}
+        ></lightning-button-icon>
+
+        <div class="slds-var-p-horizontal_medium">
+            <template lwc:if={notConfigured}>
+                <p class="slds-text-color_weak">
+                    Pick the LinkedIn URL field in this component's properties in Lightning App Builder.
+                </p>
+            </template>
+
+            <template lwc:elseif={isLoading}>
+                <div class="spinner-holder">
+                    <lightning-spinner alternative-text="Loading LinkedIn info" size="small"></lightning-spinner>
+                </div>
+            </template>
+
+            <template lwc:elseif={isEmpty}>
+                <p class="slds-text-color_weak">No LinkedIn URL on this record.</p>
+            </template>
+
+            <template lwc:elseif={errorMessage}>
+                <p class="slds-text-color_error">{errorMessage}</p>
+            </template>
+
+            <template lwc:elseif={showProfile}>
+                <div class="header">
+                    <template lwc:if={showImage}>
+                        <img class="logo" src={profile.imageUrl} alt={profile.name} onerror={handleImageError} />
+                    </template>
+                    <template lwc:else>
+                        <div class="logo logo_placeholder" aria-hidden="true">{initials}</div>
+                    </template>
+                    <div class="header-text">
+                        <a class="name" href={profile.url} target="_blank" rel="noopener noreferrer">{profile.name}</a>
+                        <template lwc:if={profile.headline}>
+                            <p class="slds-text-body_small">{profile.headline}</p>
+                        </template>
+                        <span class="slds-badge slds-m-top_xx-small">{typeLabel}</span>
+                    </div>
+                </div>
+
+                <template lwc:if={hasDetails}>
+                    <dl class="details slds-m-top_small">
+                        <template lwc:if={profile.currentCompany}>
+                            <div class="detail">
+                                <dt>Current Company</dt>
+                                <dd>{profile.currentCompany}</dd>
+                            </div>
+                        </template>
+                        <template lwc:if={profile.connections}>
+                            <div class="detail">
+                                <dt>Connections</dt>
+                                <dd>{profile.connections}</dd>
+                            </div>
+                        </template>
+                        <template lwc:if={profile.followers}>
+                            <div class="detail">
+                                <dt>Followers</dt>
+                                <dd>{profile.followers}</dd>
+                            </div>
+                        </template>
+                        <template lwc:if={profile.employees}>
+                            <div class="detail">
+                                <dt>Employees on LinkedIn</dt>
+                                <dd>{profile.employees}</dd>
+                            </div>
+                        </template>
+                        <template lwc:if={profile.location}>
+                            <div class="detail">
+                                <dt>Location</dt>
+                                <dd>{profile.location}</dd>
+                            </div>
+                        </template>
+                        <template lwc:if={profile.website}>
+                            <div class="detail">
+                                <dt>Website</dt>
+                                <dd>
+                                    <a href={profile.website} target="_blank" rel="noopener noreferrer">{profile.website}</a>
+                                </dd>
+                            </div>
+                        </template>
+                    </dl>
+                </template>
+
+                <template lwc:if={profile.description}>
+                    <h3 class="section-title">{descriptionLabel}</h3>
+                    <p class={descriptionClass}>{profile.description}</p>
+                    <template lwc:if={isLongDescription}>
+                        <lightning-button variant="base" label={descriptionToggleLabel} onclick={toggleDescription}></lightning-button>
+                    </template>
+                </template>
+
+                <template lwc:if={hasExperience}>
+                    <h3 class="section-title">Experience</h3>
+                    <ul class="timeline">
+                        <template for:each={profile.experience} for:item="job">
+                            <li key={job.key} class="timeline-item">
+                                <template lwc:if={job.url}>
+                                    <a class="org" href={job.url} target="_blank" rel="noopener noreferrer">{job.organization}</a>
+                                </template>
+                                <template lwc:else>
+                                    <span class="org">{job.organization}</span>
+                                </template>
+                                <template lwc:if={job.title}>
+                                    <div>{job.title}</div>
+                                </template>
+                                <template lwc:if={job.dateRange}>
+                                    <div class="slds-text-body_small slds-text-color_weak">{job.dateRange}</div>
+                                </template>
+                                <template lwc:if={job.description}>
+                                    <div class="slds-text-body_small">{job.description}</div>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+
+                <template lwc:if={hasEducation}>
+                    <h3 class="section-title">Education</h3>
+                    <ul class="timeline">
+                        <template for:each={profile.education} for:item="school">
+                            <li key={school.key} class="timeline-item">
+                                <template lwc:if={school.url}>
+                                    <a class="org" href={school.url} target="_blank" rel="noopener noreferrer">{school.organization}</a>
+                                </template>
+                                <template lwc:else>
+                                    <span class="org">{school.organization}</span>
+                                </template>
+                                <template lwc:if={school.dateRange}>
+                                    <div class="slds-text-body_small slds-text-color_weak">{school.dateRange}</div>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+
+                <template lwc:if={languagesText}>
+                    <h3 class="section-title">Languages</h3>
+                    <p>{languagesText}</p>
+                </template>
+
+                <template lwc:if={awardsText}>
+                    <h3 class="section-title">Honors &amp; Awards</h3>
+                    <p>{awardsText}</p>
+                </template>
+
+                <template lwc:if={showFallbackNotice}>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_small">
+                        {fallbackNotice}
+                    </p>
+                </template>
+
+                <div class="slds-m-top_small">
+                    <lightning-button
+                        label="Open on LinkedIn"
+                        icon-name="utility:new_window"
+                        icon-position="right"
+                        onclick={openLinkedIn}
+                    ></lightning-button>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

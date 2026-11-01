@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Primary Marketplace Account Health --></label>
+    <name>Primary_Marketplace_Account_Health__c</name>
+</CustomFieldTranslation>

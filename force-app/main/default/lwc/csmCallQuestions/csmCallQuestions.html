@@ -1,0 +1,35 @@
+<template>
+    <lightning-card title="Opportunity Questions" icon-name="standard:question_feed">
+        <lightning-button slot="actions" variant="brand" label="Save" onclick={handleSave} disabled={saveDisabled}></lightning-button>
+        <div class="slds-p-horizontal_medium">
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+            <template for:each={questions} for:item="q">
+                <lightning-layout key={q.number} class="slds-m-bottom_medium" vertical-align="end">
+                    <lightning-layout-item size="9">
+                        <p class="slds-text-title_bold slds-m-bottom_x-small">{q.label}</p>
+                        <template if:true={q.isMood}>
+                            <lightning-combobox name={q.number} data-number={q.number} label="Client mood" variant="label-hidden"
+                                placeholder="Select client mood" options={q.options} value={q.response} onchange={handleResponse}></lightning-combobox>
+                        </template>
+                        <template if:true={q.isYesNo}>
+                            <lightning-radio-group name={q.number} data-number={q.number} label="Answer" variant="label-hidden" type="button"
+                                options={q.options} value={q.response} onchange={handleResponse}></lightning-radio-group>
+                        </template>
+                        <lightning-textarea data-number={q.number} label="Comment" variant="label-hidden" placeholder="Comment"
+                            value={q.comment} onchange={handleComment} class="slds-m-top_x-small"></lightning-textarea>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="3" padding="horizontal-small">
+                        <template if:true={q.isUpsell}>
+                            <lightning-button label="Upsell" icon-name="utility:add" onclick={handleUpsell}></lightning-button>
+                        </template>
+                        <template if:true={q.showTask}>
+                            <lightning-button class="slds-m-top_x-small" label="Create Task" data-number={q.number} disabled={isOpeningTask} icon-name="utility:task" onclick={handleCreateTask}></lightning-button>
+                        </template>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+        </div>
+    </lightning-card>
+</template>

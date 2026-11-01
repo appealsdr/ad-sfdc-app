@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Issue --></label>
+    <name>Issue__c</name>
+    <picklistValues>
+        <masterLabel>Authenticity</masterLabel>
+        <translation><!-- Authenticity --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Approval</masterLabel>
+        <translation><!-- Brand Approval --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Detail Page Removed</masterLabel>
+        <translation><!-- Detail Page Removed --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>GS1</masterLabel>
+        <translation><!-- GS1 --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Inactive</masterLabel>
+        <translation><!-- Inactive --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Infringement</masterLabel>
+        <translation><!-- Infringement --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Pricing</masterLabel>
+        <translation><!-- Pricing --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Removed by Brand Owner</masterLabel>
+        <translation><!-- Removed by Brand Owner --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Search Suppressed</masterLabel>
+        <translation><!-- Search Suppressed --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Trademark</masterLabel>
+        <translation><!-- Trademark --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

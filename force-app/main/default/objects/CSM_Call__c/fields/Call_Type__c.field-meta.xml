@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Call_Type__c</fullName>
+    <label>Call Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Monthly Retainer Call</fullName>
+                <default>false</default>
+                <label>Monthly Retainer Call</label>
+            </value>
+            <value>
+                <fullName>On-Demand Contact</fullName>
+                <default>false</default>
+                <label>On-Demand Contact</label>
+            </value>
+            <value>
+                <fullName>Escalation</fullName>
+                <default>false</default>
+                <label>Escalation</label>
+            </value>
+            <value>
+                <fullName>Cancellation / Retention Call</fullName>
+                <default>false</default>
+                <label>Cancellation / Retention Call</label>
+            </value>
+            <value>
+                <fullName>Kickoff / Introduction Call</fullName>
+                <default>false</default>
+                <label>Kickoff / Introduction Call</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

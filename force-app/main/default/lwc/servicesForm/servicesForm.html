@@ -1,0 +1,71 @@
+<template>
+    <div class="bodyMain">
+        <template if:true={showSpinner}>
+            <div style="z-index: 10000 !important;">
+                <lightning-spinner alternative-text="Uploading......" size="medium" style="z-index: 10000 !important;"></lightning-spinner>
+            </div>
+        </template>
+        <!-- <div class="indicatorPosition">
+            <template if:true={isIndicatorForCreate}>
+                <lightning-progress-indicator current-step={currentStep} type="base" has-error={hasStepError} variant="base">
+                    <lightning-progress-step label="Select Action" value="1"></lightning-progress-step>
+                    <lightning-progress-step label="Select Store" value="3"></lightning-progress-step>
+                    <lightning-progress-step label={labelForAction} value="2"></lightning-progress-step>
+                </lightning-progress-indicator>
+            </template>
+             <template if:false={isIndicatorForCreate}>
+                <lightning-progress-indicator current-step={currentStep} type="base" has-error={hasStepError} variant="base">
+                    <lightning-progress-step label="Select Action" value="1"></lightning-progress-step>
+                    <lightning-progress-step label={labelForAction} value="3"></lightning-progress-step>
+                </lightning-progress-indicator>
+            </template>
+        </div> -->
+        <template lwc:if={isStoreScreen}>
+             <!-- <div class="slds-section slds-is-open">
+                <h3 class="slds-section__title">
+                    <lightning-icon icon-name="standard:service_contract" size="small" class="slds-m-right_x-small"></lightning-icon>
+                    <span class="slds-text-heading_medium">Create Retainer</span>
+                </h3>
+            </div> -->
+ 
+            <c-store-form record-id={recordId} 
+                selected-store-records={selectedStoreRecords} 
+                selected-store-ids={selectedStoreIds} 
+                onstoredata={handleStoreData} 
+                store-creation-source="OppService"
+                selection-mode={Store_Form_Config_LABEL.table_Record_Selection_Mode}>
+            </c-store-form>
+        </template>
+        <template lwc:elseif={isServicesScreen}>
+            <c-service-create-edit-form action-for={serviceActionFor} selected-store-records={selectedStoreRecords} list-wrap-services-copy={listWrapServices} oncancelservice={handleCancelService} ></c-service-create-edit-form>
+        </template>
+        <template lwc:else>
+            <!-- <c-service-navigation-screen record-id={recordId} action-for={serviceActionFor} onnavigateto={handleNavigation}></c-service-navigation-screen> -->
+        </template>
+
+        <template if:true={showUpdateScreen}>
+                <!-- Back/Next Buttons -->
+                <lightning-layout multiple-rows>
+                    <lightning-layout-item size="12" small-device-size="12" medium-device-size="12" large-device-size="12" class="slds-p-around_x-small">
+                        <div class="float-right"> <!--slds-align_absolute-center float-right-->
+                            <template if:true={showBackBtn}>
+                                <lightning-button variant="brand-outline" label="Back" name="Back" onclick={handleNextBack} ></lightning-button>
+                            </template>
+                            <template if:true={showNextBtn}>
+                                <lightning-button variant="brand-outline" name="Next" label="Next" class="slds-m-left_small" disabled={isDisabledNextBtn} onclick={handleNextBack} ></lightning-button>
+                            </template>
+                            <template if:true={showCreateServiceBtn}>
+                                <!-- <lightning-button variant="brand" label="Reset"  name="reset" class="slds-m-left_small" onclick={handleReset} ></lightning-button> -->
+                                <lightning-button variant="brand" label={labelForAction}  name="CreateServices" class="slds-m-left_small" onclick={handleCreateServices} ></lightning-button>
+                            </template>
+                        </div>
+                    </lightning-layout-item>
+                </lightning-layout>
+        </template>
+        <template if:false={showUpdateScreen}>
+        <div class="slds-align_absolute-center">
+            <lightning-badge label=" There is no service available."></lightning-badge>  
+        </div> 
+        </template>
+    </div>
+</template>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Case</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Case Risk of Deactivation Status</masterLabel>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;When Assigned follow usual flow&lt;/p&gt;</info>
+        <picklistValueName>Assigned</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>OwnerId</fieldNames>
+        <info>&lt;p&gt;Set Owner for Case before moving to New&lt;/p&gt;</info>
+        <picklistValueName>Draft</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;Update status&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Request documents; &lt;/li&gt;&lt;li&gt;Request Access; &lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;Define amazon Flow&lt;/p&gt;</info>
+        <picklistValueName>Waiting on Amazon</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;Define response Time. &lt;/p&gt;</info>
+        <picklistValueName>Waiting on Client</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>Account_At_Risk_of_Deactivation</recordTypeName>
+</PathAssistant>

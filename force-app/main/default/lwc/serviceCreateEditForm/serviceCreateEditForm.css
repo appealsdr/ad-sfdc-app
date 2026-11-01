@@ -1,0 +1,45 @@
+@import "c/sharedCss";
+
+:host {
+    z-index: auto;
+}
+
+.float-right {
+    margin-left: auto;   /* pushes delete button to the right */
+    display: flex;
+    align-items: center;
+}
+
+.marginTopInMinus {
+    margin-top: -10px;
+}
+.retainerServiceTable {
+    overflow: visible;
+    width: 100%;
+}
+
+.custom-header-box {
+    background-color: #0070d2; /* Lightning Blue */
+    color: white;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    height: 18px;
+}
+
+.serviceHeader {
+     background :#3a3835;
+    color: white;
+    font-weight: 500;
+    border-radius: 5px;
+    height: 30px;
+    font-size: 16px;
+    display: flex;
+}
+
+.delete-right {
+    margin-left: auto;   /* pushes delete button to the right */
+    display: flex;
+    align-items: center;
+    padding-bottom: 1px;
+}

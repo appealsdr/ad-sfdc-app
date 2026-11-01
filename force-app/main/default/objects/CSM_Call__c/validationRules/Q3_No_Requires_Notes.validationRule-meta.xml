@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Q3_No_Requires_Notes</fullName>
+    <active>true</active>
+    <description>Q3 (Satisfied With Tech Updates): notes are required when the answer is No, since No is the problem answer.</description>
+    <errorConditionFormula>AND(
+    ISPICKVAL(Q3_Response__c, &quot;No&quot;),
+    ISBLANK(Q3_Answer__c)
+)</errorConditionFormula>
+    <errorDisplayField>Q3_Answer__c</errorDisplayField>
+    <errorMessage>Please add notes when the client is not satisfied.</errorMessage>
+</ValidationRule>

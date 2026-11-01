@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Preview_Type__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+    BEGINS(LOWER(Content_Type__c), &quot;image/&quot;), &quot;Image&quot;,
+    IF(LOWER(Content_Type__c) = &quot;application/pdf&quot;, &quot;PDF&quot;,
+    IF(BEGINS(LOWER(Content_Type__c), &quot;video/&quot;), &quot;Video&quot;,
+    IF(LOWER(Content_Type__c) = &quot;text/plain&quot;, &quot;Text&quot;, &quot;None&quot;))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Preview Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

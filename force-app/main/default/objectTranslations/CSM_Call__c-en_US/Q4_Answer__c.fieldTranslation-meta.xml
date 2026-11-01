@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- Are there any open issues you feel have been pending too long? --></help>
+    <label><!-- Q4 Issues Pending Too Long Notes --></label>
+    <name>Q4_Answer__c</name>
+</CustomFieldTranslation>

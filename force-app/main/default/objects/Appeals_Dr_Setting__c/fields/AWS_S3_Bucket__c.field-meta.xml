@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AWS_S3_Bucket__c</fullName>
+    <defaultValue>&quot;appeals-doctor&quot;</defaultValue>
+    <description>S3 bucket name for case file and store file uploads. Bucket must already exist.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>S3 bucket name used for case file uploads and store file uploads.</inlineHelpText>
+    <label>AWS S3 Bucket</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

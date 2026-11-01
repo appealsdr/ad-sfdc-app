@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Case</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Case A-Z Claims Status</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>Closed_Reason__c</fieldNames>
+        <fieldNames>Closed_Comments__c</fieldNames>
+        <info>&lt;ul&gt;&lt;li&gt;Fill Closed Reason &lt;/li&gt;&lt;li&gt;Add Closed Comments (Optional)&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Closed</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;ul&gt;&lt;li&gt;Gather all supporting documents and evidence and Draft appeal professionally &lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Draft</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;ul&gt;&lt;li&gt;Track updates and responses daily&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>In Progress - Tech</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;ul&gt;&lt;li&gt;Identify scope, risks, and missing details&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>New</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;ul&gt;&lt;li&gt;Follow up regularly until the response/annotation is received&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Waiting on Amazon</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <info>&lt;ul&gt;&lt;li&gt;Follow up regularly until the response/document is received&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Waiting on Client</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>A_Z_Claims</recordTypeName>
+</PathAssistant>

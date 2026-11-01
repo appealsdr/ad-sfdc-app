@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Store</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Stores</value>
+    </caseValues>
+    <layouts>
+        <layout>On Demand</layout>
+        <sections>
+            <label><!-- App Information --></label>
+            <section>App Information</section>
+        </sections>
+        <sections>
+            <label><!-- Business Address --></label>
+            <section>Business Address</section>
+        </sections>
+        <sections>
+            <label><!-- Business Info --></label>
+            <section>Business Info</section>
+        </sections>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+        <sections>
+            <label><!-- Description --></label>
+            <section>Description</section>
+        </sections>
+        <sections>
+            <label><!-- Related To --></label>
+            <section>Related To</section>
+        </sections>
+    </layouts>
+    <layouts>
+        <layout>Store Layout</layout>
+        <sections>
+            <label><!-- App Information --></label>
+            <section>App Information</section>
+        </sections>
+        <sections>
+            <label><!-- Business Address --></label>
+            <section>Business Address</section>
+        </sections>
+        <sections>
+            <label><!-- Business Info --></label>
+            <section>Business Info</section>
+        </sections>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+        <sections>
+            <label><!-- Description --></label>
+            <section>Description</section>
+        </sections>
+        <sections>
+            <label><!-- Related To --></label>
+            <section>Related To</section>
+        </sections>
+        <sections>
+            <label><!-- Subscription Information --></label>
+            <section>Subscription Information</section>
+        </sections>
+    </layouts>
+    <quickActions>
+        <label><!-- New Case --></label>
+        <name>New_Case</name>
+    </quickActions>
+    <recordTypes>
+        <label><!-- On Demand --></label>
+        <name>On_Demand</name>
+    </recordTypes>
+    <recordTypes>
+        <label><!-- White Glove --></label>
+        <name>White_Glove</name>
+    </recordTypes>
+    <startsWith>Consonant</startsWith>
+</CustomObjectTranslation>

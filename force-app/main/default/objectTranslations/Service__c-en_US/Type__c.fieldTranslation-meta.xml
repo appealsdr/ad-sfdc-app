@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Type --></label>
+    <name>Type__c</name>
+    <picklistValues>
+        <masterLabel>A-Z Claim</masterLabel>
+        <translation><!-- A-Z Claim --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Gating</masterLabel>
+        <translation><!-- Brand Gating --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Brand Removal</masterLabel>
+        <translation><!-- Brand Removal --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Compliance</masterLabel>
+        <translation><!-- Compliance --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Customer Message</masterLabel>
+        <translation><!-- Customer Message --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Feedback Removal</masterLabel>
+        <translation><!-- Feedback Removal --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Full Account Audit</masterLabel>
+        <translation><!-- Full Account Audit --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Listing Issue</masterLabel>
+        <translation><!-- Listing Issue --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Storage Increase</masterLabel>
+        <translation><!-- Storage Increase --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Violation</masterLabel>
+        <translation><!-- Violation --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

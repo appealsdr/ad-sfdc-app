@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Document_Types__c</fullName>
+    <label>Document Types</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Business Registration</fullName>
+                <default>false</default>
+                <label>Business Registration</label>
+            </value>
+            <value>
+                <fullName>Letter of Authorization(LOA)</fullName>
+                <default>false</default>
+                <label>Letter of Authorization(LOA)</label>
+            </value>
+            <value>
+                <fullName>GS1 Proof</fullName>
+                <default>false</default>
+                <label>GS1 Proof</label>
+            </value>
+            <value>
+                <fullName>Purchasing</fullName>
+                <default>false</default>
+                <label>Purchasing(e.g. Invoicing, Bank Statement, Credit Card Statement, Receipts)</label>
+            </value>
+            <value>
+                <fullName>product images</fullName>
+                <default>false</default>
+                <label>product images</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+            <value>
+                <fullName>Previous submission docs</fullName>
+                <default>false</default>
+                <label>Previous submission docs</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>
