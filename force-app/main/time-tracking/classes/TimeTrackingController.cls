@@ -314,6 +314,7 @@ public with sharing class TimeTrackingController {
                    Status__c, Comments__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name
             FROM Time_Tracking__c
             WHERE Store__c = :recordId
+              AND Case__c = null
             ORDER BY Start_Time__c DESC
         ];
     }
@@ -358,12 +359,13 @@ public with sharing class TimeTrackingController {
         if (objectType == 'Case') {
             return record.Case__c == recordId;
         }
-        return record.Store__c == recordId;
+        return record.Store__c == recordId && record.Case__c == null;
     }
 
     private static void setRelatedRecord(Time_Tracking__c record, Id recordId, String objectType) {
         if (objectType == 'Case') {
             record.Case__c = recordId;
+            record.Store__c = [SELECT Store__c FROM Case WHERE Id = :recordId].Store__c;
         } else {
             record.Store__c = recordId;
         }
