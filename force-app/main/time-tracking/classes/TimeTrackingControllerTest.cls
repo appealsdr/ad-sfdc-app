@@ -45,7 +45,7 @@ private class TimeTrackingControllerTest {
 
     private static Case getPrimaryCase() {
         Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
-        return [SELECT Id FROM Case WHERE Store__c = :store.Id LIMIT 1];
+        return [SELECT Id, Store__c FROM Case WHERE Store__c = :store.Id LIMIT 1];
     }
 
     private static Case getOtherCase() {
@@ -56,23 +56,107 @@ private class TimeTrackingControllerTest {
     @IsTest
     static void testGetTimeTrackingDataForStore() {
         Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        Store__c otherStore = [SELECT Id FROM Store__c WHERE Name = 'Secondary Store' LIMIT 1];
+        Case testCase = getPrimaryCase();
+        Datetime endTime = System.now();
 
-        insert new Time_Tracking__c(
+        Time_Tracking__c storeEntry = new Time_Tracking__c(
             Assignee__c = UserInfo.getUserId(),
             Store__c = store.Id,
-            Start_Time__c = System.now().addMinutes(-15),
-            End_Time__c = System.now(),
+            Start_Time__c = endTime.addMinutes(-15),
+            End_Time__c = endTime,
             Status__c = TimeTrackingController.STATUS_COMPLETED,
             Comments__c = 'Store work'
         );
+        insert new List<Time_Tracking__c>{
+            storeEntry,
+            new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Store__c = store.Id,
+                Case__c = testCase.Id,
+                Start_Time__c = endTime.addMinutes(-30),
+                End_Time__c = endTime,
+                Status__c = TimeTrackingController.STATUS_COMPLETED,
+                Comments__c = 'Case work'
+            ),
+            new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Store__c = store.Id,
+                Case__c = testCase.Id,
+                Start_Time__c = endTime.addMinutes(-10),
+                Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+            ),
+            new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Store__c = otherStore.Id,
+                Start_Time__c = endTime.addMinutes(-45),
+                End_Time__c = endTime,
+                Status__c = TimeTrackingController.STATUS_COMPLETED,
+                Comments__c = 'Other store work'
+            )
+        };
 
         Test.startTest();
         TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(store.Id);
+        TimeTrackingController.TimeTrackingData caseData = TimeTrackingController.getTimeTrackingData(testCase.Id);
         Test.stopTest();
 
         System.assertEquals('Store__c', data.objectType);
         System.assertEquals(1, data.records.size());
+        System.assertEquals(storeEntry.Id, data.records[0].id);
         System.assertEquals('Primary Store', data.records[0].relatedRecordName);
+        System.assertEquals(15, data.totalMinutes, 'Store totals must exclude case entries and other stores.');
+        System.assertEquals(null, data.activeTimer, 'A case timer must not appear as an active store timer.');
+        System.assertEquals(2, caseData.records.size(), 'Case entries should remain visible on their case.');
+        System.assertNotEquals(null, caseData.activeTimer);
+    }
+
+    @IsTest
+    static void testStartTimerOnStore() {
+        Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+
+        Test.startTest();
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(store.Id);
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(store.Id);
+        TimeTrackingController.StartTimerResult resumed = TimeTrackingController.startTimer(store.Id);
+        Test.stopTest();
+
+        Time_Tracking__c record = [
+            SELECT Case__c, Store__c
+            FROM Time_Tracking__c
+            WHERE Id = :result.timeTrackingId
+        ];
+        System.assertEquals(true, result.success);
+        System.assertEquals(store.Id, record.Store__c);
+        System.assertEquals(null, record.Case__c);
+        System.assertEquals(1, data.records.size());
+        System.assertNotEquals(null, data.activeTimer);
+        System.assertEquals(result.timeTrackingId, data.activeTimer.id);
+        System.assertEquals(true, resumed.success);
+        System.assertEquals(result.timeTrackingId, resumed.timeTrackingId);
+    }
+
+    @IsTest
+    static void testCaseTimerBlocksTimerOnSameStore() {
+        Case testCase = getPrimaryCase();
+        Time_Tracking__c caseTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Case__c = testCase.Id,
+            Store__c = testCase.Store__c,
+            Start_Time__c = System.now(),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+        );
+        insert caseTimer;
+
+        Test.startTest();
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(testCase.Store__c);
+        Test.stopTest();
+
+        System.assertEquals(false, result.success);
+        System.assertEquals(null, result.timeTrackingId);
+        System.assertNotEquals(null, result.blockingTimer);
+        System.assertEquals(caseTimer.Id, result.blockingTimer.id);
+        System.assertEquals(1, [SELECT COUNT() FROM Time_Tracking__c]);
     }
 
     @IsTest
@@ -141,6 +225,7 @@ private class TimeTrackingControllerTest {
         Time_Tracking__c existing = new Time_Tracking__c(
             Assignee__c = UserInfo.getUserId(),
             Case__c = testCase.Id,
+            Store__c = testCase.Store__c,
             Start_Time__c = System.now(),
             Status__c = TimeTrackingController.STATUS_IN_PROGRESS
         );
@@ -417,13 +502,15 @@ private class TimeTrackingControllerTest {
         Test.stopTest();
 
         Time_Tracking__c completedRecord = [
-            SELECT Status__c, End_Time__c, Comments__c
+            SELECT Status__c, End_Time__c, Comments__c, Case__c, Store__c
             FROM Time_Tracking__c
             WHERE Id = :startResult.timeTrackingId
         ];
         System.assertEquals(TimeTrackingController.STATUS_COMPLETED, completedRecord.Status__c);
         System.assertNotEquals(null, completedRecord.End_Time__c);
         System.assertEquals('Finished task', completedRecord.Comments__c);
+        System.assertEquals(testCase.Id, completedRecord.Case__c);
+        System.assertEquals(testCase.Store__c, completedRecord.Store__c);
     }
 
     @IsTest
@@ -503,13 +590,37 @@ private class TimeTrackingControllerTest {
         Test.stopTest();
 
         Time_Tracking__c record = [
-            SELECT Status__c, Start_Time__c, End_Time__c, Comments__c, Assignee__c
+            SELECT Status__c, Start_Time__c, End_Time__c, Comments__c, Assignee__c, Case__c, Store__c
             FROM Time_Tracking__c
             WHERE Id = :newId
         ];
         System.assertEquals(TimeTrackingController.STATUS_COMPLETED, record.Status__c);
         System.assertEquals('Manual entry', record.Comments__c);
         System.assertEquals(UserInfo.getUserId(), record.Assignee__c);
+        System.assertEquals(testCase.Id, record.Case__c);
+        System.assertEquals(testCase.Store__c, record.Store__c);
+    }
+
+    @IsTest
+    static void testCreateManualEntryOnStore() {
+        Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        Datetime endTime = System.now();
+
+        Test.startTest();
+        Id newId = TimeTrackingController.createManualEntry(store.Id, endTime.addMinutes(-20), endTime, 'Store work');
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(store.Id);
+        Test.stopTest();
+
+        Time_Tracking__c record = [
+            SELECT Case__c, Store__c
+            FROM Time_Tracking__c
+            WHERE Id = :newId
+        ];
+        System.assertEquals(store.Id, record.Store__c);
+        System.assertEquals(null, record.Case__c);
+        System.assertEquals(1, data.records.size());
+        System.assertEquals(newId, data.records[0].id);
+        System.assertEquals(20, data.totalMinutes);
     }
 
     @IsTest
