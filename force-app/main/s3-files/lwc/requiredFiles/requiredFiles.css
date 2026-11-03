@@ -20,34 +20,6 @@
     overflow-x: auto;
 }
 
-.file-link {
-    background: none;
-    border: 0;
-    color: #0176d3;
-    cursor: pointer;
-    font-size: 0.875rem;
-    font-weight: 700;
-    padding: 0;
-    text-align: left;
-    text-decoration: underline;
-}
-
-.file-link:hover,
-.file-link:focus {
-    color: #014486;
-}
-
-.file-text {
-    color: #181818;
-    font-size: 0.875rem;
-    font-weight: 700;
-}
-
-.file-empty {
-    color: #706e6b;
-    font-size: 0.875rem;
-}
-
 .preview-modal-container {
     max-width: 72rem;
     width: 92vw;
@@ -64,6 +36,20 @@
     min-height: 60vh;
     max-height: 75vh;
     overflow: auto;
+}
+
+.preview-layout {
+    min-height: 68vh;
+}
+
+.preview-navigation {
+    border-right: 1px solid #dddbda;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.preview-pane {
+    min-width: 0;
 }
 
 .preview-image {

@@ -3,11 +3,20 @@ public with sharing class RequiredFileController {
     public class RequiredFileWrapper {
         @AuraEnabled public Id id { get; set; }
         @AuraEnabled public String name { get; set; }
+        @AuraEnabled public String rowType { get; set; }
         @AuraEnabled public String shortDescription { get; set; }
         @AuraEnabled public Boolean fileUploaded { get; set; }
         @AuraEnabled public String uploadedLabel { get; set; }
         @AuraEnabled public Id lastVersionId { get; set; }
         @AuraEnabled public String uploadedFileName { get; set; }
+        @AuraEnabled public Boolean canPreview { get; set; }
+        @AuraEnabled public List<UploadedFileWrapper> uploadedFiles { get; set; }
+    }
+
+    public class UploadedFileWrapper {
+        @AuraEnabled public Id id { get; set; }
+        @AuraEnabled public String name { get; set; }
+        @AuraEnabled public String shortDescription { get; set; }
         @AuraEnabled public Boolean canPreview { get; set; }
     }
 
@@ -29,16 +38,14 @@ public with sharing class RequiredFileController {
 
         if (objectApiName == 'Case') {
             requiredFiles = [
-                SELECT Id, Name, Short_Description__c, File_Uploaded__c, Last_Version__c,
-                       Last_Version__r.File_Name__c, Last_Version__r.Is_Previewable__c
+                SELECT Id, Name, Short_Description__c, Last_Version__c
                 FROM Required_File__c
                 WHERE Case__c = :recordId
                 ORDER BY Name ASC
             ];
         } else if (objectApiName == 'Store__c') {
             requiredFiles = [
-                SELECT Id, Name, Short_Description__c, File_Uploaded__c, Last_Version__c,
-                       Last_Version__r.File_Name__c, Last_Version__r.Is_Previewable__c
+                SELECT Id, Name, Short_Description__c, Last_Version__c
                 FROM Required_File__c
                 WHERE Store__c = :recordId
                 ORDER BY Name ASC
@@ -48,8 +55,34 @@ public with sharing class RequiredFileController {
         }
 
         List<RequiredFileWrapper> wrappers = new List<RequiredFileWrapper>();
+        Map<Id, RequiredFileWrapper> requiredFilesById = new Map<Id, RequiredFileWrapper>();
         for (Required_File__c requiredFile : requiredFiles) {
-            wrappers.add(toWrapper(requiredFile));
+            RequiredFileWrapper wrapper = toWrapper(requiredFile);
+            wrappers.add(wrapper);
+            requiredFilesById.put(requiredFile.Id, wrapper);
+        }
+
+        String parentRecordId = String.valueOf(recordId);
+        for (S3_Document__c document : [
+            SELECT Id, Required_File__c, File_Name__c, Description__c, Is_Previewable__c
+            FROM S3_Document__c
+            WHERE Related_Record_Id__c = :parentRecordId
+              AND Status__c = 'Active'
+            ORDER BY Uploaded_Date__c DESC NULLS LAST, CreatedDate DESC, Id ASC
+        ]) {
+            RequiredFileWrapper requiredFile = requiredFilesById.get(document.Required_File__c);
+            if (requiredFile != null) {
+                requiredFile.uploadedFiles.add(toUploadedFileWrapper(document));
+                requiredFile.fileUploaded = true;
+                requiredFile.uploadedLabel = 'Yes';
+                if (document.Id == requiredFile.lastVersionId) {
+                    requiredFile.uploadedFileName = document.File_Name__c;
+                    requiredFile.canPreview = document.Is_Previewable__c == true;
+                }
+            } else {
+                // Parent-bound uploads remain visible when their requirement is absent or belongs elsewhere.
+                wrappers.add(toDocumentRow(document));
+            }
         }
         return wrappers;
     }
@@ -168,17 +201,36 @@ public with sharing class RequiredFileController {
         RequiredFileWrapper wrapper = new RequiredFileWrapper();
         wrapper.id = requiredFile.Id;
         wrapper.name = requiredFile.Name;
+        wrapper.rowType = 'requiredFile';
         wrapper.shortDescription = requiredFile.Short_Description__c;
-        wrapper.fileUploaded = requiredFile.File_Uploaded__c == true;
-        wrapper.uploadedLabel = wrapper.fileUploaded ? 'Yes' : 'No';
+        wrapper.uploadedFiles = new List<UploadedFileWrapper>();
+        wrapper.fileUploaded = false;
+        wrapper.uploadedLabel = 'No';
         wrapper.lastVersionId = requiredFile.Last_Version__c;
-        wrapper.uploadedFileName = requiredFile.Last_Version__r != null
-            ? requiredFile.Last_Version__r.File_Name__c
-            : null;
-        wrapper.canPreview = wrapper.fileUploaded
-            && requiredFile.Last_Version__c != null
-            && requiredFile.Last_Version__r != null
-            && requiredFile.Last_Version__r.Is_Previewable__c == true;
+        wrapper.canPreview = false;
+        return wrapper;
+    }
+
+    private static UploadedFileWrapper toUploadedFileWrapper(S3_Document__c document) {
+        UploadedFileWrapper wrapper = new UploadedFileWrapper();
+        wrapper.id = document.Id;
+        wrapper.name = document.File_Name__c;
+        wrapper.shortDescription = document.Description__c;
+        wrapper.canPreview = document.Is_Previewable__c == true;
+        return wrapper;
+    }
+
+    private static RequiredFileWrapper toDocumentRow(S3_Document__c document) {
+        RequiredFileWrapper wrapper = new RequiredFileWrapper();
+        wrapper.id = document.Id;
+        wrapper.name = document.File_Name__c;
+        wrapper.rowType = 'uploadedFile';
+        wrapper.shortDescription = document.Description__c;
+        wrapper.fileUploaded = true;
+        wrapper.uploadedLabel = 'Yes';
+        wrapper.uploadedFileName = document.File_Name__c;
+        wrapper.canPreview = document.Is_Previewable__c == true;
+        wrapper.uploadedFiles = new List<UploadedFileWrapper>();
         return wrapper;
     }
 }

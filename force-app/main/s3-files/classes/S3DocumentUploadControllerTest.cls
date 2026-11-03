@@ -68,6 +68,8 @@ private class S3DocumentUploadControllerTest {
 
         System.assertEquals(true, context.uploadAllowed, context.message);
         System.assertEquals('amzn-andrei-appeals-dr-test-bucket', context.bucket);
+        System.assertEquals(String.valueOf(testCase.Id), context.relatedRecordId);
+        System.assertEquals('Case', context.relatedObjectType);
         String expectedAccountSegment = expectedVuidSegment('Account', 'account-vuid-001', store.Account__c);
         String expectedStoreSegment = expectedVuidSegment('Store__c', 'store-vuid-001', store.Id);
         System.assert(context.message.contains(
@@ -85,6 +87,8 @@ private class S3DocumentUploadControllerTest {
         Test.stopTest();
 
         System.assertEquals(true, context.uploadAllowed, context.message);
+        System.assertEquals(String.valueOf(store.Id), context.relatedRecordId);
+        System.assertEquals('Store__c', context.relatedObjectType);
         System.assert(context.message.contains('/Documents/Files/'));
     }
 
@@ -98,6 +102,8 @@ private class S3DocumentUploadControllerTest {
         Test.stopTest();
 
         System.assertEquals(true, context.uploadAllowed, context.message);
+        System.assertEquals(String.valueOf(template.Id), context.relatedRecordId);
+        System.assertEquals('Document_Template__c', context.relatedObjectType);
         System.assert(context.message.contains('/Templates/' + template.Id + '/Files/'));
     }
 
@@ -171,12 +177,13 @@ private class S3DocumentUploadControllerTest {
         System.assertNotEquals(null, result.documentId);
 
         S3_Document__c document = [
-            SELECT Related_Record_Id__c, Related_Object_Type__c, S3_Key__c, File_Name__c
+            SELECT Related_Record_Id__c, Related_Object_Type__c, Required_File__c, S3_Key__c, File_Name__c
             FROM S3_Document__c
             WHERE Id = :result.documentId
         ];
         System.assertEquals(String.valueOf(testCase.Id), document.Related_Record_Id__c);
         System.assertEquals('Case', document.Related_Object_Type__c);
+        System.assertEquals(null, document.Required_File__c, 'Direct Case uploads remain standalone.');
         System.assertEquals('invoice.pdf', document.File_Name__c);
     }
 
@@ -190,6 +197,8 @@ private class S3DocumentUploadControllerTest {
         insert requiredFile;
 
         Test.startTest();
+        S3DocumentUploadService.UploadContextWrapper context =
+            S3DocumentUploadController.getUploadContext(requiredFile.Id);
         S3DocumentUploadService.UploadTargetWrapper target =
             S3DocumentUploadController.prepareUpload(requiredFile.Id, 'invoice.pdf', 'application/pdf', 1024);
         S3DocumentUploadService.FinalizeResultWrapper result =
@@ -203,6 +212,9 @@ private class S3DocumentUploadControllerTest {
             );
         Test.stopTest();
 
+        System.assertEquals(true, context.uploadAllowed, context.message);
+        System.assertEquals(String.valueOf(testCase.Id), context.relatedRecordId);
+        System.assertEquals('Case', context.relatedObjectType);
         Required_File__c refreshedRequiredFile = [
             SELECT File_Uploaded__c, Last_Version__c
             FROM Required_File__c
@@ -212,12 +224,69 @@ private class S3DocumentUploadControllerTest {
         System.assertEquals(result.documentId, refreshedRequiredFile.Last_Version__c);
 
         S3_Document__c document = [
-            SELECT Related_Record_Id__c, Related_Object_Type__c
+            SELECT Related_Record_Id__c, Related_Object_Type__c, Required_File__c
             FROM S3_Document__c
             WHERE Id = :result.documentId
         ];
-        System.assertEquals(String.valueOf(requiredFile.Id), document.Related_Record_Id__c);
-        System.assertEquals('Required_File__c', document.Related_Object_Type__c);
+        System.assertEquals(String.valueOf(testCase.Id), document.Related_Record_Id__c);
+        System.assertEquals('Case', document.Related_Object_Type__c);
+        System.assertEquals(requiredFile.Id, document.Required_File__c);
+    }
+
+    @IsTest
+    static void testMultipleRequiredFileStoreUploadsKeepAllDocuments() {
+        Store__c store = [SELECT Id FROM Store__c LIMIT 1];
+        Required_File__c requiredFile = new Required_File__c(
+            Name = 'Store Required Invoices',
+            Store__c = store.Id
+        );
+        insert requiredFile;
+
+        Test.startTest();
+        S3DocumentUploadService.UploadTargetWrapper firstTarget =
+            S3DocumentUploadController.prepareUpload(requiredFile.Id, 'invoice.pdf', 'application/pdf', 1024);
+        S3DocumentUploadService.UploadTargetWrapper secondTarget =
+            S3DocumentUploadController.prepareUpload(requiredFile.Id, 'invoice.pdf', 'application/pdf', 2048);
+        S3DocumentUploadService.FinalizeResultWrapper firstResult =
+            S3DocumentUploadController.finalizeUpload(
+                requiredFile.Id, 'invoice.pdf', 'application/pdf', 1024, firstTarget.s3Key, 'First invoice'
+            );
+        Required_File__c afterFirstUpload = [
+            SELECT Last_Version__c FROM Required_File__c WHERE Id = :requiredFile.Id
+        ];
+        S3DocumentUploadService.FinalizeResultWrapper secondResult =
+            S3DocumentUploadController.finalizeUpload(
+                requiredFile.Id, 'invoice.pdf', 'application/pdf', 2048, secondTarget.s3Key, 'Second invoice'
+            );
+        Test.stopTest();
+
+        System.assertNotEquals(firstTarget.s3Key, secondTarget.s3Key, 'Same-name uploads use distinct S3 keys.');
+        System.assertNotEquals(firstResult.documentId, secondResult.documentId);
+        System.assertEquals(firstResult.documentId, afterFirstUpload.Last_Version__c);
+        Required_File__c afterSecondUpload = [
+            SELECT File_Uploaded__c, Last_Version__c FROM Required_File__c WHERE Id = :requiredFile.Id
+        ];
+        System.assertEquals(true, afterSecondUpload.File_Uploaded__c);
+        System.assertEquals(secondResult.documentId, afterSecondUpload.Last_Version__c);
+
+        List<S3_Document__c> documents = [
+            SELECT Id, Required_File__c, Related_Record_Id__c, Related_Object_Type__c, S3_Key__c, Status__c
+            FROM S3_Document__c
+            WHERE Required_File__c = :requiredFile.Id
+        ];
+        System.assertEquals(2, documents.size(), 'Earlier required-file uploads remain available.');
+        Set<Id> uploadedIds = new Set<Id>();
+        Set<String> objectKeys = new Set<String>();
+        for (S3_Document__c document : documents) {
+            uploadedIds.add(document.Id);
+            objectKeys.add(document.S3_Key__c);
+            System.assertEquals(requiredFile.Id, document.Required_File__c);
+            System.assertEquals(String.valueOf(store.Id), document.Related_Record_Id__c);
+            System.assertEquals('Store__c', document.Related_Object_Type__c);
+            System.assertEquals('Active', document.Status__c);
+        }
+        System.assertEquals(new Set<Id>{ firstResult.documentId, secondResult.documentId }, uploadedIds);
+        System.assertEquals(new Set<String>{ firstTarget.s3Key, secondTarget.s3Key }, objectKeys);
     }
 
     @IsTest
@@ -300,6 +369,8 @@ private class S3DocumentUploadControllerTest {
         Test.stopTest();
 
         System.assertEquals(true, context.uploadAllowed, context.message);
+        System.assertEquals(String.valueOf(store.Id), context.relatedRecordId);
+        System.assertEquals('Store__c', context.relatedObjectType);
         System.assert(context.message.contains('/Documents/Files/'));
     }
 
@@ -318,6 +389,8 @@ private class S3DocumentUploadControllerTest {
         Test.stopTest();
 
         System.assertEquals(true, context.uploadAllowed, context.message);
+        System.assertEquals(String.valueOf(template.Id), context.relatedRecordId);
+        System.assertEquals('Document_Template__c', context.relatedObjectType);
         System.assert(context.message.contains('/Templates/' + template.Id + '/Files/'));
     }
     @IsTest

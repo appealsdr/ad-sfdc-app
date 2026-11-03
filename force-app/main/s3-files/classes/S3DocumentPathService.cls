@@ -9,6 +9,7 @@ public with sharing class S3DocumentPathService {
         public String s3KeyPrefix { get; set; }
         public String relatedObjectType { get; set; }
         public String relatedRecordId { get; set; }
+        public Id requiredFileId { get; set; }
         public String pathDescription { get; set; }
     }
 
@@ -107,22 +108,25 @@ public with sharing class S3DocumentPathService {
 
         if (requiredFile.Case__c != null) {
             buildCasePath(requiredFile.Case__c, path);
-            path.relatedRecordId = String.valueOf(requiredFileId);
-            path.relatedObjectType = 'Required_File__c';
+            path.relatedRecordId = String.valueOf(requiredFile.Case__c);
+            path.relatedObjectType = 'Case';
+            path.requiredFileId = requiredFileId;
             return;
         }
 
         if (requiredFile.Store__c != null) {
             buildStorePath(requiredFile.Store__c, path);
-            path.relatedRecordId = String.valueOf(requiredFileId);
-            path.relatedObjectType = 'Required_File__c';
+            path.relatedRecordId = String.valueOf(requiredFile.Store__c);
+            path.relatedObjectType = 'Store__c';
+            path.requiredFileId = requiredFileId;
             return;
         }
 
         if (requiredFile.Document_Template__c != null) {
             buildTemplatePath(requiredFile.Document_Template__c, path);
-            path.relatedRecordId = String.valueOf(requiredFileId);
-            path.relatedObjectType = 'Required_File__c';
+            path.relatedRecordId = String.valueOf(requiredFile.Document_Template__c);
+            path.relatedObjectType = 'Document_Template__c';
+            path.requiredFileId = requiredFileId;
             return;
         }
 
