@@ -1,9 +1,18 @@
 <template>
     <lightning-card title="Required Files" icon-name="standard:file">
         <div slot="actions">
+            <lightning-button-icon
+                class="slds-m-right_x-small"
+                icon-name="utility:refresh"
+                alternative-text="Refresh files"
+                title="Refresh files"
+                disabled={isLoading}
+                onclick={handleRefresh}>
+            </lightning-button-icon>
             <lightning-button
                 label="New"
                 variant="brand"
+                disabled={isLoading}
                 onclick={handleNewClick}>
             </lightning-button>
         </div>
@@ -11,7 +20,7 @@
         <div class="toolbar">
             <lightning-input
                 type="search"
-                label="Search"
+                label="Search required files and uploaded files"
                 variant="label-hidden"
                 placeholder="Search by name, description, upload status, or file name"
                 value={searchTerm}
@@ -27,52 +36,22 @@
 
         <template if:false={isLoading}>
             <template if:true={noFiles}>
-                <p class="empty-state">No required files found for this record.</p>
+                <p class="empty-state">{emptyStateMessage}</p>
             </template>
 
             <template if:true={hasFiles}>
                 <div class="table-wrap">
-                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
-                        <thead>
-                            <tr class="slds-line-height_reset">
-                                <th scope="col"><div class="slds-truncate">File Name</div></th>
-                                <th scope="col"><div class="slds-truncate">Short Description</div></th>
-                                <th scope="col"><div class="slds-truncate">File Uploaded</div></th>
-                                <th scope="col"><div class="slds-truncate">Uploaded File</div></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template for:each={filteredFiles} for:item="file">
-                                <tr key={file.id}>
-                                    <td>
-                                        <button
-                                            type="button"
-                                            class="file-link"
-                                            data-id={file.id}
-                                            onclick={handleNameClick}>
-                                            {file.name}
-                                        </button>
-                                    </td>
-                                    <td><div class="slds-truncate">{file.shortDescription}</div></td>
-                                    <td><div class="slds-truncate">{file.uploadedLabel}</div></td>
-                                    <td>
-                                        <template if:true={file.hasUploadedFile}>
-                                            <button
-                                                type="button"
-                                                class="file-link"
-                                                data-id={file.id}
-                                                onclick={handleUploadedFileClick}>
-                                                {file.uploadedFileName}
-                                            </button>
-                                        </template>
-                                        <template if:false={file.hasUploadedFile}>
-                                            <span class="file-empty">—</span>
-                                        </template>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
+                    <lightning-tree-grid
+                        aria-label="Required files and uploaded files"
+                        key-field="id"
+                        data={filteredFiles}
+                        columns={columns}
+                        column-widths-mode="fixed"
+                        expanded-rows={expandedRows}
+                        hide-checkbox-column
+                        onrowaction={handleRowAction}
+                        ontoggle={handleRowToggle}>
+                    </lightning-tree-grid>
                 </div>
             </template>
         </template>
@@ -165,34 +144,88 @@
         <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
             <div class="slds-modal__container preview-modal-container">
                 <header class="slds-modal__header">
+                    <lightning-button-icon
+                        class="slds-modal__close"
+                        icon-name="utility:close"
+                        variant="bare-inverse"
+                        alternative-text="Close preview"
+                        title="Close preview"
+                        onclick={handleClosePreviewModal}>
+                    </lightning-button-icon>
                     <h2 class="slds-text-heading_medium">{previewFileName}</h2>
                 </header>
-                <div class="slds-modal__content slds-p-around_medium preview-content">
-                    <template if:true={isPreviewLoading}>
-                        <div class="loading-wrap">
-                            <lightning-spinner size="medium" alternative-text="Loading preview"></lightning-spinner>
-                        </div>
-                    </template>
+                <div class="slds-modal__content preview-content">
+                    <lightning-layout class="preview-layout">
+                        <lightning-layout-item size="3" class="preview-navigation">
+                            <lightning-vertical-navigation
+                                selected-item={selectedPreviewNavigationItem}
+                                onbeforeselect={handlePreviewNavigationBeforeSelect}
+                                onselect={handlePreviewNavigationSelect}>
+                                <lightning-vertical-navigation-section label="Files">
+                                    <template for:each={previewNavigationItems} for:item="item">
+                                        <template if:true={item.isFolder}>
+                                            <lightning-vertical-navigation-item-icon
+                                                key={item.navigationName}
+                                                label={item.label}
+                                                name={item.navigationName}
+                                                icon-name={item.iconName}>
+                                            </lightning-vertical-navigation-item-icon>
+                                        </template>
+                                        <template if:true={item.isDocument}>
+                                            <lightning-vertical-navigation-item-icon
+                                                key={item.navigationName}
+                                                label={item.label}
+                                                name={item.navigationName}
+                                                icon-name={item.iconName}>
+                                            </lightning-vertical-navigation-item-icon>
+                                        </template>
+                                    </template>
+                                </lightning-vertical-navigation-section>
+                            </lightning-vertical-navigation>
+                        </lightning-layout-item>
 
-                    <template if:true={showImagePreview}>
-                        <img src={previewUrl} alt={previewFileName} class="preview-image" />
-                    </template>
+                        <lightning-layout-item size="9" class="preview-pane">
+                            <div class="slds-p-around_medium">
+                                <template if:true={isPreviewLoading}>
+                                    <div class="loading-wrap">
+                                        <lightning-spinner size="medium" alternative-text="Loading preview"></lightning-spinner>
+                                    </div>
+                                </template>
 
-                    <template if:true={showPdfPreview}>
-                        <iframe src={previewUrl} title={previewFileName} class="preview-frame"></iframe>
-                    </template>
+                                <template if:true={showImagePreview}>
+                                    <img src={previewUrl} alt={previewFileName} class="preview-image" />
+                                </template>
 
-                    <template if:true={showVideoPreview}>
-                        <video controls src={previewUrl} class="preview-video"></video>
-                    </template>
+                                <template if:true={showPdfPreview}>
+                                    <iframe src={previewUrl} title={previewFileName} class="preview-frame"></iframe>
+                                </template>
 
-                    <template if:true={showTextPreview}>
-                        <iframe src={previewUrl} title={previewFileName} class="preview-frame"></iframe>
-                    </template>
+                                <template if:true={showVideoPreview}>
+                                    <video controls src={previewUrl} class="preview-video"></video>
+                                </template>
 
-                    <template if:true={showUnsupportedPreview}>
-                        <p class="empty-state">Preview is not available for this file type.</p>
-                    </template>
+                                <template if:true={showTextPreview}>
+                                    <iframe src={previewUrl} title={previewFileName} class="preview-frame"></iframe>
+                                </template>
+
+                                <template if:true={showUnsupportedPreview}>
+                                    <p class="empty-state">Preview is not available for this file type.</p>
+                                </template>
+
+                                <template if:true={showPreviewError}>
+                                    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                                        <lightning-icon
+                                            icon-name="utility:error"
+                                            size="x-small"
+                                            variant="inverse"
+                                            alternative-text="Error">
+                                        </lightning-icon>
+                                        <span class="slds-m-left_x-small">{previewError}</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
                 </div>
                 <footer class="slds-modal__footer">
                     <lightning-button label="Close" onclick={handleClosePreviewModal}></lightning-button>

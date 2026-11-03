@@ -2052,6 +2052,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>S3_Document__c.Required_File__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>S3_Document__c.S3_Bucket__c</field>
         <readable>true</readable>
     </fieldPermissions>

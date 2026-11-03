@@ -19,6 +19,40 @@ const CREATE_MODE_OPTIONS = [
     { label: 'From Template', value: CREATE_MODE_TEMPLATE }
 ];
 
+const DOCUMENT_ACTIONS = [
+    { label: 'Preview', name: 'preview' },
+    { label: 'View', name: 'view' }
+];
+
+const COLUMNS = [
+    {
+        label: 'File Name',
+        fieldName: 'name',
+        type: 'button',
+        initialWidth: 420,
+        typeAttributes: {
+            label: { fieldName: 'name' },
+            title: { fieldName: 'name' },
+            name: 'open',
+            variant: 'base'
+        },
+        cellAttributes: { iconName: { fieldName: 'iconName' } }
+    },
+    {
+        label: 'Short Description',
+        fieldName: 'shortDescription',
+        type: 'text',
+        wrapText: true,
+        initialWidth: 300
+    },
+    { label: 'Uploaded', fieldName: 'uploadedLabel', type: 'text', initialWidth: 100 },
+    {
+        type: 'action',
+        initialWidth: 70,
+        typeAttributes: { rowActions: { fieldName: 'rowActions' } }
+    }
+];
+
 export default class RequiredFiles extends NavigationMixin(LightningElement) {
     @api recordId;
 
@@ -28,6 +62,8 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
     @track acceptedFormatOptions = [];
 
     searchTerm = '';
+    expandedRowIds = [];
+    columns = COLUMNS;
     isLoading = true;
     isCreateModalOpen = false;
     isPreviewModalOpen = false;
@@ -47,6 +83,8 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
     previewDocumentId;
     previewIsPreviewable = false;
     previewContentType;
+    previewError;
+    selectedPreviewNavigationItem;
 
     wiredRequiredFilesResult;
     wiredTemplatesResult;
@@ -76,10 +114,31 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
 
         const { data, error } = result;
         if (data) {
-            this.requiredFiles = data.map((file) => ({
-                ...file,
-                hasUploadedFile: file.fileUploaded && file.uploadedFileName
-            }));
+            this.requiredFiles = data.map((file) => {
+                if (file.rowType === 'uploadedFile') {
+                    return this.toDocumentRow(file);
+                }
+                const uploadedFiles = file.uploadedFiles || [];
+                const uploadCount = uploadedFiles.length;
+                const row = {
+                    id: file.id,
+                    name: `${file.name} (${uploadCount})`,
+                    folderName: file.name,
+                    shortDescription: file.shortDescription,
+                    uploadedLabel: file.uploadedLabel,
+                    uploadCount,
+                    rowType: 'requiredFile',
+                    iconName: 'utility:open_folder',
+                    rowActions: []
+                };
+                if (uploadedFiles.length) {
+                    row._children = uploadedFiles.map((document) => this.toDocumentRow(document, file.id));
+                }
+                return row;
+            });
+            this.expandedRowIds = this.expandedRowIds.filter((id) =>
+                this.requiredFiles.some((file) => file.id === id && file._children)
+            );
             this.applySearchFilter();
         } else if (error) {
             this.requiredFiles = [];
@@ -105,6 +164,18 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
 
     get noFiles() {
         return !this.isLoading && this.filteredFiles.length === 0;
+    }
+
+    get emptyStateMessage() {
+        return this.searchTerm.trim()
+            ? 'No required files or uploaded files match your search.'
+            : 'No required files or uploaded files found for this record.';
+    }
+
+    get expandedRows() {
+        return this.searchTerm.trim()
+            ? this.filteredFiles.filter((file) => file._children?.length).map((file) => file.id)
+            : this.expandedRowIds;
     }
 
     get isDefaultMode() {
@@ -155,12 +226,66 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
     }
 
     get showUnsupportedPreview() {
-        return this.previewDocumentId && !this.previewIsPreviewable && !this.isPreviewLoading;
+        return this.previewDocumentId
+            && !this.previewIsPreviewable
+            && !this.isPreviewLoading
+            && !this.previewError;
+    }
+
+    get showPreviewError() {
+        return this.previewError && !this.isPreviewLoading;
+    }
+
+    get previewNavigationItems() {
+        return this.requiredFiles.reduce((items, row) => {
+            if (row.rowType === 'requiredFile') {
+                items.push({
+                    navigationName: `folder:${row.id}`,
+                    label: row.name,
+                    iconName: 'utility:open_folder',
+                    isFolder: true,
+                    isDocument: false
+                });
+                (row._children || []).forEach((document) => {
+                    items.push({
+                        navigationName: `document:${document.documentId}`,
+                        label: `↳ ${document.name}`,
+                        iconName: 'utility:file',
+                        isFolder: false,
+                        isDocument: true
+                    });
+                });
+            } else {
+                items.push({
+                    navigationName: `document:${row.documentId}`,
+                    label: row.name,
+                    iconName: 'utility:file',
+                    isFolder: false,
+                    isDocument: true
+                });
+            }
+            return items;
+        }, []);
     }
 
     handleSearchChange(event) {
         this.searchTerm = event.target.value || '';
         this.applySearchFilter();
+    }
+
+    async handleRefresh() {
+        if (!this.wiredRequiredFilesResult || this.isLoading) {
+            return;
+        }
+
+        this.isLoading = true;
+        try {
+            await refreshApex(this.wiredRequiredFilesResult);
+        } catch (error) {
+            this.showToast('Error', this.getErrorMessage(error), 'error');
+        } finally {
+            this.isLoading = false;
+        }
     }
 
     handleNewClick() {
@@ -197,34 +322,74 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
         this.selectedTemplateId = selectedRows.length ? selectedRows[0].id : null;
     }
 
-    handleNameClick(event) {
-        const fileId = event.currentTarget.dataset.id;
-        if (!fileId) {
+    handleRowAction(event) {
+        const { action, row } = event.detail;
+        const isDocument = Boolean(row.documentId);
+        if (action.name === 'preview' && isDocument) {
+            this.openPreview(row);
             return;
         }
 
+        if (action.name === 'view' && isDocument) {
+            this.navigateToRecord(row.documentId, 'S3_Document__c');
+            return;
+        }
+
+        if (action.name !== 'open') {
+            return;
+        }
+
+        if (isDocument) {
+            this.openPreview(row);
+            return;
+        }
+
+        this.navigateToRecord(row.id, 'Required_File__c');
+    }
+
+    navigateToRecord(recordId, objectApiName) {
         this[NavigationMixin.Navigate]({
             type: 'standard__recordPage',
             attributes: {
-                recordId: fileId,
-                objectApiName: 'Required_File__c',
+                recordId,
+                objectApiName,
                 actionName: 'view'
             }
         });
     }
 
-    handleUploadedFileClick(event) {
-        const fileId = event.currentTarget.dataset.id;
-        const file = this.requiredFiles.find((item) => item.id === fileId);
-        if (!file || !file.lastVersionId) {
+    handleRowToggle(event) {
+        if (this.searchTerm.trim()) {
             return;
         }
-        this.openPreview(file);
+        const { name, isExpanded } = event.detail;
+        const expanded = this.expandedRowIds.filter((id) => id !== name);
+        this.expandedRowIds = isExpanded ? [...expanded, name] : expanded;
     }
 
     handleClosePreviewModal() {
         this.isPreviewModalOpen = false;
         this.clearPreview();
+    }
+
+    handlePreviewNavigationBeforeSelect(event) {
+        const navigationName = event.detail?.name || event.detail;
+        if (navigationName?.startsWith('folder:')) {
+            event.preventDefault();
+        }
+    }
+
+    handlePreviewNavigationSelect(event) {
+        const navigationName = event.detail?.name || event.detail;
+        if (!navigationName?.startsWith('document:')) {
+            return;
+        }
+
+        const documentId = navigationName.substring('document:'.length);
+        const document = this.findDocumentRow(documentId);
+        if (document) {
+            this.openPreview(document);
+        }
     }
 
     handleDownloadPreview() {
@@ -290,16 +455,24 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
     }
 
     openPreview(file) {
-        this.previewDocumentId = file.lastVersionId;
-        this.previewFileName = file.uploadedFileName || file.name;
+        const documentId = file.documentId || file.id;
+        if (!documentId) {
+            this.showToast('Error', 'Document Id is required to open the preview.', 'error');
+            return;
+        }
+
+        this.previewDocumentId = documentId;
+        this.selectedPreviewNavigationItem = `document:${documentId}`;
+        this.previewFileName = file.name;
         this.isPreviewModalOpen = true;
         this.isPreviewLoading = true;
         this.previewUrl = null;
         this.previewType = 'None';
         this.previewIsPreviewable = false;
+        this.previewError = null;
 
         getDocumentAccess({
-            documentId: file.lastVersionId,
+            documentId,
             accessType: 'preview'
         })
             .then((access) => {
@@ -309,12 +482,37 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
                 this.previewContentType = access.contentType;
             })
             .catch((error) => {
-                this.showToast('Error', this.getErrorMessage(error), 'error');
-                this.isPreviewModalOpen = false;
+                this.previewError = this.getErrorMessage(error);
             })
             .finally(() => {
                 this.isPreviewLoading = false;
             });
+    }
+
+    toDocumentRow(document, requiredFileId) {
+        return {
+            id: requiredFileId ? `${requiredFileId}-${document.id}` : document.id,
+            documentId: document.id,
+            name: document.name,
+            shortDescription: document.shortDescription,
+            uploadedLabel: document.uploadedLabel,
+            rowType: 'uploadedFile',
+            iconName: 'utility:file',
+            rowActions: DOCUMENT_ACTIONS
+        };
+    }
+
+    findDocumentRow(documentId) {
+        for (const row of this.requiredFiles) {
+            if (row.documentId === documentId) {
+                return row;
+            }
+            const child = (row._children || []).find((document) => document.documentId === documentId);
+            if (child) {
+                return child;
+            }
+        }
+        return null;
     }
 
     applySearchFilter() {
@@ -324,16 +522,20 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
             return;
         }
 
-        this.filteredFiles = this.requiredFiles.filter((file) => {
-            const name = (file.name || '').toLowerCase();
-            const shortDescription = (file.shortDescription || '').toLowerCase();
-            const uploadedLabel = (file.uploadedLabel || '').toLowerCase();
-            const uploadedFileName = (file.uploadedFileName || '').toLowerCase();
-            return name.includes(term)
-                || shortDescription.includes(term)
-                || uploadedLabel.includes(term)
-                || uploadedFileName.includes(term);
-        });
+        const matches = (row) => [row.name, row.shortDescription, row.uploadedLabel]
+            .some((value) => (value || '').toLowerCase().includes(term));
+
+        this.filteredFiles = this.requiredFiles.reduce((rows, file) => {
+            if (matches(file)) {
+                rows.push(file);
+            } else {
+                const children = (file._children || []).filter(matches);
+                if (children.length) {
+                    rows.push({ ...file, _children: children });
+                }
+            }
+            return rows;
+        }, []);
     }
 
     resetCreateForm() {
@@ -352,6 +554,8 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
         this.previewDocumentId = null;
         this.previewIsPreviewable = false;
         this.previewContentType = null;
+        this.previewError = null;
+        this.selectedPreviewNavigationItem = null;
     }
 
     showToast(title, message, variant) {
