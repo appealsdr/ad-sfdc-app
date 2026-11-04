@@ -9,5 +9,15 @@
     <columns>CREATEDBY_USER</columns>
     <columns>CREATED_DATE</columns>
     <filterScope>Everything</filterScope>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>Active</value>
+    </filters>
+    <filters>
+        <field>White_Glove__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
     <label>All</label>
 </ListView>

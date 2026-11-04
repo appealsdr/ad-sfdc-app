@@ -14,13 +14,6 @@
                 <elementReference>CaseStatusOnUpdate_f</elementReference>
             </value>
         </assignmentItems>
-        <assignmentItems>
-            <assignToReference>$Record.Subject</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>caseSubject</elementReference>
-            </value>
-        </assignmentItems>
         <connector>
             <targetReference>Status_Check</targetReference>
         </connector>
@@ -49,13 +42,6 @@
             <operator>Assign</operator>
             <value>
                 <stringValue>Status</stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>$Record.Subject</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>caseSubject</elementReference>
             </value>
         </assignmentItems>
         <connector>
@@ -335,11 +321,6 @@ ISCHANGED({!$Record.OwnerId})
 ,  &apos;Assigned&apos;
 , TEXT({!$Record.Status})
 )</expression>
-    </formulas>
-    <formulas>
-        <name>caseSubject</name>
-        <dataType>String</dataType>
-        <expression>{!$Record.CaseNumber}&amp;&quot;-&quot;&amp;{!$Record.Store__r.Name}&amp;&quot;-&quot;&amp;{!$Record.RecordType.Name}</expression>
     </formulas>
     <formulas>
         <name>defaultCaseOwnerId_f</name>

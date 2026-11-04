@@ -185,7 +185,6 @@
     <tabs>Case_Document_Type_List__c</tabs>
     <tabs>Contract__c</tabs>
     <tabs>Payment__c</tabs>
-    <tabs>Log__c</tabs>
     <tabs>Document_Template__c</tabs>
     <workspaceConfig>
         <mappings>
@@ -196,9 +195,6 @@
         </mappings>
         <mappings>
             <tab>Document_Template__c</tab>
-        </mappings>
-        <mappings>
-            <tab>Log__c</tab>
         </mappings>
         <mappings>
             <tab>Payment__c</tab>

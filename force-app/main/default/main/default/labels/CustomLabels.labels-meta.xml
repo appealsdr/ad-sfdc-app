@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>CaseOwner</fullName>
+        <categories>Case Default User</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>CaseOwner</shortDescription>
+        <value>005Kd000004pBNtIAM</value>
+    </labels>
+    <labels>
+        <fullName>Case_Status</fullName>
+        <categories>Case</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Case Status</shortDescription>
+        <value>{
+&quot;Canceled&quot; : &quot;Canceled&quot;,
+ &quot;Closed&quot; : &quot;Closed&quot;,
+  &quot;CLOSE_STATUS_FOR_CANCEL_SERVICE&quot;  : &quot;Closed, Completed, Canceled&quot;
+
+
+}</value>
+    </labels>
+    <labels>
+        <fullName>Custom_Notification_Id</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Custom Notification Id</shortDescription>
+        <value>0MLVp0000005HY5OAM</value>
+    </labels>
+    <labels>
+        <fullName>Opportunity_Screen_Label</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Opportunity Screen Label</shortDescription>
+        <value>Missing required information. The request cannot be processed without Deposit Upfront and Total Price. Please include these fields and try again</value>
+    </labels>
+    <labels>
+        <fullName>Performance_Notification</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Performance Notification</shortDescription>
+        <value>{
+&quot;In_Testing_Mode&quot; : &quot;True&quot;,
+&quot;Test_From_Address&quot; : &quot;notifications+a0QDf000004XTEXMA4@appealsdoctor.com&quot;
+}</value>
+    </labels>
+    <labels>
+        <fullName>Store_Form_Config</fullName>
+        <categories>Store From</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Store Form Config</shortDescription>
+        <value>{
+&quot;table_Record_Selection_Mode&quot; : &quot;radio&quot;,
+&quot;Case_Store_Selection_Mode&quot; : &quot;checkbox&quot;
+}</value>
+    </labels>
+    <labels>
+        <fullName>Store_available</fullName>
+        <categories>Case Form</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Store Instruction</shortDescription>
+        <value>&lt;p&gt;&lt;strong&gt;1. Create store should be exclusively in Stores Tab.&lt;br&gt;2. Create Cases Tab
+- If no stores, message to &quot;No stores yet&quot; Button to go to store tab to create a store.
+-if stores, list of stores with message&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;&quot;select store(s) to create cases for&quot;.&lt;/strong&gt;&lt;/p&gt;</value>
+    </labels>
+</CustomLabels>

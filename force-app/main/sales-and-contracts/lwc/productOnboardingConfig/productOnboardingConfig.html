@@ -1,0 +1,200 @@
+<template>
+  <lightning-card title="Case Onboarding Fields" icon-name="standard:case">
+    <div
+      slot="actions"
+      class="slds-grid slds-wrap slds-grid_align-end slds-gutters_xx-small"
+    >
+      <template lwc:if={isEditing}>
+        <lightning-button
+          class="slds-col"
+          label="Add Field"
+          icon-name="utility:add"
+          onclick={handleAdd}
+          disabled={addDisabled}
+        ></lightning-button>
+        <lightning-button
+          class="slds-col"
+          label="Cancel"
+          onclick={handleCancel}
+          disabled={isSaving}
+        ></lightning-button>
+        <lightning-button
+          class="slds-col"
+          label="Save"
+          variant="brand"
+          onclick={handleSave}
+          disabled={saveDisabled}
+        ></lightning-button>
+      </template>
+      <template lwc:else>
+        <lightning-button
+          label="Edit"
+          onclick={handleEdit}
+          disabled={editDisabled}
+        ></lightning-button>
+      </template>
+    </div>
+
+    <div class="card-body slds-p-horizontal_medium slds-p-bottom_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Loading onboarding fields"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <template lwc:if={isSaving}>
+        <lightning-spinner
+          alternative-text="Saving onboarding fields"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <template lwc:if={error}>
+        <p class="slds-text-color_error slds-m-bottom_small" role="alert">
+          {error}
+        </p>
+      </template>
+      <template lwc:if={showReadOnlyNotice}>
+        <p class="slds-text-color_weak slds-m-bottom_small">
+          You have read-only access to this configuration.
+        </p>
+      </template>
+
+      <template lwc:if={isEditing}>
+        <p class="slds-text-color_weak slds-m-bottom_small">
+          Add Case fields, override their labels, and mark them required. Drag
+          the handles or use the arrows to change the order.
+        </p>
+        <template lwc:if={hasDraftRows}>
+          <ol class="slds-has-dividers_bottom-space">
+            <template for:each={editorRows} for:item="row">
+              <li
+                key={row.key}
+                class="slds-item editor-row"
+                data-key={row.key}
+                ondragover={handleDragOver}
+                ondrop={handleDrop}
+              >
+                <div class="row-heading slds-m-bottom_x-small">
+                  <span
+                    class="drag-handle slds-m-right_x-small"
+                    draggable={canDrag}
+                    data-key={row.key}
+                    ondragstart={handleDragStart}
+                    ondragend={handleDragEnd}
+                    title="Drag to reorder"
+                    aria-hidden="true"
+                  >
+                    <lightning-icon
+                      icon-name="utility:drag_and_drop"
+                      size="x-small"
+                    ></lightning-icon>
+                  </span>
+                  <span class="slds-text-title_bold">Field {row.position}</span>
+                  <div class="row-actions">
+                    <lightning-button-icon
+                      icon-name="utility:up"
+                      alternative-text={row.moveUpLabel}
+                      title={row.moveUpLabel}
+                      data-key={row.key}
+                      data-direction="-1"
+                      onclick={handleMove}
+                      disabled={row.moveUpDisabled}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:down"
+                      alternative-text={row.moveDownLabel}
+                      title={row.moveDownLabel}
+                      data-key={row.key}
+                      data-direction="1"
+                      onclick={handleMove}
+                      disabled={row.moveDownDisabled}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:delete"
+                      alternative-text={row.removeLabel}
+                      title={row.removeLabel}
+                      data-key={row.key}
+                      onclick={handleRemove}
+                      disabled={isSaving}
+                    ></lightning-button-icon>
+                  </div>
+                </div>
+                <div class="slds-grid slds-wrap slds-gutters_small">
+                  <div
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
+                  >
+                    <lightning-combobox
+                      label="Case Field"
+                      value={row.fieldapiname}
+                      options={row.options}
+                      data-key={row.key}
+                      onchange={handleFieldChange}
+                      placeholder="Select a Case field"
+                      required
+                      disabled={isSaving}
+                    ></lightning-combobox>
+                  </div>
+                  <div
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
+                  >
+                    <lightning-input
+                      type="text"
+                      label="Override Label"
+                      value={row.fieldlabel}
+                      placeholder={row.defaultLabel}
+                      data-key={row.key}
+                      onchange={handleLabelChange}
+                      disabled={isSaving}
+                    ></lightning-input>
+                  </div>
+                </div>
+                <lightning-input
+                  class="slds-m-top_small"
+                  type="checkbox"
+                  label="Required"
+                  checked={row.required}
+                  data-key={row.key}
+                  onchange={handleRequiredChange}
+                  disabled={isSaving}
+                ></lightning-input>
+                <template lwc:if={row.unavailable}>
+                  <p class="slds-text-color_weak slds-m-top_x-small">
+                    This saved field is unavailable. It will be preserved unless
+                    you replace or remove it.
+                  </p>
+                </template>
+              </li>
+            </template>
+          </ol>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak slds-p-vertical_medium">
+            No fields selected. Use Add Field to start.
+          </p>
+        </template>
+      </template>
+      <template lwc:elseif={recordLoaded}>
+        <template lwc:if={hasSavedRows}>
+          <ol class="slds-has-dividers_bottom-space">
+            <template for:each={displayRows} for:item="row">
+              <li key={row.fieldapiname} class="slds-item detail-row">
+                <div class="field-description">
+                  <p class="slds-text-body_regular">{row.label}</p>
+                  <p class="slds-text-body_small slds-text-color_weak">
+                    {row.fieldapiname}
+                  </p>
+                </div>
+                <span class="slds-badge">{row.requiredLabel}</span>
+              </li>
+            </template>
+          </ol>
+        </template>
+        <template lwc:elseif={showEmptySaved}>
+          <p class="slds-text-color_weak slds-p-vertical_medium">
+            No Case fields configured.
+          </p>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>

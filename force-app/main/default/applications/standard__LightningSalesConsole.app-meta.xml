@@ -58,12 +58,10 @@
     <tabs>standard-Feed</tabs>
     <tabs>standard-CollaborationGroup</tabs>
     <tabs>standard-File</tabs>
-    <tabs>standard-AgentforceSDR</tabs>
     <tabs>Store__c</tabs>
     <tabs>Case_Document_Type_List__c</tabs>
     <tabs>Contract__c</tabs>
     <tabs>Payment__c</tabs>
-    <tabs>Log__c</tabs>
     <tabs>Document_Template__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>LightningSalesConsole_UtilityBar</utilityBar>
@@ -78,9 +76,6 @@
             <tab>Document_Template__c</tab>
         </mappings>
         <mappings>
-            <tab>Log__c</tab>
-        </mappings>
-        <mappings>
             <tab>Payment__c</tab>
         </mappings>
         <mappings>
@@ -88,9 +83,6 @@
         </mappings>
         <mappings>
             <tab>standard-Account</tab>
-        </mappings>
-        <mappings>
-            <tab>standard-AgentforceSDR</tab>
         </mappings>
         <mappings>
             <tab>standard-Campaign</tab>

@@ -1,0 +1,34 @@
+<template>
+  <template lwc:if={isVisible}>
+    <div class={alertClass} role="alert">
+      <span class="slds-assistive-text">{assistiveText}</span>
+
+      <span class={iconContainerClass} title={iconTitle}>
+        <lightning-icon
+          icon-name={normalizedIconName}
+          size="x-small"
+          variant={iconVariant}
+          alternative-text={iconTitle}
+        ></lightning-icon>
+      </span>
+
+      <div class="banner-message">
+        <lightning-formatted-rich-text
+          value={text}
+        ></lightning-formatted-rich-text>
+      </div>
+
+      <div class="slds-notify__close">
+        <lightning-button-icon
+          class={closeButtonClass}
+          icon-name="utility:close"
+          variant={closeButtonVariant}
+          size="small"
+          title="Close"
+          alternative-text="Close"
+          onclick={handleClose}
+        ></lightning-button-icon>
+      </div>
+    </div>
+  </template>
+</template>

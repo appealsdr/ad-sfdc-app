@@ -3,6 +3,6 @@
     <customSettingsType>Hierarchy</customSettingsType>
     <description>Application URL and AWS S3/SES integration settings for Appeals Doctor file uploads and email.</description>
     <enableFeeds>false</enableFeeds>
-    <label>Appeals Dr Setting</label>
+    <label>Web App Settings</label>
     <visibility>Public</visibility>
 </CustomObject>

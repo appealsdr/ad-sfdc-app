@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
     <baseObject>Store__c</baseObject>
-    <category>other</category>
-    <deployed>true</deployed>
-    <description>Cases By Store used to disapyl chart on store page</description>
+    <category>cases</category>
+    <deployed>false</deployed>
+    <description>Cases by Store</description>
     <join>
-        <outerJoin>true</outerJoin>
+        <outerJoin>false</outerJoin>
         <relationship>Cases__r</relationship>
     </join>
     <label>Cases By Store</label>
@@ -412,6 +412,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Active_Daily_Store_Check__c</field>
+            <table>Store__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>appealsdoctor_vuid__c</field>
             <table>Store__c</table>
         </columns>
@@ -422,12 +427,22 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>Total_Revenue_Recovered__c</field>
+            <field>Total_Cases__c</field>
             <table>Store__c</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>Store_Health__c</field>
+            <field>Total_Open_Cases__c</field>
+            <table>Store__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Total_Closed_Cases__c</field>
+            <table>Store__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Amazon_Seller_Page__c</field>
             <table>Store__c</table>
         </columns>
         <masterLabel>Stores</masterLabel>
@@ -1420,7 +1435,37 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Other_Category__c</field>
+            <table>Store__c.Cases__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Contract__c</field>
+            <table>Store__c.Cases__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Contract_Line_Item__c</field>
+            <table>Store__c.Cases__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Estimated_Revenue_at_Risk__c</field>
+            <table>Store__c.Cases__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Work_Order__c</field>
+            <table>Store__c.Cases__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>Case_Link__c</field>
+            <table>Store__c.Cases__r</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Case_Type__c</field>
             <table>Store__c.Cases__r</table>
         </columns>
         <masterLabel>Cases</masterLabel>

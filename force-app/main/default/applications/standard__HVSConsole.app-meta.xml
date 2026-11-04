@@ -8,8 +8,6 @@
     <label>Sales Engagement</label>
     <navType>Console</navType>
     <tabs>standard-home</tabs>
-    <tabs>standard-WorkQueue</tabs>
-    <tabs>standard-ActionCadence</tabs>
     <tabs>standard-Lead</tabs>
     <tabs>standard-Contact</tabs>
     <tabs>standard-Opportunity</tabs>
@@ -18,20 +16,15 @@
     <tabs>standard-Event</tabs>
     <tabs>standard-ContentNote</tabs>
     <tabs>standard-EmailTemplate</tabs>
-    <tabs>standard-CallTemplate</tabs>
     <tabs>standard-report</tabs>
     <tabs>standard-Dashboard</tabs>
     <tabs>standard-Feed</tabs>
     <tabs>standard-CollaborationGroup</tabs>
     <tabs>standard-File</tabs>
-    <tabs>standard-HvsWaveLightning</tabs>
-    <tabs>standard-SalesCoachHome</tabs>
-    <tabs>standard-AgentforceSDR</tabs>
     <tabs>Store__c</tabs>
     <tabs>Case_Document_Type_List__c</tabs>
     <tabs>Contract__c</tabs>
     <tabs>Payment__c</tabs>
-    <tabs>Log__c</tabs>
     <tabs>Document_Template__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>HVSConsole_UtilityBar</utilityBar>
@@ -46,9 +39,6 @@
             <tab>Document_Template__c</tab>
         </mappings>
         <mappings>
-            <tab>Log__c</tab>
-        </mappings>
-        <mappings>
             <tab>Payment__c</tab>
         </mappings>
         <mappings>
@@ -56,15 +46,6 @@
         </mappings>
         <mappings>
             <tab>standard-Account</tab>
-        </mappings>
-        <mappings>
-            <tab>standard-ActionCadence</tab>
-        </mappings>
-        <mappings>
-            <tab>standard-AgentforceSDR</tab>
-        </mappings>
-        <mappings>
-            <tab>standard-CallTemplate</tab>
         </mappings>
         <mappings>
             <tab>standard-CollaborationGroup</tab>
@@ -91,22 +72,13 @@
             <tab>standard-File</tab>
         </mappings>
         <mappings>
-            <tab>standard-HvsWaveLightning</tab>
-        </mappings>
-        <mappings>
             <tab>standard-Lead</tab>
         </mappings>
         <mappings>
             <tab>standard-Opportunity</tab>
         </mappings>
         <mappings>
-            <tab>standard-SalesCoachHome</tab>
-        </mappings>
-        <mappings>
             <tab>standard-Task</tab>
-        </mappings>
-        <mappings>
-            <tab>standard-WorkQueue</tab>
         </mappings>
         <mappings>
             <tab>standard-home</tab>

@@ -5,10 +5,10 @@
         <description>New Client</description>
         <protected>false</protected>
         <recipients>
-            <recipient>C_LEVEL</recipient>
-            <type>group</type>
+            <recipient>andrei.pruzan@appealsdoctor.com</recipient>
+            <type>user</type>
         </recipients>
         <senderType>CurrentUser</senderType>
-        <template>ClientNotifications/New_Client_1788731125012</template>
+        <template>unfiled$public/App_Account_Created</template>
     </alerts>
 </Workflow>

@@ -5,46 +5,11 @@
     <authenticationFailureAction>Discard</authenticationFailureAction>
     <authorizationFailureAction>Bounce</authorizationFailureAction>
     <emailServicesAddresses>
-        <authorizedSenders>charles.roberts@appealsdoctor.com</authorizedSenders>
+        <authorizedSenders>andrei.pruzan@appealsdoctor.com</authorizedSenders>
         <developerName>emailtosalesforce</developerName>
         <isActive>true</isActive>
         <localPart>emailtosalesforce</localPart>
-        <runAsUser>avi@appealsdoctor.com</runAsUser>
-    </emailServicesAddresses>
-    <emailServicesAddresses>
-        <authorizedSenders>sam@appealsdoctor.com</authorizedSenders>
-        <developerName>emailtosalesforce1</developerName>
-        <isActive>true</isActive>
-        <localPart>emailtosalesforce</localPart>
-        <runAsUser>sam@appealsdoctor.com</runAsUser>
-    </emailServicesAddresses>
-    <emailServicesAddresses>
-        <authorizedSenders>jammila@appealsdoctor.com</authorizedSenders>
-        <developerName>emailtosalesforce2</developerName>
-        <isActive>true</isActive>
-        <localPart>emailtosalesforce</localPart>
-        <runAsUser>jammila@appealsdoctor.com</runAsUser>
-    </emailServicesAddresses>
-    <emailServicesAddresses>
-        <authorizedSenders>juan@appealsdoctor.com</authorizedSenders>
-        <developerName>emailtosalesforce3</developerName>
-        <isActive>true</isActive>
-        <localPart>emailtosalesforce</localPart>
-        <runAsUser>juan@appealsdoctor.com</runAsUser>
-    </emailServicesAddresses>
-    <emailServicesAddresses>
-        <authorizedSenders>leo.m@appealsdoctor.com</authorizedSenders>
-        <developerName>emailtosalesforce4</developerName>
-        <isActive>true</isActive>
-        <localPart>emailtosalesforce</localPart>
-        <runAsUser>leo.m@appealsdoctor.com</runAsUser>
-    </emailServicesAddresses>
-    <emailServicesAddresses>
-        <authorizedSenders>andrei.pruzan@appealsdoctor.com</authorizedSenders>
-        <developerName>emailtosalesforce5</developerName>
-        <isActive>true</isActive>
-        <localPart>emailtosalesforce</localPart>
-        <runAsUser>andrei.pruzan@appealsdoctor.com</runAsUser>
+        <runAsUser>andrei.pruzan@appealsdoctor.com.partial</runAsUser>
     </emailServicesAddresses>
     <functionInactiveAction>Bounce</functionInactiveAction>
     <functionName>EmailToSalesforce</functionName>

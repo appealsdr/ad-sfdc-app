@@ -532,8 +532,4 @@
         <viewAllFields>true</viewAllFields>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
-    <pageAccesses>
-        <apexPage>Lead_Help_Page</apexPage>
-        <enabled>true</enabled>
-    </pageAccesses>
 </PermissionSet>

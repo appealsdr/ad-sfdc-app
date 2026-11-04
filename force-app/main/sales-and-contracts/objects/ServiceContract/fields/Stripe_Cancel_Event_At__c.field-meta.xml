@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stripe_Cancel_Event_At__c</fullName>
+    <description>Creation timestamp of the last handled Stripe subscription event, used for conservative stale-event detection. Stripe timestamps have second precision and do not define a total event order.</description>
+    <label>Stripe Cancel Event At</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

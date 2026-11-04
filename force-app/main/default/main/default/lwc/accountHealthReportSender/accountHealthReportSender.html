@@ -1,0 +1,371 @@
+<template>
+  <lightning-card icon-name="standard:account">
+
+    <!-- Card title slot -->
+    <span slot="title">
+      <span class="card-title">Account Health Report</span>
+      <template if:true={report.accountName}>
+        &nbsp;—&nbsp;<span class="card-account">{report.accountName}</span>
+      </template>
+    </span>
+
+    <!-- ─── LOADING (initial data fetch) ────────────────────────────── -->
+    <template if:true={isLoading}>
+      <div class="slds-align_absolute-center slds-p-around_large">
+        <lightning-spinner alternative-text="Loading account data" size="medium" variant="brand"></lightning-spinner>
+      </div>
+    </template>
+
+    <!-- ─── ERROR BANNER ─────────────────────────────────────────────── -->
+    <template if:true={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-theme_error slds-m-around_medium" role="alert">
+        <lightning-icon icon-name="utility:error" alternative-text="Error" variant="inverse" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+        {errorMessage}
+      </div>
+    </template>
+
+    <!-- ─── MAIN CONTENT ─────────────────────────────────────────────── -->
+    <template if:true={isReady}>
+      <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 1 — REPORT INFORMATION
+        ══════════════════════════════════════════════════════════ -->
+        <div class="section-header">
+          <span class="section-label">Report Information</span>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input label="Account Name" value={report.accountName}
+              data-field="accountName" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input label="Account Manager" value={report.accountManager}
+              data-field="accountManager" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input label="Report Date" value={report.reportDate}
+              data-field="reportDate" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input label="Report Period Start" value={report.reportStart}
+              placeholder="e.g. 4/1/2026"
+              data-field="reportStart" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-input label="Report Period End" value={report.reportEnd}
+              placeholder="e.g. 4/30/2026"
+              data-field="reportEnd" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-combobox label="Report Type" value={report.reportType}
+              options={reportTypeOptions} data-field="reportType"
+              onchange={handleChange}></lightning-combobox>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 2 — ACCOUNT HEALTH SCORES
+        ══════════════════════════════════════════════════════════ -->
+        <div class="section-header">
+          <span class="section-label">Account Health</span>
+        </div>
+        <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input label="Current Score" value={report.currentHealth} type="text"
+              data-field="currentHealth" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input label="This Reporting Period" value={report.healthThisPeriod} type="text"
+              data-field="healthThisPeriod" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input label="Last Reporting Period" value={report.healthLastPeriod} type="text"
+              data-field="healthLastPeriod" onchange={handleChange}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input label="Change Since Last Report" value={report.healthChange} type="text"
+              data-field="healthChange" onchange={handleChange}></lightning-input>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 3 — ACTIVITY TABLES (side by side)
+        ══════════════════════════════════════════════════════════ -->
+        <div class="section-header">
+          <span class="section-label">Account Activity Details</span>
+        </div>
+
+        <div class="slds-grid slds-gutters activity-grid slds-m-bottom_medium">
+
+          <!-- ── Solved Issues ── -->
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <div class="activity-card solved">
+              <div class="activity-card-header solved-header">
+                ✓ &nbsp;Solved Issues
+              </div>
+              <table class="activity-table">
+                <thead>
+                  <tr>
+                    <th class="col-type">Type</th>
+                    <th class="col-qty">Qty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={solvedRows} for:item="row">
+                    <tr key={row.field}>
+                      <td class="type-cell">{row.label}</td>
+                      <td class="qty-cell">
+                        <lightning-input variant="label-hidden" value={row.value}
+                          data-field={row.field} onchange={handleChange}
+                          class="compact-input"></lightning-input>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+                <tfoot>
+                  <tr class="total-row solved-total">
+                    <td>Total Issues Fixed</td>
+                    <td>
+                      <lightning-input variant="label-hidden" value={report.totalIssuesFixed}
+                        data-field="totalIssuesFixed" onchange={handleChange}
+                        class="compact-input total-input"></lightning-input>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- ── New & Ongoing Issues ── -->
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <div class="activity-card ongoing">
+              <div class="activity-card-header ongoing-header">
+                ⚠ &nbsp;New &amp; Ongoing Issues
+              </div>
+              <table class="activity-table">
+                <thead>
+                  <tr>
+                    <th class="col-type">Type</th>
+                    <th class="col-qty">Qty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="type-cell">Full Account Audit</td>
+                    <td class="qty-cell na-cell">—</td>
+                  </tr>
+                  <template for:each={ongoingRows} for:item="row">
+                    <tr key={row.field}>
+                      <td class="type-cell">{row.label}</td>
+                      <td class="qty-cell">
+                        <lightning-input variant="label-hidden" value={row.value}
+                          data-field={row.field} onchange={handleChange}
+                          class="compact-input"></lightning-input>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+                <tfoot>
+                  <tr class="total-row ongoing-total">
+                    <td>Total New &amp; Ongoing</td>
+                    <td>
+                      <lightning-input variant="label-hidden" value={report.totalNewOngoing}
+                        data-field="totalNewOngoing" onchange={handleChange}
+                        class="compact-input total-input"></lightning-input>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 4 — EMAIL PREVIEW
+        ══════════════════════════════════════════════════════════ -->
+        <div class="section-header preview-toggle" onclick={togglePreview}>
+          <span class="section-label">
+            <lightning-icon icon-name={previewIcon} size="x-small" class="slds-m-right_x-small"></lightning-icon>
+            Email Preview
+          </span>
+          <span class="toggle-hint">{previewToggleLabel}</span>
+        </div>
+
+        <template if:true={showPreview}>
+          <div class="email-preview-wrapper">
+            <!-- ═══ EMAIL PREVIEW HTML (matches exact email output) ═══ -->
+            <div class="email-outer">
+
+              <!-- Header -->
+              <div class="ep-header">
+                <div class="ep-header-top">
+                  <span class="ep-logo-text">APPEALS DOCTOR</span>
+                  <span class="ep-services">Account Management • Suspensions • Listing Violations • Advertising • Trademarks</span>
+                </div>
+                <p class="ep-title">Account Health Management Report</p>
+              </div>
+              <div class="ep-accent-bar"></div>
+
+              <!-- Meta table -->
+              <div class="ep-section">
+                <table class="ep-meta-table">
+                  <thead>
+                    <tr>
+                      <th>Account Name</th>
+                      <th>Account Manager</th>
+                      <th>Report Date</th>
+                      <th>Report Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="ep-meta-val">{report.accountName}</td>
+                      <td class="ep-meta-val">{report.accountManager}</td>
+                      <td class="ep-meta-val">{report.reportDate}</td>
+                      <td class="ep-meta-val">{report.reportType}</td>
+                    </tr>
+                    <tr class="ep-meta-period">
+                      <td colspan="2"><span class="ep-label">Period Start:</span> <strong>{report.reportStart}</strong></td>
+                      <td colspan="2"><span class="ep-label">Period End:</span> <strong>{report.reportEnd}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Activity section label -->
+              <div class="ep-section">
+                <p class="ep-section-label">Account Activity Details</p>
+              </div>
+
+              <!-- Two-column preview body -->
+              <div class="ep-section ep-body-grid">
+
+                <!-- Left: Activity tables -->
+                <div class="ep-left">
+                  <table class="ep-activity-table">
+                    <thead>
+                      <tr><th>Type</th><th>Qty</th><th>Notes</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr class="ep-subheader-solved"><td colspan="3">✓ Solved Issues</td></tr>
+                      <template for:each={solvedRows} for:item="row">
+                        <tr key={row.field}>
+                          <td>{row.label}</td>
+                          <td class="ep-qty">{row.value}</td>
+                          <td>&nbsp;</td>
+                        </tr>
+                      </template>
+                      <tr class="ep-total-fixed">
+                        <td>Total Issues Fixed</td>
+                        <td class="ep-qty ep-total-qty">{report.totalIssuesFixed}</td>
+                        <td>&nbsp;</td>
+                      </tr>
+                      <tr class="ep-subheader-ongoing"><td colspan="3">⚠ New &amp; Ongoing Issues</td></tr>
+                      <tr><td>Full Account Audit</td><td class="ep-qty ep-na">—</td><td>&nbsp;</td></tr>
+                      <template for:each={ongoingRows} for:item="row">
+                        <tr key={row.field}>
+                          <td>{row.label}</td>
+                          <td class="ep-qty">{row.value}</td>
+                          <td>&nbsp;</td>
+                        </tr>
+                      </template>
+                      <tr class="ep-total-ongoing">
+                        <td>Total New &amp; Ongoing</td>
+                        <td class="ep-qty ep-total-qty">{report.totalNewOngoing}</td>
+                        <td>&nbsp;</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Right: Health panel -->
+                <div class="ep-right">
+                  <div class="ep-health-card">
+                    <div class="ep-panel-header">Account Health</div>
+                    <div class="ep-score-row">
+                      <span class="ep-score-label">Current Score</span>
+                      <span class="ep-score-value">{report.currentHealth}</span>
+                    </div>
+                    <div class="ep-health-row">
+                      <span>This Reporting Period</span><span class="ep-health-val">{report.healthThisPeriod}</span>
+                    </div>
+                    <div class="ep-health-row ep-health-row-alt">
+                      <span>Last Reporting Period</span><span class="ep-health-val">{report.healthLastPeriod}</span>
+                    </div>
+                    <div class="ep-health-row">
+                      <span>Change Since Last Report</span><span class="ep-health-val">{report.healthChange}</span>
+                    </div>
+                  </div>
+
+                  <div class="ep-summary-card">
+                    <div class="ep-panel-header">Period Summary</div>
+                    <div class="ep-summary-row ep-summary-fixed">
+                      <span>✓ Total Issues Fixed</span>
+                      <span class="ep-summary-num ep-num-green">{report.totalIssuesFixed}</span>
+                    </div>
+                    <div class="ep-summary-row ep-summary-ongoing">
+                      <span>⚠ New &amp; Ongoing</span>
+                      <span class="ep-summary-num ep-num-orange">{report.totalNewOngoing}</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Footer -->
+              <div class="ep-footer">
+                <p class="ep-footer-services">Account Management • Suspensions • Listing Violations • Advertising • Trademarks</p>
+                <p class="ep-footer-contact">
+                  800 SE 4th Ave, Hallandale Beach FL 33009 &nbsp;|&nbsp; 786.259.0027 &nbsp;|&nbsp;
+                  Team@appealdoctor.com &nbsp;|&nbsp; www.appealsdoctor.com
+                </p>
+              </div>
+
+            </div>
+            <!-- /email-outer -->
+          </div>
+        </template>
+
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 5 — SEND EMAIL
+        ══════════════════════════════════════════════════════════ -->
+        <div class="section-header">
+          <span class="section-label">Send Report Email</span>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+            <lightning-input label="Recipient Email Address" type="email"
+              value={toEmail} onchange={handleEmailChange}
+              placeholder="client@example.com"
+              required></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 send-btn-col">
+            <lightning-button
+              label={sendButtonLabel}
+              variant="brand"
+              icon-name="utility:email"
+              onclick={handleSendEmail}
+              disabled={isSending}
+              class="send-btn">
+            </lightning-button>
+          </div>
+        </div>
+
+        <!-- Send success banner -->
+        <template if:true={sendSuccess}>
+          <div class="slds-notify slds-notify_alert slds-theme_success slds-m-top_small" role="status">
+            <lightning-icon icon-name="utility:success" alternative-text="Success" variant="inverse" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+            Report email sent successfully to <strong>{toEmail}</strong>.
+          </div>
+        </template>
+
+      </div>
+      <!-- /slds-p-horizontal_medium -->
+    </template>
+    <!-- /isReady -->
+
+  </lightning-card>
+</template>

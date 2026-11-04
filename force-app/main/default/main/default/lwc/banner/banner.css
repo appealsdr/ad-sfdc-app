@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.banner-message {
+  min-width: 0;
+  padding-right: var(--slds-g-spacing-6, var(--lwc-spacingXLarge));
+}
+
+.banner-message lightning-formatted-rich-text {
+  display: block;
+}
+
+.banner-close {
+  --slds-c-icon-color-foreground-default: var(
+    --slds-g-color-neutral-base-10,
+    #181818
+  );
+}
+
+.banner-close_inverse {
+  --slds-c-icon-color-foreground-default: var(
+    --slds-g-color-neutral-base-100,
+    #ffffff
+  );
+}

@@ -1,0 +1,37 @@
+Id,Name,ProductCode,Description,IsActive,Family,Case_Type__c,Category__c,StockKeepingUnit
+01tVZ00000FB5dFYAT,A-Z Claims,AZ-001,"Defense and resolution of Amazon A-to-z Guarantee claims filed by customers against the seller, including appeal of granted claims to protect account health and recover funds.",true,Services,A-Z Claims,#N/A,#N/A
+01tVZ00000FB5dGYAT,FBA Account Suspension,ACC-FBA-001,Reinstatement of a suspended FBA account so the merchant can resume sending and storing inventory in Amazon fulfillment centers (FBA).,false,Services,FBA Account Suspension,#N/A,#N/A
+01tVZ00000FB5dHYAT,FBM Account Suspension,ACC-FBM-001,Reinstatement of a suspended FBM account so the merchant can resume selling and shipping products directly to customers (FBM).,true,Services,FBM Account Suspension,#N/A,#N/A
+01tVZ00000FB5dIYAT,Arbitration,ACC-ARB-001,Arbitration support for Amazon seller disputes. Referral partner service — no fixed price.,true,Services,Arbitration,#N/A,#N/A
+01tVZ00000FB5dJYAT,Seller Account Creation,SET-001,"End-to-end setup of a new Amazon seller account, including registration, verification, and configuration to meet Amazon requirements.",true,Services,Seller Account Creation,#N/A,#N/A
+01tVZ00000FB5dKYAT,Account Ownership Transfer,SET-002,"Transfer of an existing Amazon seller account to a new owner or entity, handling verification and documentation requirements.",true,Services,Account Ownership Transfer,#N/A,#N/A
+01tVZ00000FB5dLYAT,Expedited appeal within 48 hours,EXP-48-001,Rush handling of an appeal case so that it is prepared and submitted within 48 hours.,true,Services,Expedited appeal within 48 hours,#N/A,#N/A
+01tVZ00000FB5dMYAT,Chargeback,BNK-001,"Response and dispute support when a customer files a chargeback on their credit card through their bank, to recover funds and protect account standing.",true,Services,Chargeback,#N/A,#N/A
+01tVZ00000FB5dNYAT,Brand Reinstatement / Ungating,BRD-REINST-001,"Reinstatement and ungating of a brand that Amazon has blocked the seller from selling, restoring approval to list and sell the brand.",true,Services,Brand Reinstatement / Ungating,#N/A,#N/A
+01tVZ00000FB5dOYAT,Brand Approval (For a Brand),BRD-APPR-001,Application and approval process to gain authorization to sell a specific brand on Amazon.,true,Services,Brand Approval (For a Brand),#N/A,#N/A
+01tVZ00000FB5dPYAT,Suspended Account,PERF-SUSP-001,"Appeal and reinstatement of an account suspended due to performance issues, restoring selling privileges.",true,Services,Suspended Account,#N/A,#N/A
+01tVZ00000FB5dQYAT,Account at Risk of Deactivation,PERF-RISK-001,"Remediation and appeal for an account flagged at risk of deactivation due to performance, preventing suspension.",true,Services,Account at Risk of Deactivation,#N/A,#N/A
+01tVZ00000FB5dRYAT,FBA Feedback Removal,FBK-FBA-001,Removal of eligible negative seller feedback on FBA orders that violates Amazon policy or relates to fulfillment by Amazon.,true,Services,FBA Feedback Removal,#N/A,#N/A
+01tVZ00000FB5dSYAT,FBM Feedback Removal,FBK-FBM-001,Removal of eligible negative seller feedback on FBM orders that violates Amazon policy.,true,Services,FBM Feedback Removal,#N/A,#N/A
+01tVZ00000FB5dTYAT,Storage Increase for FBA,STG-FBA-001,Request and justification to increase FBA storage limits so the seller can send more inventory to Amazon fulfillment centers.,true,Services,Storage Increase for FBA,#N/A,#N/A
+01tVZ00000FB5dUYAT,Blocked Listing - Reinstate Product Listing,LST-REINST-001,"Reinstatement of a blocked or suppressed product listing, restoring it to active, buyable status.",true,Services,Blocked Listing - Reinstate Product Listing,#N/A,#N/A
+01tVZ00000FB5dVYAT,Ad Suspension,LST-AD-001,"Reinstatement of suspended Amazon advertising privileges, restoring the ability to run sponsored ad campaigns.",true,Services,Ad Suspension,#N/A,#N/A
+01tVZ00000FB5dWYAT,LSR (Late Shipment Rate),MET-LSR-001,Remediation of a high Late Shipment Rate (LSR) that has placed the account at risk of deactivation.,true,Services,LSR (Late Shipment Rate),#N/A,#N/A
+01tVZ00000FB5dXYAT,ODR (Order Defect Rate),MET-ODR-001,Remediation of a high Order Defect Rate (ODR) that has placed the account at risk of deactivation.,true,Services,ODR (Order Defect Rate),#N/A,#N/A
+01tVZ00000FB5dYYAT,PFCR (Pre-fulfilment Cancel Rate),MET-PFCR-001,Remediation of a high Pre-Fulfilment Cancel Rate (PFCR) that has placed the account at risk of deactivation.,true,Services,PFCR (Pre-fulfilment Cancel Rate),#N/A,#N/A
+01tVZ00000FB5dZYAT,VTR (Valid Tracking Rate),MET-VTR-001,Remediation of a low Valid Tracking Rate (VTR) that has placed the account at risk of deactivation.,true,Services,VTR (Valid Tracking Rate),#N/A,#N/A
+01tVZ00000FB5daYAD,Trademark Application,TRD-001,"Filing of a trademark application for a private label brand, enabling Brand Registry enrollment and brand protection.",true,Services,Trademark Application,#N/A,#N/A
+01tVZ00000FB5dbYAD,Vendor central account review,VCR-001,Review and remediation support for Vendor Central accounts (sellers who sell directly to Amazon as a first-party vendor).,true,Services,Vendor central account review,#N/A,#N/A
+01tVZ00000FB5dcYAD,High critical violation,VIO-CRIT-H-001,Appeal of a high critical violation where the account is at immediate risk of deactivation.,true,Services,High critical violation,#N/A,#N/A
+01tVZ00000FB5ddYAD,High repeat violation,VIO-RPT-H-001,Appeal of a high-severity repeat policy violation to protect account health.,true,Services,High repeat violation,#N/A,#N/A
+01tVZ00000FB5deYAD,Medium repeat violation,VIO-RPT-M-001,Appeal of a medium-severity repeat policy violation to protect account health.,true,Services,Medium repeat violation,#N/A,#N/A
+01tVZ00000FB5dfYAD,Low repeat violation,VIO-RPT-L-001,Appeal of a low-severity repeat policy violation to protect account health.,true,Services,Low repeat violation,#N/A,#N/A
+01tVZ00000FB5dgYAD,High impact violation,VIO-IMP-H-001,Appeal of a high-impact violation that Amazon has determined significantly affects account health.,true,Services,High impact violation,#N/A,#N/A
+01tVZ00000FB5dhYAD,Medium impact violation,VIO-IMP-M-001,Appeal of a medium-impact policy violation to protect account health.,true,Services,Medium impact violation,#N/A,#N/A
+01tVZ00000FB5diYAD,Low impact violation,VIO-IMP-L-001,Appeal of a low-impact policy violation to protect account health.,true,Services,Low impact violation,#N/A,#N/A
+01tVZ00000FB5djYAD,No Impact Violation,VIO-IMP-N-001,Appeal of a no-impact policy violation to keep the account record clean and prevent escalation.,true,Services,No Impact Violation,#N/A,#N/A
+01tVZ00000GOWNKYA5,Monitoring,MON-001,#N/A,true,Subscription,#N/A,#N/A,#N/A
+01tVZ00000GOcUMYA1,Unlimited Cases,CAS-UN,#N/A,true,Subscription,#N/A,#N/A,#N/A
+01tVZ00000GOiRhYAL,5 Credits,CAS-5,#N/A,false,Subscription,#N/A,#N/A,#N/A
+01tVZ00000GOiTJYA1,10 Credits,CAS-10,#N/A,true,Subscription,#N/A,#N/A,#N/A
+01tVZ00000GOiWXYA1,15 Credits,CAS-15,#N/A,true,Subscription,#N/A,#N/A,#N/A

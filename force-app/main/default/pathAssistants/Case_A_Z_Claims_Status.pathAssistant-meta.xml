@@ -5,10 +5,7 @@
     <fieldName>Status</fieldName>
     <masterLabel>Case A-Z Claims Status</masterLabel>
     <pathAssistantSteps>
-        <fieldNames>Closed_Reason__c</fieldNames>
-        <fieldNames>Closed_Comments__c</fieldNames>
-        <info>&lt;ul&gt;&lt;li&gt;Fill Closed Reason &lt;/li&gt;&lt;li&gt;Add Closed Comments (Optional)&lt;/li&gt;&lt;/ul&gt;</info>
-        <picklistValueName>Closed</picklistValueName>
+        <picklistValueName>Assigned</picklistValueName>
     </pathAssistantSteps>
     <pathAssistantSteps>
         <info>&lt;ul&gt;&lt;li&gt;Gather all supporting documents and evidence and Draft appeal professionally &lt;/li&gt;&lt;/ul&gt;</info>

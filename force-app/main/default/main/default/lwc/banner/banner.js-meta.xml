@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Banner</masterLabel>
+    <description
+  >Displays a configurable informational, warning, or error alert banner.</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig
+      targets="lightning__AppPage,lightning__HomePage,lightning__RecordPage"
+    >
+            <property
+        name="type"
+        type="String"
+        label="Type"
+        description="Controls the banner colors and default icon."
+        datasource="Base,Warning,Error"
+        default="Base"
+        required="true"
+      />
+            <property
+        name="icon"
+        type="String"
+        label="Icon"
+        description="Enter an SLDS icon such as user, warning, error, or utility:announcement. Leave blank to use the selected type's default."
+      />
+            <property
+        name="text"
+        type="String"
+        label="Banner Text"
+        description="Enter the banner message. Supported HTML links and formatting are sanitized before display."
+        default="Banner message"
+        required="true"
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

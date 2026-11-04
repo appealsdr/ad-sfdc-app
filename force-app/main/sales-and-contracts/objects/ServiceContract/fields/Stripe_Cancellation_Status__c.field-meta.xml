@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stripe_Cancellation_Status__c</fullName>
+    <description>Cancellation state maintained by the Stripe subscription webhook service: Scheduled, Canceled, or None.</description>
+    <externalId>false</externalId>
+    <label>Stripe Cancellation Status</label>
+    <length>40</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

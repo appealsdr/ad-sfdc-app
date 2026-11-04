@@ -4,6 +4,7 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <label>Opportunity</label>
     <referenceTo>Opportunity</referenceTo>
+    <relationshipLabel>Payments</relationshipLabel>
     <relationshipName>Payments</relationshipName>
     <required>false</required>
     <trackHistory>false</trackHistory>

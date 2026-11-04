@@ -40,6 +40,11 @@
                 <default>false</default>
                 <label>Refunded</label>
             </value>
+            <value>
+                <fullName>Request Payment</fullName>
+                <default>false</default>
+                <label>Request Payment</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

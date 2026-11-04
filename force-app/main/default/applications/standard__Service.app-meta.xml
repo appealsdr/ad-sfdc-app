@@ -18,6 +18,5 @@
     <tabs>Case_Document_Type_List__c</tabs>
     <tabs>Contract__c</tabs>
     <tabs>Payment__c</tabs>
-    <tabs>Log__c</tabs>
     <tabs>Document_Template__c</tabs>
 </CustomApplication>

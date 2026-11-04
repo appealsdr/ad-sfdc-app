@@ -8,5 +8,12 @@
         <plural>true</plural>
         <value>S3 Documents</value>
     </caseValues>
+    <layouts>
+        <layout>S3 Document Layout</layout>
+        <sections>
+            <label><!-- Custom Links --></label>
+            <section>Custom Links</section>
+        </sections>
+    </layouts>
     <startsWith>Consonant</startsWith>
 </CustomObjectTranslation>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>New_Contract_Created</name>
+        <label>New Contract Created</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>ServiceContract.New_Contract</actionName>
+        <actionType>emailAlert</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>SObjectRowId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>ServiceContract.New_Contract</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>Sends email when a Service Contract is created via the app, including contract line items.</description>
+    <environments>Default</environments>
+    <interviewLabel>Service Contract App Created Send Email {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Service Contract App Created Send Email</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>New_Contract_Created</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>appealsdoctor_vuid__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>ServiceContract</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Obsolete</status>
+    <textTemplates>
+        <name>Var_EmailBody</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;A new service contract was created through the Appeals Doctor app.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Contract Name:&lt;/strong&gt; {!$Record.Name}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Contract Number:&lt;/strong&gt; {!$Record.ContractNumber}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Description:&lt;/strong&gt; {!$Record.Description}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Amount (Grand Total):&lt;/strong&gt; {!$Record.GrandTotal}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Contact Email:&lt;/strong&gt; {!$Record.Contact.Email}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Related Account:&lt;/strong&gt; {!$Record.Account.Name}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Store:&lt;/strong&gt; {!$Record.Store__r.Name}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Contract Line Items:&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;{!varLineItemsSummary}&lt;/p&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Var_Subject</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>New Service Contract created via app : {!$Record.Name} - {!$Record.Store__r.Name}</text>
+    </textTemplates>
+    <variables>
+        <name>varLineItemsSummary</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

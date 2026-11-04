@@ -1,0 +1,103 @@
+"sf__Id","sf__Error",Id
+"01uVZ000008WqrkYAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53268 (-9032445):--","01uVZ000008WqrkYAC"
+"01uVZ000008X8zwYAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53269 (-9032445):--","01uVZ000008X8zwYAC"
+"01uVZ000008X8zxYAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53270 (-9032445):--","01uVZ000008X8zxYAC"
+"01uVZ000008X8zyYAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53271 (-9032445):--","01uVZ000008X8zyYAC"
+"01uVZ000008X8zzYAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53272 (-9032445):--","01uVZ000008X8zzYAC"
+"01uVZ000008X900YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53273 (-9032445):--","01uVZ000008X900YAC"
+"01uVZ000008X901YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53274 (-9032445):--","01uVZ000008X901YAC"
+"01uVZ000008X902YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53275 (-9032445):--","01uVZ000008X902YAC"
+"01uVZ000008X903YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53276 (-9032445):--","01uVZ000008X903YAC"
+"01uVZ000008X904YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53277 (-9032445):--","01uVZ000008X904YAC"
+"01uVZ000008X905YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53278 (-9032445):--","01uVZ000008X905YAC"
+"01uVZ000008X906YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53279 (-9032445):--","01uVZ000008X906YAC"
+"01uVZ000008X907YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53280 (-9032445):--","01uVZ000008X907YAC"
+"01uVZ000008X909YAC","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53281 (-9032445):--","01uVZ000008X909YAC"
+"01uVZ000008X90AYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53282 (-9032445):--","01uVZ000008X90AYAS"
+"01uVZ000008X90GYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53283 (-9032445):--","01uVZ000008X90GYAS"
+"01uVZ000008X90HYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53284 (-9032445):--","01uVZ000008X90HYAS"
+"01uVZ000008X90IYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53285 (-9032445):--","01uVZ000008X90IYAS"
+"01uVZ000008X90JYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53286 (-9032445):--","01uVZ000008X90JYAS"
+"01uVZ000008X90KYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53287 (-9032445):--","01uVZ000008X90KYAS"
+"01uVZ000008X90LYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53288 (-9032445):--","01uVZ000008X90LYAS"
+"01uVZ000008X90MYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53289 (-9032445):--","01uVZ000008X90MYAS"
+"01uVZ000008X90NYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53290 (-9032445):--","01uVZ000008X90NYAS"
+"01uVZ000008X90OYAS","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53291 (-9032445):--","01uVZ000008X90OYAS"
+"01uVZ00000BFnjdYAD","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53293 (-9032445):--","01uVZ00000BFnjdYAD"
+"01uVZ00000BFni1YAD","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53292 (-9032445):--","01uVZ00000BFni1YAD"
+"01uVZ00000BFnmrYAD","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53294 (-9032445):--","01uVZ00000BFnmrYAD"
+"01uVZ00000BFntJYAT","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53296 (-9032445):--","01uVZ00000BFntJYAT"
+"01uVZ00000BFnq5YAD","UNKNOWN_EXCEPTION:An unexpected error occurred. Please include this ErrorId if you contact support: 1871600700-53295 (-9032445):--","01uVZ00000BFnq5YAD"
+"01uVZ00000BFnwaYAD","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: All Things New-
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: All Things New- - 00000001, MY TEST TODAY 2026-08-26 Subscription - 00000001, test 2 aug 26 2026-08-26 Subscription - 00000001, AWS @me Company 2026-10-26 Subscription - 00000001
+Products will not be deleted from work order line items. The archived record is still visible from these work order line items: 00000002 - 00000001
+:--","01uVZ00000BFnwaYAD"
+"01uVZ00000BFnwbYAD","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: NEW STORE FOR DEMO 7/10/2026 2026-08-24 Subscription - 00000001, AWS @me Company 2026-10-25 Subscription - 00000001, AWS @me Company 2026-10-28 Subscription - 00000002
+:--","01uVZ00000BFnwbYAD"
+"01uVZ00000BFnwZYAT","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: All Things New-
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: All Things New- - 00000002
+Products will not be deleted from work order line items. The archived record is still visible from these work order line items: 00000002 - 00000002
+:--","01uVZ00000BFnwZYAT"
+"01uVZ00000BFnwYYAT","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: NEW STORE FOR DEMO 7/10/2026 2026-08-24 Subscription - 00000001
+:--","01uVZ00000BFnwYYAT"
+"01uVZ000008X06JYAS","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Aleph Trading LLC - CSM Upsell - 9/29/2026, Aleph Trading LLC - CSM Upsell - 9/29/2026, #ARB | Discount on us
+Products will not be deleted from orders. The archived record is still visible from these orders.: 00000100
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: Shop Service - 00000001, TEST STORE 2026-06-07 Services - 00000001, TEST STORE 2026-06-07 Services - 00000001, TEST STORE 2026-06-24 Services - 00000001, TEST STORE 2026-06-29 Services - 00000001...
+:--","01uVZ000008X06JYAS"
+"01uVZ000008X68fYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: TEST STORE 2026-06-07 Services - 00000002, TEST STORE 2026-06-07 Services - 00000003, TEST STORE 2026-06-24 Services - 00000002, TEST STORE 2026-06-29 Services - 00000002, TEST STORE 2026-06-29 Services - 00000003...
+:--","01uVZ000008X68fYAC"
+"01uVZ000008X68YYAS","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Number 1 In Service-, #ARB | Discount on us
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: TEST STORE 2026-06-24 Services - 00000003, TEST STORE 2026-06-29 Services - 00000003, My NEW STOR FOR AWS @ME 2026-07-01 Services - 00000002, My NEW STOR FOR AWS @ME 2222 2026-07-01 Services - 00000001, #ARB | Discount on us - 00000005...
+:--","01uVZ000008X68YYAS"
+"01uVZ000008X68sYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: test don't own 2026-07-14 Services - 00000005
+:--","01uVZ000008X68sYAC"
+"01uVZ000008X68WYAS","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Aleph Trading LLC - CSM Upsell - 10/1/2026, Number 1 In Service-, #ARB | Discount on us
+Products will not be deleted from orders. The archived record is still visible from these orders.: 00000100
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: Shop Service - 00000003, test don't own 2026-07-14 Services - 00000001, #ARB | Discount on us - 00000002, Number 1 In Service- - 00000001, Aleph Trading LLC - CSM Upsell - 10/1/2026 - 00000002
+:--","01uVZ000008X68WYAS"
+"01uVZ000008X68dYAC","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Number 1 In Service-
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: Number 1 In Service- - 00000008
+:--","01uVZ000008X68dYAC"
+"01uVZ000008X68cYAC","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Number 1 In Service-
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: Number 1 In Service- - 00000007, My New Store 2026-10-26 Services - 00000003
+:--","01uVZ000008X68cYAC"
+"01uVZ000008X68bYAC","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Number 1 In Service-
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: Number 1 In Service- - 00000005
+:--","01uVZ000008X68bYAC"
+"01uVZ000008X68aYAC","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Number 1 In Service-
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: Number 1 In Service- - 00000006
+:--","01uVZ000008X68aYAC"
+"01uVZ000008X68uYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: TEST STORE 2026-06-07 Services - 00000004, MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000004, Test 2026-07-12 Services - 00000001, Test 2026-07-12 Services - 00000001, test don't own 2026-07-14 Services - 00000002...
+:--","01uVZ000008X68uYAC"
+"01uVZ000008X68VYAS","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Aleph Trading LLC - CSM Upsell - 10/1/2026, #ARB | Discount on us
+Products will not be deleted from orders. The archived record is still visible from these orders.: 00000100
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: Shop Service - 00000002, TEST STORE 2026-06-07 Services - 00000003, TEST STORE 2026-06-07 Services - 00000002, TEST STORE 2026-06-29 Services - 00000002, TEST STORE 2026-06-29 Services - 00000002...
+:--","01uVZ000008X68VYAS"
+"01uVZ000008X68eYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000006, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000007
+:--","01uVZ000008X68eYAC"
+"01uVZ000008X68gYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000008, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000004, NEW STORE FOR DEMO 7/10/2026 2026-07-10 Services - 00000002
+:--","01uVZ000008X68gYAC"
+"01uVZ000008X68ZYAS","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Number 1 In Service-, #ARB | Discount on us
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: #ARB | Discount on us - 00000006, Number 1 In Service- - 00000004
+:--","01uVZ000008X68ZYAS"
+"01uVZ000008X68XYAS","DELETE_FAILED:Products will not be deleted from opportunities. The archived record is still visible from these opportunity products: Number 1 In Service-, #ARB | Discount on us
+Products will not be deleted from contract line items. The archived record is still visible from these contract line items: #ARB | Discount on us - 00000004, Number 1 In Service- - 00000002
+:--","01uVZ000008X68XYAS"
+"01uVZ000008X68wYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000003, NEW APP STORE LOGIN 2026-10-26 Services - 00000002, NEW APP STORE LOGIN 2026-10-26 Services - 00000004
+:--","01uVZ000008X68wYAC"
+"01uVZ000008X68hYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000003, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000001
+:--","01uVZ000008X68hYAC"
+"01uVZ000008X68jYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000006, STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000007, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000005
+:--","01uVZ000008X68jYAC"
+"01uVZ000008X68oYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000005, STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000010, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000002
+:--","01uVZ000008X68oYAC"
+"01uVZ000008X68lYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000003, STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000005, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000003
+:--","01uVZ000008X68lYAC"
+"01uVZ000008X68iYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000001, STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000004, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000008, NEW STORE FOR DEMO 7/10/2026 2026-07-10 Services - 00000001
+:--","01uVZ000008X68iYAC"
+"01uVZ000008X68nYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000002, STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000001, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000010
+:--","01uVZ000008X68nYAC"
+"01uVZ000008X68kYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000007, STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000002, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000009
+:--","01uVZ000008X68kYAC"
+"01uVZ000008X68pYAC","DELETE_FAILED:Products will not be deleted from contract line items. The archived record is still visible from these contract line items: MY Store For andrey.pruzan@gmail.com 2026-06-29 Services - 00000004, STORE for andrey.pruzan@me.com 2026-06-29 Services - 00000009, TEST STORE DEMO WITH SAM 2026-06-30 Services - 00000006, Test 2026-07-12 Services - 00000001
+:--","01uVZ000008X68pYAC"

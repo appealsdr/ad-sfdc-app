@@ -345,11 +345,6 @@
             <field>IsProfilePhotoActive</field>
             <table>User</table>
         </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Slack_Used_Id__c</field>
-            <table>User</table>
-        </columns>
         <masterLabel>Users</masterLabel>
     </sections>
     <sections>
@@ -531,6 +526,11 @@
         <masterLabel>Activities (Assigned To)</masterLabel>
     </sections>
     <sections>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>CSM_Call__c</field>
+            <table>User.Activity$OwnerId</table>
+        </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>quo_call_id__c</field>

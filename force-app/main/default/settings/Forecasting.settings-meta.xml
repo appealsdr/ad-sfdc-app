@@ -264,7 +264,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -300,11 +300,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -328,6 +332,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -348,6 +356,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -360,16 +372,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -416,6 +420,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -436,6 +444,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -444,7 +456,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -470,10 +482,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -544,7 +552,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -553,24 +561,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -582,21 +591,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -782,7 +792,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -818,11 +828,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -846,6 +860,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -866,6 +884,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -878,16 +900,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -934,6 +948,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -954,6 +972,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -962,7 +984,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -988,10 +1010,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -1062,7 +1080,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -1071,24 +1089,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -1100,21 +1119,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -1304,7 +1324,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -1340,11 +1360,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -1368,6 +1392,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -1388,6 +1416,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -1400,16 +1432,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -1456,6 +1480,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -1476,6 +1504,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -1484,7 +1516,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -1510,10 +1542,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -1585,7 +1613,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -1594,24 +1622,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -1623,21 +1652,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -1823,7 +1853,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -1859,11 +1889,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -1887,6 +1921,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -1907,6 +1945,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -1919,16 +1961,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -1975,6 +2009,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -1995,6 +2033,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -2003,7 +2045,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -2029,10 +2071,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -2103,7 +2141,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -2112,24 +2150,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -2141,21 +2180,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -2345,7 +2385,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -2381,11 +2421,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -2409,6 +2453,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -2429,6 +2477,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -2441,16 +2493,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -2497,6 +2541,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -2517,6 +2565,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -2525,7 +2577,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -2551,10 +2603,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -2626,7 +2674,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -2635,24 +2683,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -2664,21 +2713,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -2864,7 +2914,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -2900,11 +2950,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -2928,6 +2982,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -2948,6 +3006,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -2960,16 +3022,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -3016,6 +3070,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -3036,6 +3094,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -3044,7 +3106,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -3070,10 +3132,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -3144,7 +3202,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -3153,24 +3211,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -3182,21 +3241,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -3386,7 +3446,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -3422,11 +3482,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -3450,6 +3514,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -3470,6 +3538,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -3482,16 +3554,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -3538,6 +3602,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -3558,6 +3626,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -3566,7 +3638,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -3592,10 +3664,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -3667,7 +3735,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -3676,24 +3744,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -3705,21 +3774,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -3905,7 +3975,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -3941,11 +4011,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -3969,6 +4043,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -3989,6 +4067,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -4001,16 +4083,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -4057,6 +4131,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -4077,6 +4155,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -4085,7 +4167,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -4111,10 +4193,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -4185,7 +4263,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -4194,24 +4272,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -4223,21 +4302,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -4427,7 +4507,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -4463,11 +4543,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -4491,6 +4575,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -4511,6 +4599,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -4523,16 +4615,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -4579,6 +4663,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -4599,6 +4687,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -4607,7 +4699,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -4633,10 +4725,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -4708,7 +4796,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -4717,24 +4805,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -4746,21 +4835,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -4946,7 +5036,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -4982,11 +5072,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -5010,6 +5104,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -5030,6 +5128,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -5042,16 +5144,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -5098,6 +5192,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -5118,6 +5216,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -5126,7 +5228,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -5152,10 +5254,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -5226,7 +5324,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -5235,24 +5333,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -5264,21 +5363,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -5468,7 +5568,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -5504,11 +5604,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -5532,6 +5636,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -5552,6 +5660,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -5564,16 +5676,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -5620,6 +5724,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -5640,6 +5748,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -5648,7 +5760,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -5674,10 +5786,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -5749,7 +5857,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -5758,24 +5866,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -5787,21 +5896,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>
@@ -5987,7 +6097,7 @@
             <label>Budget Confirmed</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <label>Case</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -6023,11 +6133,15 @@
             <label>Contact Information</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP1</field>
+            <label>Contract Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBr</field>
             <label>Corporation Name</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <label>CSM Call</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -6051,6 +6165,10 @@
             <label>External Link for Files</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjIU</field>
+            <label>KPI Week</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlBw</field>
             <label>Last Appeal Date</label>
         </opportunityListFieldsLabelMappings>
@@ -6071,6 +6189,10 @@
             <label>Marketplaces</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP2</field>
+            <label>Meeting Completed Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFfm9</field>
             <label>Open Issues</label>
         </opportunityListFieldsLabelMappings>
@@ -6083,16 +6205,8 @@
             <label>Opportunity Address</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000CtwpF</field>
-            <label>Opportunity Closer</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCB</field>
             <label>Opportunity Email</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwnd</field>
-            <label>Opportunity Opener</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCC</field>
@@ -6139,6 +6253,10 @@
             <label>Project System Id</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP3</field>
+            <label>Proposal Sent Date/Time</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlC5</field>
             <label>Requires Documents</label>
         </opportunityListFieldsLabelMappings>
@@ -6159,6 +6277,10 @@
             <label>Service Details</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00NVZ000004JjP5</field>
+            <label>SLA Met</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00NKd00000tFcBr</field>
             <label>SPN Access</label>
         </opportunityListFieldsLabelMappings>
@@ -6167,7 +6289,7 @@
             <label>State Incorporated</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <label>Store</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
@@ -6193,10 +6315,6 @@
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCH</field>
             <label>Task Input Report Link</label>
-        </opportunityListFieldsLabelMappings>
-        <opportunityListFieldsLabelMappings>
-            <field>00NVp00000Ctwu5</field>
-            <label>Technical expert</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00NKd00000uBlCJ</field>
@@ -6267,7 +6385,7 @@
             <field>00NKd00000tFfm5</field>
             <field>00NKd00000tFcBp</field>
             <field>00NKd00000c7vZt</field>
-            <field>00NVp00000COVtN</field>
+            <field>00NVZ000004gLov</field>
             <field>00NKd00000uBlBn</field>
             <field>00NKd00000xKGfG</field>
             <field>00NKd00000uBlBL</field>
@@ -6276,24 +6394,25 @@
             <field>00NKd00000uBlBp</field>
             <field>00NKd00000uBlBq</field>
             <field>00NKd00000tFfm7</field>
+            <field>00NVZ000004JjP1</field>
             <field>00NKd00000uBlBr</field>
-            <field>00NVp00000COVzp</field>
+            <field>00NVZ000004gLiT</field>
             <field>00NKd00000uBlBs</field>
             <field>00NKd00000c7vZu</field>
             <field>00NKd00000uBlBt</field>
             <field>00NKd00000uBlBu</field>
             <field>00NKd00000uBlBv</field>
+            <field>00NVZ000004JjIU</field>
             <field>00NKd00000uBlBw</field>
             <field>00NKd00000uBlBx</field>
             <field>00NKd00000tFfm8</field>
             <field>00NKd00000c7vZw</field>
             <field>00NKd00000uBlBy</field>
+            <field>00NVZ000004JjP2</field>
             <field>00NKd00000tFfm9</field>
             <field>00NKd00000uBlBz</field>
             <field>00NKd00000uBlCA</field>
-            <field>00NVp00000CtwpF</field>
             <field>00NKd00000uBlCB</field>
-            <field>00NVp00000Ctwnd</field>
             <field>00NKd00000uBlCC</field>
             <field>00NKd00000uBlCD</field>
             <field>00NKd00000uBlC0</field>
@@ -6305,21 +6424,22 @@
             <field>00NKd00000uBlC2</field>
             <field>00NKd00000uBlC3</field>
             <field>00NKd00000tFfmB</field>
+            <field>00NVZ000004JjP3</field>
             <field>00NKd00000uBlC5</field>
             <field>00NKd00000c7vZv</field>
             <field>00NKd00000uBlC6</field>
             <field>00NKd00000uBlC7</field>
             <field>00NKd00000uBlC8</field>
+            <field>00NVZ000004JjP5</field>
             <field>00NKd00000tFcBr</field>
             <field>00NKd00000uBlC9</field>
-            <field>00NVp00000COUXV</field>
+            <field>00NVZ000004gdsH</field>
             <field>00NKd00000tFfmC</field>
             <field>00NKd00000uBlCE</field>
             <field>00NKd00000uBlCF</field>
             <field>00NKd00000uBlCI</field>
             <field>00NKd00000uBlCG</field>
             <field>00NKd00000uBlCH</field>
-            <field>00NVp00000Ctwu5</field>
             <field>00NKd00000uBlCJ</field>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <field>OPPORTUNITY.LAST_STG_CHG_DAYS</field>

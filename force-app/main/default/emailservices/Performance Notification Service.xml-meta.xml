@@ -4,13 +4,6 @@
     <attachmentOption>None</attachmentOption>
     <authenticationFailureAction>Discard</authenticationFailureAction>
     <authorizationFailureAction>Discard</authorizationFailureAction>
-    <emailServicesAddresses>
-        <authorizedSenders>rahul.k@appealsdoctor.com</authorizedSenders>
-        <developerName>PerformanceNotificationEm</developerName>
-        <isActive>true</isActive>
-        <localPart>performance_notification_service</localPart>
-        <runAsUser>rahul.k@appealsdoctor.com</runAsUser>
-    </emailServicesAddresses>
     <functionInactiveAction>Discard</functionInactiveAction>
     <functionName>Performance Notification Service</functionName>
     <isActive>true</isActive>

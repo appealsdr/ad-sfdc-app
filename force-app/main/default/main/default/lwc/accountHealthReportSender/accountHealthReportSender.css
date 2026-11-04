@@ -1,0 +1,440 @@
+/*
+ * accountHealthReportSender.css
+ * Appeals Doctor  —  Navy #102542  |  Orange #FF9900
+ */
+
+/* ── Card title ──────────────────────────────────────────────────────────── */
+.card-title {
+    font-weight: 700;
+    color: #102542;
+}
+.card-account {
+    color: #FF9900;
+    font-weight: 700;
+}
+
+/* ── Section headers ─────────────────────────────────────────────────────── */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 3px solid #FF9900;
+    padding-top: 10px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+.section-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: #102542;
+}
+.preview-toggle {
+    cursor: pointer;
+    user-select: none;
+}
+.toggle-hint {
+    font-size: 11px;
+    color: #888888;
+}
+
+/* ── Activity cards ──────────────────────────────────────────────────────── */
+.activity-grid {
+    align-items: flex-start;
+}
+.activity-card {
+    border: 1px solid #d0d7e2;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+}
+.activity-card-header {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+.solved-header {
+    background-color: #e8f0fe;
+    color: #102542;
+}
+.ongoing-header {
+    background-color: #fff3e0;
+    color: #b85c00;
+}
+
+/* ── Activity tables ─────────────────────────────────────────────────────── */
+.activity-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.activity-table thead tr {
+    background-color: #102542;
+}
+.activity-table thead th {
+    padding: 7px 10px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-align: left;
+}
+.col-type { width: 70%; }
+.col-qty  { width: 30%; }
+
+.activity-table tbody tr:nth-child(even) {
+    background-color: #fafbfc;
+}
+.activity-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+.type-cell {
+    padding: 4px 10px;
+    color: #333333;
+    border-bottom: 1px solid #f0f2f5;
+}
+.qty-cell {
+    padding: 2px 6px 2px 4px;
+    border-bottom: 1px solid #f0f2f5;
+}
+.na-cell {
+    color: #888888;
+    font-size: 12px;
+    padding: 4px 10px;
+}
+
+/* compact lightning-input inside table cells */
+.compact-input {
+    --slds-c-input-sizing-height: 28px;
+}
+.compact-input lightning-input {
+    margin: 0;
+}
+
+/* ── Table totals ────────────────────────────────────────────────────────── */
+.total-row {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.total-row td {
+    padding: 8px 10px;
+    color: #ffffff;
+}
+.solved-total  { background-color: #102542; }
+.ongoing-total { background-color: #b85c00; }
+.total-input lightning-input {
+    --slds-c-input-color-text: #ffffff;
+}
+
+/* ── Send button alignment ───────────────────────────────────────────────── */
+.send-btn-col {
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 2px;
+}
+.send-btn {
+    width: 100%;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   EMAIL PREVIEW STYLES
+   These reproduce the exact visual layout of the sent email.
+════════════════════════════════════════════════════════════════════════════ */
+.email-preview-wrapper {
+    background-color: #f0f2f5;
+    padding: 24px 0;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+.email-outer {
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Header */
+.ep-header {
+    background-color: #102542;
+    padding: 24px 36px 18px;
+}
+.ep-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.ep-logo-text {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+.ep-services {
+    color: #FF9900;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: right;
+    max-width: 240px;
+}
+.ep-title {
+    margin: 14px 0 0;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Accent bar */
+.ep-accent-bar {
+    height: 4px;
+    background-color: #FF9900;
+}
+
+/* Sections */
+.ep-section {
+    padding: 18px 36px 0;
+}
+.ep-section-label {
+    margin: 0;
+    color: #102542;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-top: 3px solid #FF9900;
+    padding-top: 10px;
+}
+
+/* Meta table */
+.ep-meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #d0d7e2;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+}
+.ep-meta-table thead tr {
+    background-color: #102542;
+}
+.ep-meta-table thead th {
+    padding: 9px 14px;
+    color: #FF9900;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-align: left;
+}
+.ep-meta-table tbody tr:first-child {
+    background-color: #f8f9fb;
+}
+.ep-meta-val {
+    padding: 9px 14px;
+    color: #102542;
+    font-size: 13px;
+    font-weight: 700;
+}
+.ep-meta-period td {
+    padding: 8px 14px;
+    color: #555555;
+    font-size: 12px;
+    background-color: #ffffff;
+}
+.ep-label {
+    color: #888888;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Two-column body */
+.ep-body-grid {
+    display: flex;
+    gap: 14px;
+    padding-bottom: 24px;
+}
+.ep-left  { flex: 0 0 55%; }
+.ep-right { flex: 1; }
+
+/* Activity table in preview */
+.ep-activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #d0d7e2;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+}
+.ep-activity-table thead tr {
+    background-color: #102542;
+}
+.ep-activity-table thead th {
+    padding: 8px 12px;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-align: left;
+}
+.ep-activity-table tbody tr:nth-child(even) { background-color: #fafbfc; }
+.ep-activity-table tbody tr:nth-child(odd)  { background-color: #ffffff; }
+.ep-activity-table tbody td {
+    padding: 6px 12px;
+    color: #333333;
+    border-bottom: 1px solid #f0f2f5;
+    font-size: 12px;
+}
+.ep-qty {
+    text-align: center;
+    font-weight: 700;
+    color: #102542;
+}
+.ep-na { color: #888888; font-weight: normal; }
+
+/* Sub-headers */
+.ep-subheader-solved td {
+    background-color: #e8f0fe;
+    color: #102542;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 12px;
+}
+.ep-subheader-ongoing td {
+    background-color: #fff3e0;
+    color: #b85c00;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 12px;
+}
+
+/* Total rows */
+.ep-total-fixed td {
+    background-color: #102542;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border-bottom: none;
+}
+.ep-total-fixed .ep-total-qty { color: #FF9900; font-size: 14px; }
+
+.ep-total-ongoing td {
+    background-color: #b85c00;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border-bottom: none;
+}
+.ep-total-ongoing .ep-total-qty { color: #ffffff; font-size: 14px; }
+
+/* Health card */
+.ep-health-card,
+.ep-summary-card {
+    border: 1px solid #d0d7e2;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+.ep-panel-header {
+    background-color: #102542;
+    color: #FF9900;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 8px 12px;
+}
+.ep-score-row {
+    background-color: #f8f9fb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 12px 8px;
+}
+.ep-score-label {
+    color: #888888;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.ep-score-value {
+    color: #102542;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+}
+.ep-health-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    border-top: 1px solid #f0f2f5;
+    color: #555555;
+    background-color: #ffffff;
+}
+.ep-health-row-alt {
+    background-color: #f8f9fb;
+}
+.ep-health-val {
+    font-weight: 700;
+    color: #102542;
+}
+
+/* Summary card */
+.ep-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #d0d7e2;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #555555;
+}
+.ep-summary-fixed  { background-color: #f0f7f0; }
+.ep-summary-ongoing { background-color: #fff8f0; border-bottom: none; }
+.ep-summary-num { font-size: 18px; font-weight: 700; }
+.ep-num-green  { color: #2e7d32; }
+.ep-num-orange { color: #b85c00; }
+
+/* Footer */
+.ep-footer {
+    background-color: #102542;
+    padding: 18px 36px;
+    border-top: 4px solid #FF9900;
+}
+.ep-footer-services {
+    margin: 0 0 6px;
+    color: #FF9900;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-align: center;
+}
+.ep-footer-contact {
+    margin: 0;
+    color: #aaaaaa;
+    font-size: 10px;
+    text-align: center;
+    line-height: 1.7;
+}

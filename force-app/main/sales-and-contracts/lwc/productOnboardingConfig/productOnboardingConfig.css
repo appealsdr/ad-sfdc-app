@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.card-body {
+  position: relative;
+  min-height: 4rem;
+}
+
+.row-heading,
+.detail-row,
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.row-actions {
+  margin-left: auto;
+}
+
+.editor-row {
+  padding-block: 0.75rem;
+}
+
+.drag-handle {
+  display: inline-flex;
+  cursor: grab;
+  padding: 0.5rem;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.detail-row {
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.field-description {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

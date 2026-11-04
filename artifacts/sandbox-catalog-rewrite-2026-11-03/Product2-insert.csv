@@ -1,0 +1,7 @@
+Name,ProductCode,Description,IsActive,Family,Case_Type__c,Category__c,StockKeepingUnit
+Brand Protection,INS-001,"Brand protection service fee is $3000 per brand. Please note that we charge a $1500 deposit per item upfront, with the balance due upon completion",true,Services,Brand Protection,"",INS-001
+SAM PRODUCT,SAM-001,SAM WANT THIS,false,"","",Brand Approval,SAM-001
+JUAN TEST,"","",true,Services,"","",""
+Protection,"","",true,Subscription,"","",""
+Advertising,"",Monthly Keyword-targeted pay-per-click ads for individual product listings that appear prominently in search results and on product detail pages to improve visibility and sales,true,Services,"","",""
+TEST PRODUCT,TST-PRD-0001,TEST PRODUCT,false,Services,Account at Risk of Deactivation,"",TST-PRD-0001
