@@ -145,10 +145,6 @@ public with sharing class TimeTrackingController {
         if (endTime.getTime() - startTime.getTime() > MAX_ENTRY_DURATION_MS) {
             throw new AuraHandledException('A single time entry cannot exceed 24 hours.');
         }
-        if (String.isBlank(comments)) {
-            throw new AuraHandledException('Comments are required.');
-        }
-
         try {
             String objectType = recordId.getSObjectType().getDescribe().getName();
             if (objectType != 'Case' && objectType != 'Store__c') {
@@ -163,7 +159,7 @@ public with sharing class TimeTrackingController {
                 Start_Time__c = startTime,
                 End_Time__c = endTime,
                 Status__c = STATUS_COMPLETED,
-                Comments__c = comments.trim()
+                Comments__c = String.isBlank(comments) ? null : comments.trim()
             );
             setRelatedRecord(newRecord, recordId, objectType);
             insert newRecord;
@@ -189,10 +185,6 @@ public with sharing class TimeTrackingController {
         if (endTime.getTime() - startTime.getTime() > MAX_ENTRY_DURATION_MS) {
             throw new AuraHandledException('A single time entry cannot exceed 24 hours.');
         }
-        if (String.isBlank(comments)) {
-            throw new AuraHandledException('Comments are required.');
-        }
-
         try {
             if (!hasAdminAccess()) {
                 throw new AuraHandledException('You do not have permission to edit time tracking records.');
@@ -211,7 +203,7 @@ public with sharing class TimeTrackingController {
             record.Start_Time__c = startTime;
             record.End_Time__c = endTime;
             record.Status__c = STATUS_COMPLETED;
-            record.Comments__c = comments.trim();
+            record.Comments__c = String.isBlank(comments) ? null : comments.trim();
             update record;
         } catch (AuraHandledException ex) {
             throw ex;
@@ -225,10 +217,6 @@ public with sharing class TimeTrackingController {
         if (timeTrackingId == null) {
             throw new AuraHandledException('Time Tracking Id is required.');
         }
-        if (String.isBlank(comments)) {
-            throw new AuraHandledException('Comments are required to complete the timer.');
-        }
-
         try {
             Time_Tracking__c record = [
                 SELECT Id, Status__c, Assignee__c
@@ -246,7 +234,7 @@ public with sharing class TimeTrackingController {
 
             record.Status__c = STATUS_COMPLETED;
             record.End_Time__c = System.now();
-            record.Comments__c = comments.trim();
+            record.Comments__c = String.isBlank(comments) ? null : comments.trim();
             update record;
         } catch (AuraHandledException ex) {
             throw ex;
@@ -260,10 +248,6 @@ public with sharing class TimeTrackingController {
         if (timeTrackingId == null) {
             throw new AuraHandledException('Time Tracking Id is required.');
         }
-        if (String.isBlank(comments)) {
-            throw new AuraHandledException('Comments are required to delete the time tracking record.');
-        }
-
         try {
             if (!hasAdminAccess()) {
                 throw new AuraHandledException('You do not have permission to delete time tracking records.');
@@ -279,8 +263,10 @@ public with sharing class TimeTrackingController {
                 LIMIT 1
             ];
 
-            record.Comments__c = comments.trim();
-            update record;
+            if (!String.isBlank(comments)) {
+                record.Comments__c = comments.trim();
+                update record;
+            }
             delete record;
         } catch (AuraHandledException ex) {
             throw ex;
