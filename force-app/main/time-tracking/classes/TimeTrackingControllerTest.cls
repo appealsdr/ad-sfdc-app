@@ -272,22 +272,34 @@ private class TimeTrackingControllerTest {
     @IsTest
     static void testCreateManualEntryBlankComments() {
         Case testCase = getPrimaryCase();
+        Datetime endTime = System.now().addHours(-1);
+        List<String> blankComments = new List<String>{ null, '', ' \t ' };
+        Set<Id> createdIds = new Set<Id>();
 
-        Boolean exceptionThrown = false;
         Test.startTest();
-        try {
-            TimeTrackingController.createManualEntry(
+        for (String comments : blankComments) {
+            createdIds.add(TimeTrackingController.createManualEntry(
                 testCase.Id,
-                System.now().addHours(-1),
-                System.now(),
-                '   '
-            );
-        } catch (AuraHandledException ex) {
-            exceptionThrown = true;
+                endTime.addHours(-1),
+                endTime,
+                comments
+            ));
         }
         Test.stopTest();
 
-        System.assertEquals(true, exceptionThrown);
+        System.assertEquals(3, createdIds.size(), 'Null, empty, and whitespace comments must allow creation.');
+        for (Time_Tracking__c record : [
+            SELECT Comments__c, Status__c, Start_Time__c, End_Time__c, Case__c, Store__c
+            FROM Time_Tracking__c
+            WHERE Id IN :createdIds
+        ]) {
+            System.assertEquals(null, record.Comments__c, 'Blank comments should be stored as null.');
+            System.assertEquals(TimeTrackingController.STATUS_COMPLETED, record.Status__c);
+            System.assertEquals(endTime.addHours(-1), record.Start_Time__c);
+            System.assertEquals(endTime, record.End_Time__c);
+            System.assertEquals(testCase.Id, record.Case__c);
+            System.assertEquals(testCase.Store__c, record.Store__c);
+        }
     }
 
     @IsTest
@@ -353,31 +365,41 @@ private class TimeTrackingControllerTest {
     @IsTest
     static void testUpdateTimeTrackingBlankComments() {
         Case testCase = getPrimaryCase();
-        Time_Tracking__c record = new Time_Tracking__c(
-            Assignee__c = UserInfo.getUserId(),
-            Case__c = testCase.Id,
-            Start_Time__c = System.now().addHours(-1),
-            End_Time__c = System.now(),
-            Status__c = TimeTrackingController.STATUS_COMPLETED,
-            Comments__c = 'Original'
-        );
-        insert record;
+        Datetime newEnd = System.now().addHours(-2);
+        Datetime newStart = newEnd.addHours(-1);
+        List<String> blankComments = new List<String>{ null, '', ' \t ' };
+        List<Time_Tracking__c> records = new List<Time_Tracking__c>();
+        for (String comments : blankComments) {
+            records.add(new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Case__c = testCase.Id,
+                Start_Time__c = System.now().addHours(-1),
+                End_Time__c = System.now(),
+                Status__c = TimeTrackingController.STATUS_COMPLETED,
+                Comments__c = 'Original'
+            ));
+        }
+        insert records;
 
-        Boolean exceptionThrown = false;
+        User adminUser = getAdminUser();
         Test.startTest();
-        try {
-            TimeTrackingController.updateTimeTracking(
-                record.Id,
-                System.now().addHours(-1),
-                System.now(),
-                '   '
-            );
-        } catch (AuraHandledException ex) {
-            exceptionThrown = true;
+        System.runAs(adminUser) {
+            for (Integer index = 0; index < blankComments.size(); index++) {
+                TimeTrackingController.updateTimeTracking(records[index].Id, newStart, newEnd, blankComments[index]);
+            }
         }
         Test.stopTest();
 
-        System.assertEquals(true, exceptionThrown);
+        for (Time_Tracking__c record : [
+            SELECT Comments__c, Start_Time__c, End_Time__c, Status__c
+            FROM Time_Tracking__c
+            WHERE Id IN :records
+        ]) {
+            System.assertEquals(null, record.Comments__c, 'Blank comments must clear an existing comment.');
+            System.assertEquals(newStart, record.Start_Time__c);
+            System.assertEquals(newEnd, record.End_Time__c);
+            System.assertEquals(TimeTrackingController.STATUS_COMPLETED, record.Status__c);
+        }
     }
 
     @IsTest
@@ -397,24 +419,40 @@ private class TimeTrackingControllerTest {
     @IsTest
     static void testDeleteTimeTrackingBlankComments() {
         Case testCase = getPrimaryCase();
-        Time_Tracking__c record = new Time_Tracking__c(
-            Assignee__c = UserInfo.getUserId(),
-            Case__c = testCase.Id,
-            Start_Time__c = System.now(),
-            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
-        );
-        insert record;
+        List<String> blankComments = new List<String>{ null, '', ' \t ' };
+        List<Time_Tracking__c> records = new List<Time_Tracking__c>();
+        for (String comments : blankComments) {
+            records.add(new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Case__c = testCase.Id,
+                Start_Time__c = System.now().addHours(-1),
+                End_Time__c = System.now(),
+                Status__c = TimeTrackingController.STATUS_COMPLETED,
+                Comments__c = 'Original comment'
+            ));
+        }
+        insert records;
 
-        Boolean exceptionThrown = false;
+        User adminUser = getAdminUser();
         Test.startTest();
-        try {
-            TimeTrackingController.deleteTimeTracking(record.Id, '   ');
-        } catch (AuraHandledException ex) {
-            exceptionThrown = true;
+        System.runAs(adminUser) {
+            for (Integer index = 0; index < blankComments.size(); index++) {
+                TimeTrackingController.deleteTimeTracking(records[index].Id, blankComments[index]);
+            }
         }
         Test.stopTest();
 
-        System.assertEquals(true, exceptionThrown);
+        List<Time_Tracking__c> deletedRecords = [
+            SELECT IsDeleted, Comments__c
+            FROM Time_Tracking__c
+            WHERE Id IN :records
+            ALL ROWS
+        ];
+        System.assertEquals(3, deletedRecords.size());
+        for (Time_Tracking__c record : deletedRecords) {
+            System.assertEquals(true, record.IsDeleted, 'Blank comments must not block an authorized deletion.');
+            System.assertEquals('Original comment', record.Comments__c, 'Deleting without a comment must not update the existing comment.');
+        }
     }
 
     @IsTest
@@ -498,7 +536,7 @@ private class TimeTrackingControllerTest {
             TimeTrackingController.startTimer(testCase.Id);
         System.assertEquals(true, startResult.success);
 
-        TimeTrackingController.completeTimer(startResult.timeTrackingId, 'Finished task');
+        TimeTrackingController.completeTimer(startResult.timeTrackingId, '  Finished task  ');
         Test.stopTest();
 
         Time_Tracking__c completedRecord = [
@@ -548,7 +586,7 @@ private class TimeTrackingControllerTest {
         Boolean exceptionThrown = false;
         Test.startTest();
         try {
-            TimeTrackingController.deleteTimeTracking(record.Id, 'Removing incorrect entry');
+            TimeTrackingController.deleteTimeTracking(record.Id, null);
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
         }
@@ -572,11 +610,18 @@ private class TimeTrackingControllerTest {
         User adminUser = getAdminUser();
         Test.startTest();
         System.runAs(adminUser) {
-            TimeTrackingController.deleteTimeTracking(record.Id, 'Removing incorrect entry');
+            TimeTrackingController.deleteTimeTracking(record.Id, '  Removing incorrect entry  ');
         }
         Test.stopTest();
 
         System.assertEquals(0, [SELECT COUNT() FROM Time_Tracking__c WHERE Id = :record.Id]);
+        Time_Tracking__c deletedRecord = [
+            SELECT Comments__c
+            FROM Time_Tracking__c
+            WHERE Id = :record.Id
+            ALL ROWS
+        ];
+        System.assertEquals('Removing incorrect entry', deletedRecord.Comments__c);
     }
 
     @IsTest
@@ -586,7 +631,7 @@ private class TimeTrackingControllerTest {
         Datetime endTime = System.now().addHours(-1);
 
         Test.startTest();
-        Id newId = TimeTrackingController.createManualEntry(testCase.Id, startTime, endTime, 'Manual entry');
+        Id newId = TimeTrackingController.createManualEntry(testCase.Id, startTime, endTime, '  Manual entry  ');
         Test.stopTest();
 
         Time_Tracking__c record = [
@@ -679,7 +724,7 @@ private class TimeTrackingControllerTest {
                 record.Id,
                 System.now().addHours(-2),
                 System.now().addHours(-1),
-                'Updated comment'
+                null
             );
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
@@ -708,7 +753,7 @@ private class TimeTrackingControllerTest {
         User adminUser = getAdminUser();
         Test.startTest();
         System.runAs(adminUser) {
-            TimeTrackingController.updateTimeTracking(record.Id, newStart, newEnd, 'Updated comment');
+            TimeTrackingController.updateTimeTracking(record.Id, newStart, newEnd, '  Updated comment  ');
         }
         Test.stopTest();
 
@@ -740,26 +785,37 @@ private class TimeTrackingControllerTest {
     }
 
     @IsTest
-    static void testCompleteTimerRequiresComments() {
+    static void testCompleteTimerBlankComments() {
         Case testCase = getPrimaryCase();
-        Time_Tracking__c record = new Time_Tracking__c(
-            Assignee__c = UserInfo.getUserId(),
-            Case__c = testCase.Id,
-            Start_Time__c = System.now(),
-            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
-        );
-        insert record;
+        List<String> blankComments = new List<String>{ null, '', ' \t ' };
+        Set<Id> completedIds = new Set<Id>();
 
-        Boolean exceptionThrown = false;
         Test.startTest();
-        try {
-            TimeTrackingController.completeTimer(record.Id, '   ');
-        } catch (AuraHandledException ex) {
-            exceptionThrown = true;
+        for (String comments : blankComments) {
+            Time_Tracking__c record = new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Case__c = testCase.Id,
+                Start_Time__c = System.now().addMinutes(-5),
+                Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
+                Comments__c = 'Original comment'
+            );
+            insert record;
+            TimeTrackingController.completeTimer(record.Id, comments);
+            completedIds.add(record.Id);
         }
         Test.stopTest();
 
-        System.assertEquals(true, exceptionThrown);
+        System.assertEquals(3, completedIds.size(), 'Null, empty, and whitespace comments must allow completion.');
+        for (Time_Tracking__c record : [
+            SELECT Comments__c, Status__c, Start_Time__c, End_Time__c
+            FROM Time_Tracking__c
+            WHERE Id IN :completedIds
+        ]) {
+            System.assertEquals(null, record.Comments__c, 'Completing without comments must clear an existing comment.');
+            System.assertEquals(TimeTrackingController.STATUS_COMPLETED, record.Status__c);
+            System.assertNotEquals(null, record.End_Time__c);
+            System.assert(record.End_Time__c > record.Start_Time__c, 'The completed timer must retain a valid duration.');
+        }
     }
 
     @IsTest
