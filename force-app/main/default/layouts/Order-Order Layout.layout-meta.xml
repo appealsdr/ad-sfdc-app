@@ -35,6 +35,10 @@
                 <behavior>Readonly</behavior>
                 <field>ActivatedById</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Store__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

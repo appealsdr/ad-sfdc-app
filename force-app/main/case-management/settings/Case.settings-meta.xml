@@ -20,16 +20,33 @@
         <enableE2CExternalServer>false</enableE2CExternalServer>
         <enableE2CSourceTracking>true</enableE2CSourceTracking>
         <enableEmailToCase>true</enableEmailToCase>
-        <enableHtmlEmail>false</enableHtmlEmail>
+        <enableHtmlEmail>true</enableHtmlEmail>
         <enableNewToReadTriggers>false</enableNewToReadTriggers>
-        <enableOnDemandEmailToCase>false</enableOnDemandEmailToCase>
+        <enableOnDemandEmailToCase>true</enableOnDemandEmailToCase>
         <enableThreadTokenInBody>true</enableThreadTokenInBody>
         <enableThreadTokenInSubject>true</enableThreadTokenInSubject>
         <movingEmailEnabled>false</movingEmailEnabled>
         <notifyOwnerOnNewCaseEmail>true</notifyOwnerOnNewCaseEmail>
         <notifySenderE2CError>false</notifySenderE2CError>
+        <overEmailLimitAction>Bounce</overEmailLimitAction>
         <preQuoteSignature>false</preQuoteSignature>
         <replyWithNewContentOnly>false</replyWithNewContentOnly>
+        <routingAddresses>
+            <addressType>EmailToCase</addressType>
+            <caseOrigin>Email-Amazon</caseOrigin>
+            <caseOwner>andrei.pruzan@appealsdoctor.com</caseOwner>
+            <caseOwnerType>User</caseOwnerType>
+            <casePriority>High</casePriority>
+            <createTask>false</createTask>
+            <emailAddress>notifications@appealsdoctor.com</emailAddress>
+            <emailServicesAddress>notifications@d-tqz0jctl87hkvp7q9lpnpfy31k0bfuuxjun2r6wj6lr628pac.vz-58rht2am.usa710s.case.sandbox.salesforce.com</emailServicesAddress>
+            <isPermsetControlled>false</isPermsetControlled>
+            <isVerified>true</isVerified>
+            <newEntityRecordType>Case.Violations</newEntityRecordType>
+            <routingName>Email-Amazon</routingName>
+            <saveEmailHeaders>true</saveEmailHeaders>
+        </routingAddresses>
+        <unauthorizedSenderAction>Discard</unauthorizedSenderAction>
         <useEmailHeadersForThreading>true</useEmailHeadersForThreading>
     </emailToCase>
     <enableCaseFeed>true</enableCaseFeed>
@@ -39,6 +56,7 @@
     <enableEarlyEscalationRuleTriggers>false</enableEarlyEscalationRuleTriggers>
     <enableEmailActionDefaultsHandler>false</enableEmailActionDefaultsHandler>
     <enableEscalateQfiToCaseInternal>false</enableEscalateQfiToCaseInternal>
+    <enableEscalateQfiToCaseNetworks>false</enableEscalateQfiToCaseNetworks>
     <enableMultiLangSolnSrchCSS>false</enableMultiLangSolnSrchCSS>
     <enableMultiLangSolnSrchPKB>false</enableMultiLangSolnSrchPKB>
     <enableMultiLangSolution>false</enableMultiLangSolution>

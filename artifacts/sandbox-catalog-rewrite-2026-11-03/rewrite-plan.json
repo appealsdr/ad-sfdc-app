@@ -1,0 +1,22 @@
+{
+  "product_updates": 36,
+  "product_inserts": 6,
+  "product_deletes": 4,
+  "pricebook_updates": 4,
+  "pricebook_inserts": 2,
+  "omitted_source_fields": {
+    "Product2": [
+      "ConfigureDuringSale",
+      "Credits__c",
+      "HelpText",
+      "IsAssetizable",
+      "IsSoldOnlyWithOtherProds"
+    ],
+    "Pricebook2": [
+      "Price_Book__c"
+    ],
+    "PricebookEntry": [
+      "ProductSellingModelId"
+    ]
+  }
+}

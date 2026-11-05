@@ -1,0 +1,4 @@
+Object,ExpectedRows,ActualRows,Mismatches
+Product2,42,42,0
+Pricebook2,6,6,0
+PricebookEntry,152,152,0

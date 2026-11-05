@@ -3,8 +3,8 @@
     <layouts>
         <layout>Opportunity Layout</layout>
         <sections>
-            <label><!-- Parties Involved --></label>
-            <section>Parties Involved</section>
+            <label><!-- Price Book Info --></label>
+            <section>Price Book Info</section>
         </sections>
     </layouts>
     <quickActions>

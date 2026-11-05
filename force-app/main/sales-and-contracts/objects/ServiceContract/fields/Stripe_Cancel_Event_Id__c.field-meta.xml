@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stripe_Cancel_Event_Id__c</fullName>
+    <description>Last Stripe subscription event ID handled by the cancellation webhook service, used to recognize repeat deliveries.</description>
+    <externalId>false</externalId>
+    <label>Stripe Cancel Event Id</label>
+    <length>255</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

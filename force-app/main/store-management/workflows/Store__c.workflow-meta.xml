@@ -5,10 +5,10 @@
         <description>New Store</description>
         <protected>false</protected>
         <recipients>
-            <recipient>C_LEVEL</recipient>
-            <type>group</type>
+            <recipient>andrei.pruzan@appealsdoctor.com</recipient>
+            <type>user</type>
         </recipients>
         <senderType>CurrentUser</senderType>
-        <template>ClientNotifications/New_Store_Email_1788802843859</template>
+        <template>unfiled$public/App_Store_Created</template>
     </alerts>
 </Workflow>

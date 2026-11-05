@@ -403,6 +403,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>Active_Daily_Store_Check__c</field>
+            <table>Store__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>appealsdoctor_vuid__c</field>
             <table>Store__c</table>
         </columns>
@@ -413,12 +418,22 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>Total_Revenue_Recovered__c</field>
+            <field>Total_Cases__c</field>
             <table>Store__c</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>Store_Health__c</field>
+            <field>Total_Open_Cases__c</field>
+            <table>Store__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Total_Closed_Cases__c</field>
+            <table>Store__c</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Amazon_Seller_Page__c</field>
             <table>Store__c</table>
         </columns>
         <masterLabel>Stores</masterLabel>

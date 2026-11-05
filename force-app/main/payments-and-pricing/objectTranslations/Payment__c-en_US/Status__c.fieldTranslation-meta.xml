@@ -26,4 +26,8 @@
         <masterLabel>Refunded</masterLabel>
         <translation><!-- Refunded --></translation>
     </picklistValues>
+    <picklistValues>
+        <masterLabel>Request Payment</masterLabel>
+        <translation><!-- Request Payment --></translation>
+    </picklistValues>
 </CustomFieldTranslation>

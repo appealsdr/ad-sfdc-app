@@ -228,11 +228,6 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>ActionCadenceState</field>
-            <table>Contact</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
             <field>CreatedDate</field>
             <table>Contact</table>
         </columns>
@@ -288,16 +283,6 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>FirstCallDateTime</field>
-            <table>Contact</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>FirstEmailDateTime</field>
-            <table>Contact</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
             <field>Pronouns</field>
             <table>Contact</table>
         </columns>
@@ -318,7 +303,27 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UserName__c</field>
+            <table>Contact</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>appealsdoctor_vuid__c</field>
+            <table>Contact</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Password_Reset_At__c</field>
+            <table>Contact</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Failed_Login_Attempts__c</field>
+            <table>Contact</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Account_Locked_Until__c</field>
             <table>Contact</table>
         </columns>
         <masterLabel>Contacts</masterLabel>

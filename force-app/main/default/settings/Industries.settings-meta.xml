@@ -2,15 +2,8 @@
 <IndustriesSettings xmlns="http://soap.sforce.com/2006/04/metadata">
     <enableAIAccelerator>false</enableAIAccelerator>
     <enableAccountScoreEnabled>false</enableAccountScoreEnabled>
-    <enableDataCloudEventsOnTimeline>false</enableDataCloudEventsOnTimeline>
-    <enableDiscoveryFrameworkMetadata>false</enableDiscoveryFrameworkMetadata>
     <enableDontSharePartyprofWPortalOrgPref>false</enableDontSharePartyprofWPortalOrgPref>
-    <enableEnhancedQuestionCreation>true</enableEnhancedQuestionCreation>
-    <enableEpcDeleteAccess>false</enableEpcDeleteAccess>
-    <enableIndustriesAssessment>false</enableIndustriesAssessment>
-    <enableIndustriesAssessmentPrefill>false</enableIndustriesAssessmentPrefill>
     <enableNewTimelineSetupFlow>false</enableNewTimelineSetupFlow>
-    <enablePCMConfigRules>false</enablePCMConfigRules>
     <enablePartyProfileParentSharingOrgPref>false</enablePartyProfileParentSharingOrgPref>
     <enablePartyprofParentMultiSharingOrgPref>false</enablePartyprofParentMultiSharingOrgPref>
     <enableRecordAlertCustomSharingPref>false</enableRecordAlertCustomSharingPref>

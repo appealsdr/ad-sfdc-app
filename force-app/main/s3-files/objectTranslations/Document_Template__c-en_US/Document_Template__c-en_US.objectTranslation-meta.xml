@@ -15,8 +15,8 @@
             <section>Custom Links</section>
         </sections>
         <sections>
-            <label><!-- Instructions --></label>
-            <section>Instructions</section>
+            <label><!-- Instrcutions --></label>
+            <section>Instrcutions</section>
         </sections>
     </layouts>
     <startsWith>Consonant</startsWith>

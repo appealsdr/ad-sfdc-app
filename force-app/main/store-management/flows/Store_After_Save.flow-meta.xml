@@ -1,76 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
-    <actionCalls>
-        <name>New_Store_Email</name>
-        <label>New Store Email</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>Store__c.New_Store</actionName>
-        <actionType>emailAlert</actionType>
-        <faultConnector>
-            <targetReference>Create_Log</targetReference>
-        </faultConnector>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>SObjectRowId</name>
-            <value>
-                <elementReference>$Record.Id</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>Store__c.New_Store</nameSegment>
-        <offset>0</offset>
-    </actionCalls>
-    <apiVersion>66.0</apiVersion>
+    <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <decisions>
-        <name>Check</name>
-        <label>Check</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
-        <rules>
-            <name>New</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record__Prior.Id</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>New_Store_Email</targetReference>
-            </connector>
-            <label>New</label>
-        </rules>
-        <rules>
-            <name>Is_Update</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>IsChanged</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>$Record.Status__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>Archived</stringValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Update_Cases</targetReference>
-            </connector>
-            <label>Is Update</label>
-        </rules>
-    </decisions>
-    <description>v1 - when status archived - update all related cases to: Status - Closed, Closed Reason - Archived</description>
     <environments>Default</environments>
     <interviewLabel>Store - After Save {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>Store - Insert/Update</label>
+    <label>Store - After Save</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -90,29 +24,9 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
-    <recordCreates>
-        <name>Create_Log</name>
-        <label>Create Log</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <inputAssignments>
-            <field>Body__c</field>
-            <value>
-                <elementReference>$Flow.FaultMessage</elementReference>
-            </value>
-        </inputAssignments>
-        <inputAssignments>
-            <field>Error__c</field>
-            <value>
-                <elementReference>$Flow.FaultMessage</elementReference>
-            </value>
-        </inputAssignments>
-        <object>Application_Log__c</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordCreates>
     <recordUpdates>
-        <name>Update_Cases</name>
-        <label>Update Cases</label>
+        <name>Update_Related_Cases</name>
+        <label>Update Related Cases</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <filterLogic>and</filterLogic>
@@ -141,10 +55,18 @@
         <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Check</targetReference>
+            <targetReference>Update_Related_Cases</targetReference>
         </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Status__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Archived</stringValue>
+            </value>
+        </filters>
         <object>Store__c</object>
-        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <recordTriggerType>Update</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>

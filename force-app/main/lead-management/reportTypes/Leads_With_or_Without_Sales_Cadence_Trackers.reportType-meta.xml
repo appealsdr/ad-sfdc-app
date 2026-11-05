@@ -4,10 +4,6 @@
     <category>other</category>
     <deployed>true</deployed>
     <description>Leads that may or may not have cadence trackers</description>
-    <join>
-        <outerJoin>true</outerJoin>
-        <relationship>ActionCadenceTracker</relationship>
-    </join>
     <label>Leads With or Without Cadence Trackers</label>
     <sections>
         <columns>
@@ -267,21 +263,6 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>ActionCadenceState</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>FirstCallDateTime</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>FirstEmailDateTime</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
             <field>Message__c</field>
             <table>Lead</table>
         </columns>
@@ -302,52 +283,12 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>Lead_Load_Status__c</field>
+            <field>Import_Batch_Name__c</field>
             <table>Lead</table>
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>Decision_Macking_LinkedIn__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Brands_Listed__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Brand_Owner__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Number_of_Brands__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Third_Category__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Next_Follow_Up__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Follow_Up_Today__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Percentage_Positive_Reviews__c</field>
-            <table>Lead</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Missed_Data__c</field>
             <table>Lead</table>
         </columns>
         <masterLabel>Leads</masterLabel>

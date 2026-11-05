@@ -25,7 +25,7 @@
     </networkAccess>
     <passwordPolicies>
         <complexity>AlphaNumeric</complexity>
-        <expiration>OneYear</expiration>
+        <expiration>NinetyDays</expiration>
         <historyRestriction>3</historyRestriction>
         <lockoutInterval>FifteenMinutes</lockoutInterval>
         <maxLoginAttempts>TenAttempts</maxLoginAttempts>
@@ -57,7 +57,7 @@
         <enableCoopHeader>false</enableCoopHeader>
         <enableLightningLogin>true</enableLightningLogin>
         <enableLightningLoginOnlyWithUserPerm>false</enableLightningLoginOnlyWithUserPerm>
-        <enableMFADirectUILoginOptIn>true</enableMFADirectUILoginOptIn>
+        <enableMFADirectUILoginOptIn>false</enableMFADirectUILoginOptIn>
         <enableOauthCorsPolicy>false</enableOauthCorsPolicy>
         <enablePermissionsPolicy>false</enablePermissionsPolicy>
         <enablePostForSessions>false</enablePostForSessions>
@@ -87,7 +87,7 @@
         <sendCspForUncommonClients>false</sendCspForUncommonClients>
         <sessionTimeout>TwoHours</sessionTimeout>
         <sidToken3rdPartyAuraApp>false</sidToken3rdPartyAuraApp>
-        <skipSFAWhenMFADirectUILogin>true</skipSFAWhenMFADirectUILogin>
+        <skipSFAWhenMFADirectUILogin>false</skipSFAWhenMFADirectUILogin>
         <terminateUserSessionsWhenAdminResetsPassword>false</terminateUserSessionsWhenAdminResetsPassword>
         <untrustedRedirect>AlwaysAllowed</untrustedRedirect>
         <useEAPIRateLimitForConnectAPI>false</useEAPIRateLimitForConnectAPI>

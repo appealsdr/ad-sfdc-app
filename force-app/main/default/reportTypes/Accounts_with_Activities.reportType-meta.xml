@@ -410,6 +410,11 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>CSM_Call__c</field>
+            <table>Account.Activities</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>quo_call_id__c</field>
             <table>Account.Activities</table>
         </columns>
@@ -429,31 +434,6 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>appealsdoctor_vuid__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Stripe_Customer_Id__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Enable_AI_Assistant__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Enable_AI_Chat__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Cases_Per_Month__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Service_Contract__c</field>
             <table>Account</table>
         </columns>
         <columns>

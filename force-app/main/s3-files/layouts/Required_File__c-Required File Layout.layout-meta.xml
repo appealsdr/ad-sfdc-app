@@ -16,10 +16,6 @@
                 <behavior>Edit</behavior>
                 <field>Short_Description__c</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>Case_Link__c</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

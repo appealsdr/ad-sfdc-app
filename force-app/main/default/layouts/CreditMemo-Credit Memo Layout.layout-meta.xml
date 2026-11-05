@@ -134,11 +134,6 @@
         <fields>UnappliedDate</fields>
         <relatedList>CreditMemoInvApplications</relatedList>
     </relatedLists>
-    <relatedLists>
-        <fields>Name</fields>
-        <fields>Status</fields>
-        <relatedList>AsyncOperationTrackerRecords</relatedList>
-    </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>

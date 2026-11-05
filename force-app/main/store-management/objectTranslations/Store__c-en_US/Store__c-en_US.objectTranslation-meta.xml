@@ -11,10 +11,6 @@
     <layouts>
         <layout>On Demand</layout>
         <sections>
-            <label><!-- App Information --></label>
-            <section>App Information</section>
-        </sections>
-        <sections>
             <label><!-- Business Address --></label>
             <section>Business Address</section>
         </sections>
@@ -38,10 +34,6 @@
     <layouts>
         <layout>Store Layout</layout>
         <sections>
-            <label><!-- App Information --></label>
-            <section>App Information</section>
-        </sections>
-        <sections>
             <label><!-- Business Address --></label>
             <section>Business Address</section>
         </sections>
@@ -61,15 +53,7 @@
             <label><!-- Related To --></label>
             <section>Related To</section>
         </sections>
-        <sections>
-            <label><!-- Subscription Information --></label>
-            <section>Subscription Information</section>
-        </sections>
     </layouts>
-    <quickActions>
-        <label><!-- New Case --></label>
-        <name>New_Case</name>
-    </quickActions>
     <recordTypes>
         <label><!-- On Demand --></label>
         <name>On_Demand</name>

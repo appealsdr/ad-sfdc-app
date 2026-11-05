@@ -111,6 +111,7 @@ public with sharing class S3DocumentUploadService {
         S3_Document__c document = new S3_Document__c(
             Related_Record_Id__c = path.relatedRecordId,
             Related_Object_Type__c = path.relatedObjectType,
+            Required_File__c = path.requiredFileId,
             S3_Bucket__c = path.bucket,
             S3_Key__c = s3Key,
             S3_Region__c = path.region,

@@ -230,16 +230,6 @@
             <field>SicDesc</field>
             <table>Account</table>
         </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>OperatingHours</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>PersonActionCadenceState</field>
-            <table>Account</table>
-        </columns>
         <masterLabel>Accounts</masterLabel>
     </sections>
     <sections>
@@ -460,11 +450,6 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>ActionCadenceState</field>
-            <table>Account.Contacts</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
             <field>CreatedDate</field>
             <table>Account.Contacts</table>
         </columns>
@@ -520,16 +505,6 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
-            <field>FirstCallDateTime</field>
-            <table>Account.Contacts</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>FirstEmailDateTime</field>
-            <table>Account.Contacts</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
             <field>Pronouns</field>
             <table>Account.Contacts</table>
         </columns>
@@ -550,7 +525,27 @@
         </columns>
         <columns>
             <checkedByDefault>false</checkedByDefault>
+            <field>UserName__c</field>
+            <table>Account.Contacts</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
             <field>appealsdoctor_vuid__c</field>
+            <table>Account.Contacts</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Password_Reset_At__c</field>
+            <table>Account.Contacts</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Failed_Login_Attempts__c</field>
+            <table>Account.Contacts</table>
+        </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Account_Locked_Until__c</field>
             <table>Account.Contacts</table>
         </columns>
         <masterLabel>Contacts</masterLabel>
@@ -567,31 +562,6 @@
         <columns>
             <checkedByDefault>false</checkedByDefault>
             <field>appealsdoctor_vuid__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Stripe_Customer_Id__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Enable_AI_Assistant__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Enable_AI_Chat__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Cases_Per_Month__c</field>
-            <table>Account</table>
-        </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Service_Contract__c</field>
             <table>Account</table>
         </columns>
         <columns>

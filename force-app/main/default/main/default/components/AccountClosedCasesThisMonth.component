@@ -1,0 +1,93 @@
+<apex:component controller="AccountClosedCasesThisMonthController" access="global">
+    <apex:attribute name="acctId"
+                    type="Id"
+                    description="Account Id used to load Account details and current-month closed Cases."
+                    assignTo="{!accountId}" />
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;">
+        <tr>
+            <td style="padding:0 0 16px;">
+                <h2 style="margin:0 0 10px; color:#102542; font-size:18px;">Account Information</h2>
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d0d7e2; border-collapse:collapse;">
+                    <tr>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold; width:25%;">Account Name</td>
+                        <td style="padding:8px 12px;">{!accountRecord.Name}</td>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold; width:25%;">Account Number</td>
+                        <td style="padding:8px 12px;">{!accountRecord.AccountNumber}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold;">Type</td>
+                        <td style="padding:8px 12px;">{!accountRecord.Type}</td>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold;">Industry</td>
+                        <td style="padding:8px 12px;">{!accountRecord.Industry}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold;">Phone</td>
+                        <td style="padding:8px 12px;">{!accountRecord.Phone}</td>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold;">Website</td>
+                        <td style="padding:8px 12px;">{!accountRecord.Website}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold;">Owner</td>
+                        <td style="padding:8px 12px;">{!accountRecord.Owner.Name}</td>
+                        <td style="padding:8px 12px; background:#f8f9fb; font-weight:bold;">Billing Address</td>
+                        <td style="padding:8px 12px;">
+                            {!accountRecord.BillingStreet}
+                            <apex:outputText rendered="{!NOT(ISBLANK(accountRecord.BillingCity))}" value=", {!accountRecord.BillingCity}" />
+                            <apex:outputText rendered="{!NOT(ISBLANK(accountRecord.BillingState))}" value=", {!accountRecord.BillingState}" />
+                            <apex:outputText rendered="{!NOT(ISBLANK(accountRecord.BillingPostalCode))}" value=" {!accountRecord.BillingPostalCode}" />
+                            <apex:outputText rendered="{!NOT(ISBLANK(accountRecord.BillingCountry))}" value=", {!accountRecord.BillingCountry}" />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <h2 style="margin:0 0 10px; color:#102542; font-size:18px;">{!closedCasesTitle}</h2>
+
+                <apex:outputPanel rendered="{!hasClosedCases}">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d0d7e2; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#102542; color:#ffffff;">
+                                <th align="left" style="padding:8px 10px;">Case #</th>
+                                <th align="left" style="padding:8px 10px;">Subject</th>
+                                <th align="left" style="padding:8px 10px;">Status</th>
+                                <th align="left" style="padding:8px 10px;">Priority</th>
+                                <th align="left" style="padding:8px 10px;">Origin</th>
+                                <th align="left" style="padding:8px 10px;">Type</th>
+                                <th align="left" style="padding:8px 10px;">Closed Date</th>
+                                <th align="left" style="padding:8px 10px;">Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <apex:repeat value="{!closedCases}" var="caseRecord">
+                                <tr>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">{!caseRecord.CaseNumber}</td>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">{!caseRecord.Subject}</td>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">{!caseRecord.Status}</td>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">{!caseRecord.Priority}</td>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">{!caseRecord.Origin}</td>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">{!caseRecord.Type}</td>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">
+                                        <apex:outputText value="{0,date,MMM d, yyyy}">
+                                            <apex:param value="{!caseRecord.ClosedDate}" />
+                                        </apex:outputText>
+                                    </td>
+                                    <td style="padding:8px 10px; border-top:1px solid #f0f2f5;">{!caseRecord.Owner.Name}</td>
+                                </tr>
+                            </apex:repeat>
+                        </tbody>
+                    </table>
+                </apex:outputPanel>
+
+                <apex:outputPanel rendered="{!NOT(hasClosedCases)}">
+                    <p style="margin:0; padding:12px; background:#f8f9fb; border:1px solid #d0d7e2; color:#555555;">
+                        No Cases were closed for this Account during the current month.
+                    </p>
+                </apex:outputPanel>
+            </td>
+        </tr>
+    </table>
+</apex:component>

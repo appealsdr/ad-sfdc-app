@@ -2,9 +2,9 @@
 <EmailIntegrationSettings xmlns="http://soap.sforce.com/2006/04/metadata">
     <doesEmailLogAsEmailMessageInOutlook>true</doesEmailLogAsEmailMessageInOutlook>
     <doesGmailStayConnectedToSalesforce>true</doesGmailStayConnectedToSalesforce>
-    <enableContactAndEventSync>true</enableContactAndEventSync>
+    <enableContactAndEventSync>false</enableContactAndEventSync>
     <enableContextualEverywhere>true</enableContextualEverywhere>
-    <enableEmailTrackingInMobile>true</enableEmailTrackingInMobile>
+    <enableEmailTrackingInMobile>false</enableEmailTrackingInMobile>
     <enableEngageForOutlook>false</enableEngageForOutlook>
     <enableExtensionHostUnrestricted>true</enableExtensionHostUnrestricted>
     <enableGmailIntegration>true</enableGmailIntegration>
@@ -12,9 +12,9 @@
     <enableInboxMobileIntune>false</enableInboxMobileIntune>
     <enableInboxUseGraphApi>false</enableInboxUseGraphApi>
     <enableOutlookIntegration>true</enableOutlookIntegration>
-    <enableProductivityFeatures>true</enableProductivityFeatures>
+    <enableProductivityFeatures>false</enableProductivityFeatures>
     <enableSupplementalContactInfoInMobile>false</enableSupplementalContactInfoInMobile>
     <isLayoutCustomizationAllowed>true</isLayoutCustomizationAllowed>
-    <orgIsSyncingEventsOutbound>false</orgIsSyncingEventsOutbound>
+    <orgIsSyncingEventsOutbound>true</orgIsSyncingEventsOutbound>
     <shouldUseTrustedDomainsList>true</shouldUseTrustedDomainsList>
 </EmailIntegrationSettings>

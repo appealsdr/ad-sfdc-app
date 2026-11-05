@@ -371,11 +371,6 @@
             <field>GlobalIdentity</field>
             <table>User</table>
         </columns>
-        <columns>
-            <checkedByDefault>false</checkedByDefault>
-            <field>Slack_Used_Id__c</field>
-            <table>User</table>
-        </columns>
         <masterLabel>Users</masterLabel>
     </sections>
     <sections>

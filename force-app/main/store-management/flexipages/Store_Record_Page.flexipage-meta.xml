@@ -15,9 +15,6 @@
                         <valueListItems>
                             <value>ChangeOwnerOne</value>
                         </valueListItems>
-                        <valueListItems>
-                            <value>Store__c.New_Case</value>
-                        </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
@@ -83,6 +80,12 @@
                     <valueList>
                         <valueListItems>
                             <value>NewCase</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Case.Update_Status</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Case.Close_Case</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -172,7 +175,10 @@
                             <value>Case.Update_Status</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Case.CloseCaseLightning</value>
+                            <value>Case.Close_Case</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Case.create_new_task</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -267,7 +273,7 @@
                             <value>CASES.CLOSED|EQUALS|true</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Closed_Reason__c|EQUALS|[&quot;Resolved - Client&quot;,&quot;Resolved - Tech&quot;]</value>
+                            <value>Closed_Reason__c|EQUALS|[&quot;Resolved - Tech&quot;]</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -306,10 +312,10 @@
                             <value>CASES.PRIORITY</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>CASES.STATUS</value>
+                            <value>OWNER_NAME</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>OWNER_NAME</value>
+                            <value>CASES.STATUS</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -354,7 +360,7 @@
                             <value>CASES.CLOSED|EQUALS|true</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Closed_Reason__c|NOT_EQUAL|[&quot;Resolved - Client&quot;,&quot;Resolved - Tech&quot;]</value>
+                            <value>Closed_Reason__c|NOT_EQUAL|[&quot;Resolved - Tech&quot;]</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -393,7 +399,7 @@
                             <value>CASES.PRIORITY</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>CASES.STATUS</value>
+                            <value>Closed_Reason__c</value>
                         </valueListItems>
                         <valueListItems>
                             <value>OWNER_NAME</value>
@@ -430,7 +436,7 @@
                 <identifier>runtime_slack_slackRecordChannel</identifier>
             </componentInstance>
         </itemInstances>
-        <name>Facet-acd402cc-1139-4ba7-a358-626e5bd444f6</name>
+        <name>Facet-5635bc27-64d2-407d-888c-67612d515fae</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -460,7 +466,111 @@
                 <identifier>force_relatedListSingleContainer</identifier>
             </componentInstance>
         </itemInstances>
-        <name>Facet-sjtdrr8ju1</name>
+        <name>Facet-c7aa9501-0689-4d1d-88b7-a75f2620d5f2</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>requiredFiles</componentName>
+                <identifier>c_requiredFiles</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-6bb0c6b1-0b67-473a-ac8a-d0a2e72f0d57</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>s3DocumentViewer</componentName>
+                <identifier>c_s3DocumentViewer</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-2d426d6b-98bc-4e0e-b642-e976cd843c8e</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>active</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-6bb0c6b1-0b67-473a-ac8a-d0a2e72f0d57</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Required Files</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab9</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-2d426d6b-98bc-4e0e-b642-e976cd843c8e</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Store Files</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab10</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-1e4d2390-22e1-4e3b-833e-685c7ef52e26</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Tabs</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>tabs</name>
+                    <value>Facet-1e4d2390-22e1-4e3b-833e-685c7ef52e26</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tabset</componentName>
+                <identifier>flexipage_tabset3</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-393e410e-cd9d-4e20-b5ce-33bdcde45ecf</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>parentFieldApiName</name>
+                    <value>Store__c.Id</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListApiName</name>
+                    <value>Service_Contracts__r</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListComponentOverride</name>
+                    <value>NONE</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>rowsToDisplay</name>
+                    <value>10</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showActionBar</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentName>force:relatedListSingleContainer</componentName>
+                <identifier>force_relatedListSingleContainer2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-d2572c1f-bdf8-455b-a1a1-1dfce2a673c0</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -542,7 +652,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>body</name>
-                    <value>Facet-acd402cc-1139-4ba7-a358-626e5bd444f6</value>
+                    <value>Facet-5635bc27-64d2-407d-888c-67612d515fae</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>title</name>
@@ -556,7 +666,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>body</name>
-                    <value>Facet-sjtdrr8ju1</value>
+                    <value>Facet-c7aa9501-0689-4d1d-88b7-a75f2620d5f2</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>title</name>
@@ -564,6 +674,34 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>flexipage_tab7</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-393e410e-cd9d-4e20-b5ce-33bdcde45ecf</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Files</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab8</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-d2572c1f-bdf8-455b-a1a1-1dfce2a673c0</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>title</name>
+                    <value>Contract</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:tab</componentName>
+                <identifier>flexipage_tab11</identifier>
             </componentInstance>
         </itemInstances>
         <name>maintabs</name>
@@ -586,81 +724,6 @@
         </itemInstances>
         <name>main</name>
         <type>Region</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentName>storeCaseSummary</componentName>
-                <identifier>c_storeCaseSummary</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-8c402e78-3179-4c0f-b4ec-78ead9fad2d1</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>cacheAge</name>
-                    <value>1440</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>label</name>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>reportFilter</name>
-                    <value>Store__c.Id</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>reportName</name>
-                    <value>Cases_By_Store_ReportCustom_fhG</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>showRefreshButton</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:reportChart</componentName>
-                <identifier>flexipage_reportChart</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-d4bd3ca5-8e68-42c6-80db-3c3a58227610</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>active</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-8c402e78-3179-4c0f-b4ec-78ead9fad2d1</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Cases</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>flexipage_tab8</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-d4bd3ca5-8e68-42c6-80db-3c3a58227610</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Report</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>flexipage_tab9</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-696b1457-847d-418a-b244-5c0f899207e4</name>
-        <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -731,16 +794,8 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>Tabs</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>tabs</name>
-                    <value>Facet-696b1457-847d-418a-b244-5c0f899207e4</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tabset</componentName>
-                <identifier>flexipage_tabset3</identifier>
+                <componentName>storeCaseSummary</componentName>
+                <identifier>c_storeCaseSummary</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

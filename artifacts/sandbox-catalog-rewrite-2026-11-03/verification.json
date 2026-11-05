@@ -1,0 +1,17 @@
+{
+  "Product2": {
+    "expected": 42,
+    "actual": 42,
+    "mismatches": 0
+  },
+  "Pricebook2": {
+    "expected": 6,
+    "actual": 6,
+    "mismatches": 0
+  },
+  "PricebookEntry": {
+    "expected": 152,
+    "actual": 152,
+    "mismatches": 0
+  }
+}

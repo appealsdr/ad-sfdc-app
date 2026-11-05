@@ -1,0 +1,223 @@
+<template>
+    <lightning-card icon-name="standard:report">
+
+        <!-- ─── Card title slot ───────────────────────────────────────────── -->
+        <span slot="title">Account Case Report</span>
+
+        <!-- ─── Toolbar: month picker + Send Email button ────────────────── -->
+        <div slot="actions">
+            <div class="slds-grid slds-gutters_x-small slds-grid_vertical-align-center">
+                <div class="slds-col">
+                    <div class="month-wrap">
+                        <label class="slds-assistive-text" for="month-input">Report Month</label>
+                        <lightning-input
+                            type="month"
+                            label="Report Month"
+                            variant="label-hidden"
+                            value={selectedMonth}
+                            onchange={handleMonthChange}
+                            class="month-input">
+                        </lightning-input>
+                    </div>
+                </div>
+                <div class="slds-col">
+                    <lightning-button
+                        label="Send Email"
+                        variant="brand"
+                        icon-name="utility:email"
+                        onclick={handleSendEmailClick}>
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── VF Page iframe preview ────────────────────────────────────── -->
+        <div class="preview-container">
+            <template if:true={vfPageUrl}>
+                <iframe
+                    src={vfPageUrl}
+                    title="Account Case Report Preview"
+                    class="report-iframe"
+                    frameborder="0"
+                    scrolling="yes"
+                    allowfullscreen>
+                </iframe>
+            </template>
+            <template if:false={vfPageUrl}>
+                <div class="slds-align_absolute-center spinner-wrap">
+                    <lightning-spinner
+                        alternative-text="Loading report preview…"
+                        size="medium"
+                        variant="brand">
+                    </lightning-spinner>
+                </div>
+            </template>
+        </div>
+
+    </lightning-card>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         SEND EMAIL MODAL
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <template if:true={isModalOpen}>
+        <section
+            role="dialog"
+            tabindex="-1"
+            aria-modal="true"
+            aria-labelledby="modal-heading-01"
+            class="slds-modal slds-fade-in-open">
+
+            <div class="slds-modal__container">
+
+                <!-- Header -->
+                <header class="slds-modal__header">
+                    <lightning-button-icon
+                        icon-name="utility:close"
+                        alternative-text="Close"
+                        variant="bare-inverse"
+                        size="large"
+                        class="slds-modal__close"
+                        onclick={handleModalClose}>
+                    </lightning-button-icon>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                        <lightning-icon
+                            icon-name="utility:email"
+                            size="small"
+                            alternative-text="Email"
+                            class="slds-m-right_x-small modal-title-icon">
+                        </lightning-icon>
+                        Send Account Case Report
+                    </h2>
+                    <p class="slds-m-top_x-small" style="color:#fff; font-size:0.8rem; opacity:0.85;">
+                        Period: <strong>{selectedMonthLabel}</strong>
+                    </p>
+                </header>
+
+                <!-- Body -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content">
+
+                    <!-- Loading spinner while email options load -->
+                    <template if:true={isLoadingEmails}>
+                        <div class="slds-align_absolute-center slds-p-around_large">
+                            <lightning-spinner
+                                alternative-text="Loading email addresses…"
+                                size="small"
+                                variant="brand">
+                            </lightning-spinner>
+                        </div>
+                    </template>
+
+                    <!-- ── FROM ──────────────────────────────────────────────────── -->
+                    <lightning-combobox
+                        label="From"
+                        value={selectedFromVal}
+                        options={fromEmailOptions}
+                        onchange={handleFromChange}
+                        placeholder="Select sender…"
+                        class="slds-m-bottom_x-small">
+                    </lightning-combobox>
+
+                    <!-- From preview chip -->
+                    <template if:true={senderEmail}>
+                        <div class="from-email-preview slds-m-bottom_medium slds-p-horizontal_small slds-p-vertical_xx-small">
+                            <lightning-icon icon-name="utility:reply" size="x-small" alternative-text="From" class="slds-m-right_x-small"></lightning-icon>
+                            <span class="slds-text-body_small">Sending from: <strong>{senderEmail}</strong></span>
+                        </div>
+                    </template>
+
+                    <div class="slds-m-bottom_medium"><hr style="border:none;border-top:1px solid #e0e5ee;"/></div>
+
+                    <!-- No emails warning (shown only when no known emails AND no custom typed) -->
+                    <template if:true={noEmailsFound}>
+                        <div class="slds-notify slds-notify_alert slds-theme_warning slds-m-bottom_medium" role="alert">
+                            <lightning-icon
+                                icon-name="utility:warning"
+                                alternative-text="Warning"
+                                variant="inverse"
+                                size="x-small"
+                                class="slds-m-right_x-small">
+                            </lightning-icon>
+                            No email addresses found on this Account or its Contacts.
+                            Use the field below to enter a custom address.
+                        </div>
+                    </template>
+
+                    <!-- Email recipient selector (shown only when known emails exist) -->
+                    <template if:true={hasEmailOptions}>
+                        <lightning-combobox
+                            label="Send To"
+                            value={selectedEmail}
+                            options={emailOptions}
+                            onchange={handleEmailChange}
+                            placeholder="Select recipient email address…"
+                            class="slds-m-bottom_medium">
+                        </lightning-combobox>
+                    </template>
+
+                    <!-- Divider -->
+                    <template if:true={hasEmailOptions}>
+                        <div class="divider-wrap slds-m-vertical_small">
+                            <span class="divider-label">or enter a custom address</span>
+                        </div>
+                    </template>
+
+                    <!-- Custom email text input — always visible -->
+                    <lightning-input
+                        type="email"
+                        label="Custom Email Address"
+                        value={customEmail}
+                        onchange={handleCustomEmailChange}
+                        placeholder="e.g. name@example.com"
+                        message-when-type-mismatch="Please enter a valid email address."
+                        class="slds-m-bottom_medium">
+                    </lightning-input>
+
+                    <!-- Active recipient preview chip -->
+                    <template if:true={recipientEmail}>
+                        <div class="selected-email-preview slds-p-around_small">
+                            <lightning-icon
+                                icon-name="utility:email"
+                                size="x-small"
+                                alternative-text="Email"
+                                class="slds-m-right_x-small">
+                            </lightning-icon>
+                            <span class="slds-text-body_small">
+                                Will send to: <strong>{recipientEmail}</strong>
+                            </span>
+                        </div>
+                    </template>
+
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_small">
+                        The report will be sent as a <strong>PDF attachment</strong>.
+                        An email activity will be logged on this Account.
+                    </p>
+
+                </div>
+
+                <!-- Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Cancel"
+                        variant="neutral"
+                        onclick={handleModalClose}
+                        disabled={isSending}>
+                    </lightning-button>
+                    <lightning-button
+                        label={sendButtonLabel}
+                        variant="brand"
+                        icon-name="utility:send"
+                        onclick={handleSend}
+                        disabled={isSendDisabled}
+                        class="slds-m-left_x-small">
+                    </lightning-button>
+                </footer>
+
+            </div>
+        </section>
+
+        <!-- Backdrop -->
+        <div class="slds-backdrop slds-backdrop_open" role="presentation" onclick={handleModalClose}></div>
+    </template>
+
+</template>

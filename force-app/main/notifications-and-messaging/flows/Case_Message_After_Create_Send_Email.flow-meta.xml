@@ -1,22 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
-        <name>New_Message_Techs</name>
-        <label>New Message Techs</label>
+        <name>Send_Email_To_Case_Owner</name>
+        <label>Send Email To Case Owner</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>Case_Message__c.New_Message_Techs</actionName>
-        <actionType>emailAlert</actionType>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
-            <name>SObjectRowId</name>
+            <name>recipientAddresses</name>
             <value>
-                <elementReference>$Record.Id</elementReference>
+                <collectionElements>
+                    <elementReference>$Record.Case__r.Owner:User.Email</elementReference>
+                </collectionElements>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>composeEmailContent</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+                <stringValue>New message</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>&lt;p&gt;New message added temp{!$Record}&lt;/p&gt;</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
                 <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
-        <nameSegment>Case_Message__c.New_Message_Techs</nameSegment>
+        <inputParameters>
+            <name>relatedRecordId</name>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
         <offset>0</offset>
+        <versionString>2.0.1</versionString>
     </actionCalls>
     <actionCalls>
         <name>Send_Email_To_Contact</name>
@@ -35,8 +67,7 @@
         <inputParameters>
             <name>emailTemplateId</name>
             <value>
-                <inputConfiguratorMode>Custom</inputConfiguratorMode>
-                <stringValue>00XVp00000HXcW9MAL</stringValue>
+                <elementReference>Get_Template_Client.Id</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -61,32 +92,6 @@
         <offset>0</offset>
         <versionString>2.0.1</versionString>
     </actionCalls>
-    <actionCalls>
-        <name>Send_Slack_Direct_Message_to_Salesforce_App_Action_1</name>
-        <label>Send Slack Direct Message to Salesforce App Action 1</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <actionName>SendSlackDirectMessageToSalesforceApp</actionName>
-        <actionType>slackFlow</actionType>
-        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
-        <inputParameters>
-            <name>userId</name>
-            <value>
-                <elementReference>$Record.Case__r.Owner:User.Slack_Used_Id__c</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <inputParameters>
-            <name>message</name>
-            <value>
-                <elementReference>SlackMessage</elementReference>
-                <inputConfiguratorMode>Resource</inputConfiguratorMode>
-            </value>
-        </inputParameters>
-        <nameSegment>SendSlackDirectMessageToSalesforceApp</nameSegment>
-        <offset>0</offset>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
@@ -106,7 +111,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Has_Case_Owner_Email</targetReference>
+                <targetReference>Get_Template_Tech</targetReference>
             </connector>
             <label>External</label>
         </rules>
@@ -121,7 +126,7 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Has_Case_Contact</targetReference>
+                <targetReference>Get_Template_Client</targetReference>
             </connector>
             <label>Internal</label>
         </rules>
@@ -172,40 +177,13 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>New_Message_Techs</targetReference>
+                <targetReference>Send_Email_To_Case_Owner</targetReference>
             </connector>
             <label>Owner Email Exists</label>
         </rules>
     </decisions>
-    <decisions>
-        <name>Is_External_Check</name>
-        <label>Is External</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
-        <rules>
-            <name>External_Future</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>$Record.Sender_Type__c</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>External</stringValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Send_Slack_Direct_Message_to_Salesforce_App_Action_1</targetReference>
-            </connector>
-            <label>External Future</label>
-        </rules>
-    </decisions>
     <description>Sends email notifications when a Case Message is created. External messages notify the case owner. Internal messages notify the case contact.</description>
     <environments>Default</environments>
-    <formulas>
-        <name>SlackMessage</name>
-        <dataType>String</dataType>
-        <expression>&quot;New Case Message Created - https://appealsdoctor.lightning.force.com/lightning/r/Case_Message__c/&quot;&amp;{!$Record.Id}&amp;&quot;/view&quot;</expression>
-    </formulas>
     <interviewLabel>Case Message After Create Send Email {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Case Message After Create Send Email</label>
     <processMetadataValues>
@@ -227,6 +205,48 @@
         </value>
     </processMetadataValues>
     <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Template_Client</name>
+        <label>Get Template Client</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_Case_Contact</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>New_Message_Cleint</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>EmailTemplate</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Template_Tech</name>
+        <label>Get Template Tech</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Has_Case_Owner_Email</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>New_Message_Tech</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>EmailTemplate</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
     <start>
         <locationX>0</locationX>
         <locationY>0</locationY>
@@ -243,17 +263,6 @@
         </filters>
         <object>Case_Message__c</object>
         <recordTriggerType>Create</recordTriggerType>
-        <scheduledPaths>
-            <name>Record_Updated</name>
-            <connector>
-                <targetReference>Is_External_Check</targetReference>
-            </connector>
-            <label>Record Updated</label>
-            <offsetNumber>1</offsetNumber>
-            <offsetUnit>Minutes</offsetUnit>
-            <recordField>CreatedDate</recordField>
-            <timeSource>RecordField</timeSource>
-        </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
     </start>
     <status>Active</status>

@@ -136,6 +136,96 @@ private class S3DocumentControllerTest {
     }
 
     @IsTest
+    static void testGetDocumentsForRequiredFileLookupWithoutLastVersion() {
+        Case testCase = [SELECT Id FROM Case LIMIT 1];
+        Required_File__c requiredFile = new Required_File__c(
+            Name = 'Required Upload Lookup',
+            Case__c = testCase.Id
+        );
+        insert requiredFile;
+
+        S3_Document__c document = createRequiredDocument(
+            testCase.Id, requiredFile.Id, 'lookup.pdf', 'Active'
+        );
+        insert document;
+
+        Test.startTest();
+        List<S3DocumentController.DocumentWrapper> documents =
+            S3DocumentController.getDocuments(requiredFile.Id);
+        List<S3DocumentController.DocumentWrapper> caseDocuments =
+            S3DocumentController.getDocuments(testCase.Id);
+        Test.stopTest();
+
+        System.assertEquals(1, documents.size());
+        System.assertEquals(document.Id, documents[0].id);
+        System.assertEquals(2, caseDocuments.size(), 'Case files include required-file uploads.');
+    }
+
+    @IsTest
+    static void testGetDocumentsCombinesLookupAndLegacyLinks() {
+        Case testCase = [SELECT Id FROM Case LIMIT 1];
+        Required_File__c requiredFile = new Required_File__c(
+            Name = 'Required Upload Combined',
+            Case__c = testCase.Id
+        );
+        Required_File__c otherRequiredFile = new Required_File__c(
+            Name = 'Other Required Upload',
+            Case__c = testCase.Id
+        );
+        insert new List<Required_File__c>{ requiredFile, otherRequiredFile };
+
+        S3_Document__c lookupDocument = createRequiredDocument(
+            testCase.Id, requiredFile.Id, 'lookup.pdf', 'Active'
+        );
+        S3_Document__c legacyDocument = createRequiredDocument(
+            requiredFile.Id, null, 'legacy.pdf', 'Active'
+        );
+        insert new List<S3_Document__c>{
+            lookupDocument,
+            legacyDocument,
+            createRequiredDocument(testCase.Id, requiredFile.Id, 'deleted.pdf', 'Deleted'),
+            createRequiredDocument(testCase.Id, otherRequiredFile.Id, 'other.pdf', 'Active')
+        };
+        requiredFile.Last_Version__c = lookupDocument.Id;
+        update requiredFile;
+
+        Test.startTest();
+        List<S3DocumentController.DocumentWrapper> documents =
+            S3DocumentController.getDocuments(requiredFile.Id);
+        Test.stopTest();
+
+        Set<Id> documentIds = new Set<Id>();
+        for (S3DocumentController.DocumentWrapper document : documents) {
+            documentIds.add(document.id);
+        }
+        System.assertEquals(2, documents.size(), 'The latest lookup upload must not be duplicated.');
+        System.assertEquals(new Set<Id>{ lookupDocument.Id, legacyDocument.Id }, documentIds);
+    }
+
+    private static S3_Document__c createRequiredDocument(
+        Id relatedRecordId,
+        Id requiredFileId,
+        String fileName,
+        String status
+    ) {
+        return new S3_Document__c(
+            Related_Record_Id__c = String.valueOf(relatedRecordId),
+            Related_Object_Type__c = relatedRecordId.getSObjectType().getDescribe().getName(),
+            Required_File__c = requiredFileId,
+            S3_Bucket__c = 'appeals-doctor',
+            S3_Key__c = 'required/' + relatedRecordId + '/' + fileName,
+            S3_Region__c = 'us-east-1',
+            File_Name__c = fileName,
+            File_Extension__c = 'pdf',
+            Content_Type__c = 'application/pdf',
+            File_Size_Bytes__c = 1024,
+            Status__c = status,
+            Uploaded_By__c = UserInfo.getUserId(),
+            Uploaded_Date__c = System.now()
+        );
+    }
+
+    @IsTest
     static void testGetDocumentAccessUsesCachedPreviewUrl() {
         S3_Document__c document = [SELECT Id FROM S3_Document__c LIMIT 1];
 

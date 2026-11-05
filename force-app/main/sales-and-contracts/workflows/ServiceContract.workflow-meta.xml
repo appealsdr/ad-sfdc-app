@@ -5,10 +5,10 @@
         <description>New Contract</description>
         <protected>false</protected>
         <recipients>
-            <recipient>Billing</recipient>
-            <type>group</type>
+            <recipient>andrei.pruzan@appealsdoctor.com</recipient>
+            <type>user</type>
         </recipients>
         <senderType>CurrentUser</senderType>
-        <template>ClientNotifications/New_Contract_1788731160283</template>
+        <template>unfiled$public/App_Service_Contract_Created</template>
     </alerts>
 </Workflow>

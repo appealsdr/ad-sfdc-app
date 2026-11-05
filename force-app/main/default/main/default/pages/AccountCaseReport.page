@@ -1,0 +1,649 @@
+<!--
+    AccountCaseReport.page
+    ══════════════════════════════════════════════════════════════════════
+    Standard controller : Account
+    Extension           : AccountCaseReportController
+
+    URL Parameters
+    ──────────────────────────────────────────────────────────────────────
+      Month   YYYY-MM   Report month.  Default: last calendar month.
+      pdf     false     Pass ?pdf=false to render as HTML.  Default: PDF.
+
+    Example
+      /apex/AccountCaseReport?id=001XXXXXXXXXXXXXXX&Month=2026-04
+      /apex/AccountCaseReport?id=001XXXXXXXXXXXXXXX&pdf=false
+
+    Brand: Navy #102542  |  Orange #FF9900
+    ══════════════════════════════════════════════════════════════════════
+-->
+<apex:page standardController="Account"
+           extensions="AccountCaseReportController"
+           renderAs="{!renderMode}"
+           showHeader="false"
+           sidebar="false"
+           applyBodyTag="false"
+           applyHtmlTag="false"
+           docType="html-5.0">
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Case Report – <apex:outputText value="{!acc.Name}"/> – <apex:outputText value="{!monthLabel}"/></title>
+    <style>
+        /* ── Reset ─────────────────────────────────────────────────── */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── Base ──────────────────────────────────────────────────── */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+            color: #333333;
+            background-color: #f0f2f5;
+        }
+
+        /* ── Outer wrapper ─────────────────────────────────────────── */
+        .page-wrap {
+            padding: 28px 20px;
+            background-color: #f0f2f5;
+        }
+
+        /* ── Card ──────────────────────────────────────────────────── */
+        .card {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.09);
+            overflow: hidden;
+        }
+
+        /* ── Header ────────────────────────────────────────────────── */
+        .header {
+            background-color: #102542;
+            padding: 24px 36px 18px;
+        }
+        .header-top {
+            display: table;
+            width: 100%;
+        }
+        .header-logo-cell {
+            display: table-cell;
+            vertical-align: middle;
+            width: 50%;
+        }
+        .header-tag-cell {
+            display: table-cell;
+            vertical-align: bottom;
+            text-align: right;
+            width: 50%;
+        }
+
+        /* AppealsDr SVG icon + wordmark */
+        .logo-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-text-appeals {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+        .logo-text-dr {
+            font-size: 22px;
+            font-weight: 800;
+            color: #FF9900;
+        }
+
+        .header-tagline {
+            color: #FF9900;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .header-title {
+            margin-top: 14px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+        .header-subtitle {
+            margin-top: 4px;
+            color: #a8b8cc;
+            font-size: 12px;
+        }
+
+        /* ── Orange accent bar ─────────────────────────────────────── */
+        .accent-bar {
+            background-color: #FF9900;
+            height: 4px;
+            font-size: 1px;
+            line-height: 1px;
+        }
+
+        /* ── Section label ─────────────────────────────────────────── */
+        .section-wrap {
+            padding: 20px 36px 0;
+        }
+        .section-title {
+            color: #102542;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-top: 3px solid #FF9900;
+            padding-top: 10px;
+            margin-bottom: 12px;
+        }
+
+        /* ── Account Info grid ─────────────────────────────────────── */
+        .account-grid {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #d0d7e2;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        .account-grid .grid-head td {
+            background-color: #102542;
+            color: #FF9900;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 9px 14px;
+        }
+        .account-grid .grid-val td {
+            background-color: #f8f9fb;
+            color: #102542;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 9px 14px;
+        }
+        .account-grid .grid-extra td {
+            background-color: #ffffff;
+            color: #555555;
+            font-size: 11px;
+            padding: 8px 14px;
+            border-top: 1px solid #f0f2f5;
+        }
+        .account-grid .grid-extra td span.label {
+            color: #888888;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ── Summary badges ────────────────────────────────────────── */
+        .summary-wrap {
+            padding: 16px 36px 0;
+            display: table;
+            width: 100%;
+        }
+        .badge {
+            display: table-cell;
+            width: 50%;
+            padding: 14px 16px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .badge-closed {
+            background-color: #e8f0fe;
+            border: 1px solid #c5d5f5;
+            margin-right: 8px;
+        }
+        .badge-open {
+            background-color: #fff3e0;
+            border: 1px solid #ffd580;
+            margin-left: 8px;
+        }
+        .badge-number {
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .badge-number-closed { color: #102542; }
+        .badge-number-open   { color: #b85c00; }
+        .badge-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+        }
+        .badge-label-closed { color: #3a5fa0; }
+        .badge-label-open   { color: #b85c00; }
+
+        /* ── Data tables ───────────────────────────────────────────── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #d0d7e2;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .data-table thead tr {
+            background-color: #102542;
+        }
+        .data-table thead th {
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 9px 12px;
+            text-align: left;
+        }
+        .data-table thead th.center { text-align: center; }
+
+        /* Record-type group header */
+        .group-header td {
+            background-color: #e8f0fe;
+            color: #102542;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 7px 12px;
+            border-top: 1px solid #c5d5f5;
+        }
+        .group-header-open td {
+            background-color: #fff3e0;
+            color: #b85c00;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 7px 12px;
+            border-top: 1px solid #ffd580;
+        }
+
+        /* Data rows */
+        .data-table tbody tr.row-even { background-color: #ffffff; }
+        .data-table tbody tr.row-odd  { background-color: #fafbfc; }
+        .data-table tbody td {
+            padding: 7px 12px;
+            color: #333333;
+            font-size: 11px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .data-table tbody td.center { text-align: center; }
+        .data-table tbody td.mono {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #555555;
+        }
+
+        /* Priority pills */
+        .pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pill-high   { background-color: #fde8e8; color: #c0392b; }
+        .pill-medium { background-color: #fff3e0; color: #b85c00; }
+        .pill-low    { background-color: #e8f0fe; color: #2155a0; }
+        .pill-other  { background-color: #f0f2f5; color: #555555; }
+
+        /* Group subtotal row */
+        .subtotal-row td {
+            background-color: #f0f4fb;
+            color: #102542;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-top: 1px solid #d0d7e2;
+        }
+        /* Grand total row */
+        .total-row td {
+            background-color: #102542;
+            color: #FF9900;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 9px 12px;
+        }
+        .total-row-open td {
+            background-color: #b85c00;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 9px 12px;
+        }
+
+        /* Empty state */
+        .empty-row td {
+            text-align: center;
+            color: #888888;
+            font-style: italic;
+            padding: 18px 12px;
+            background-color: #fafbfc;
+        }
+
+        /* ── Footer ────────────────────────────────────────────────── */
+        .footer {
+            background-color: #102542;
+            border-top: 4px solid #FF9900;
+            padding: 18px 36px;
+            margin-top: 24px;
+        }
+        .footer-tagline {
+            color: #FF9900;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+        .footer-contact {
+            color: #aaaaaa;
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.8;
+        }
+        .footer-contact a {
+            color: #FF9900;
+            text-decoration: none;
+        }
+
+        /* ── PDF-specific overrides ────────────────────────────────── */
+        @media print {
+            body { background-color: #ffffff; }
+            .page-wrap { padding: 0; background-color: #ffffff; }
+            .card { box-shadow: none; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-wrap">
+<div class="card">
+
+    <!-- ══════════════════════════════════════════
+         HEADER
+    ═══════════════════════════════════════════ -->
+    <div class="header">
+        <div class="header-top">
+            <!-- Logo -->
+            <div class="header-logo-cell">
+                <div class="logo-wrap">
+                    <!-- AppealsDr hexagon + heartbeat icon (inline SVG) -->
+                    <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Hexagon outline -->
+                        <path d="M21 3 L37 12 L37 30 L21 39 L5 30 L5 12 Z"
+                              stroke="#FF9900" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+                        <!-- Heartbeat/EKG line -->
+                        <polyline points="9,21 14,21 16,15 18,27 20,18 22,24 24,21 33,21"
+                                  stroke="#FF9900" stroke-width="2" fill="none"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <!-- Wordmark -->
+                    <span>
+                        <span class="logo-text-appeals">appeals</span><span class="logo-text-dr">dr.</span>
+                    </span>
+                </div>
+            </div>
+            <!-- Tagline -->
+            <div class="header-tag-cell">
+                <span class="header-tagline">Account Management&nbsp;·&nbsp;Suspensions&nbsp;·&nbsp;Listing Violations&nbsp;·&nbsp;Trademarks</span>
+            </div>
+        </div>
+        <div class="header-title">Account Case Report</div>
+        <div class="header-subtitle">
+            <apex:outputText value="{!acc.Name}"/> &nbsp;·&nbsp; <apex:outputText value="{!monthLabel}"/>
+        </div>
+    </div>
+
+    <!-- Orange accent bar -->
+    <div class="accent-bar">&nbsp;</div>
+
+    <!-- ══════════════════════════════════════════
+         ACCOUNT INFORMATION
+    ═══════════════════════════════════════════ -->
+    <div class="section-wrap">
+        <div class="section-title">Account Information</div>
+        <table class="account-grid">
+            <tr class="grid-head">
+                <td style="width:25%;">Account Name</td>
+                <td style="width:25%;">Account Manager</td>
+                <td style="width:25%;">Industry</td>
+                <td style="width:25%;">Type</td>
+            </tr>
+            <tr class="grid-val">
+                <td><apex:outputText value="{!acc.Name}"/></td>
+                <td><apex:outputText value="{!acc.Owner.Name}"/></td>
+                <td><apex:outputText value="{!IF(ISBLANK(acc.Industry), '—', acc.Industry)}"/></td>
+                <td><apex:outputText value="{!IF(ISBLANK(acc.Type), '—', acc.Type)}"/></td>
+            </tr>
+            <tr class="grid-extra">
+                <td>
+                    <span class="label">Account #&nbsp;</span>
+                    <apex:outputText value="{!IF(ISBLANK(acc.AccountNumber), '—', acc.AccountNumber)}"/>
+                </td>
+                <td>
+                    <span class="label">Phone&nbsp;</span>
+                    <apex:outputText value="{!IF(ISBLANK(acc.Phone), '—', acc.Phone)}"/>
+                </td>
+                <td>
+                    <span class="label">Website&nbsp;</span>
+                    <apex:outputText value="{!IF(ISBLANK(acc.Website), '—', acc.Website)}"/>
+                </td>
+                <td>
+                    <span class="label">Location&nbsp;</span>
+                    <apex:outputText value="{!IF(AND(ISBLANK(acc.BillingCity), ISBLANK(acc.BillingState)),
+                        '—',
+                        TRIM(acc.BillingCity + IF(AND(NOT(ISBLANK(acc.BillingCity)), NOT(ISBLANK(acc.BillingState))), ', ', '') + acc.BillingState)
+                    )}"/>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         SUMMARY BADGES
+    ═══════════════════════════════════════════ -->
+    <div class="summary-wrap">
+        <table style="width:100%; border-collapse:separate; border-spacing:8px 0;">
+            <tr>
+                <td style="width:50%;">
+                    <div style="background-color:#e8f0fe; border:1px solid #c5d5f5; border-radius:8px; padding:14px 16px; text-align:center;">
+                        <div class="badge-number badge-number-closed"><apex:outputText value="{!totalClosedCases}"/></div>
+                        <div class="badge-label badge-label-closed" style="margin-top:4px;">✓&nbsp; Cases Closed This Month</div>
+                    </div>
+                </td>
+                <td style="width:50%;">
+                    <div style="background-color:#fff3e0; border:1px solid #ffd580; border-radius:8px; padding:14px 16px; text-align:center;">
+                        <div class="badge-number badge-number-open"><apex:outputText value="{!totalOpenCases}"/></div>
+                        <div class="badge-label badge-label-open" style="margin-top:4px;">⚠&nbsp; Cases In Progress This Month</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         TABLE 1 — CLOSED CASES  (grouped by Record Type)
+    ═══════════════════════════════════════════ -->
+    <div class="section-wrap" style="padding-top:20px;">
+        <div class="section-title">✓ &nbsp;Closed Cases — <apex:outputText value="{!monthLabel}"/></div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:13%;">Case #</th>
+                    <th style="width:37%;">Subject</th>
+                    <th style="width:12%;" class="center">Priority</th>
+                    <th style="width:13%;">Status</th>
+                    <th style="width:13%;">Created</th>
+                    <th style="width:12%;">Closed</th>
+                </tr>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!closedCaseGroups}" var="group">
+                    <!-- Record Type group header -->
+                    <tr class="group-header">
+                        <td colspan="6">
+                            &#9654;&nbsp;<apex:outputText value="{!group.recordTypeName}"/>
+                            &nbsp;<span style="color:#3a5fa0; font-weight:400;">(<apex:outputText value="{!group.caseCount}"/> cases)</span>
+                        </td>
+                    </tr>
+
+                    <!-- Cases within this group -->
+                    <apex:repeat value="{!group.cases}" var="c">
+                        <tr class="{!IF(MOD(FIND(c.Id, group.cases[0].Id), 2) = 0, 'row-even', 'row-odd')}">
+                            <td class="mono"><apex:outputText value="{!c.CaseNumber}"/></td>
+                            <td><apex:outputText value="{!IF(ISBLANK(c.Subject), '(no subject)', c.Subject)}"/></td>
+                            <td class="center">
+                                <apex:outputText rendered="{!c.Priority == 'High'}">
+                                    <span class="pill pill-high">High</span>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!c.Priority == 'Medium'}">
+                                    <span class="pill pill-medium">Medium</span>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!c.Priority == 'Low'}">
+                                    <span class="pill pill-low">Low</span>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!AND(c.Priority != 'High', c.Priority != 'Medium', c.Priority != 'Low')}">
+                                    <span class="pill pill-other"><apex:outputText value="{!IF(ISBLANK(c.Priority),'—',c.Priority)}"/></span>
+                                </apex:outputText>
+                            </td>
+                            <td><apex:outputText value="{!c.Status}"/></td>
+                            <td><apex:outputField value="{!c.CreatedDate}" style="font-size:11px;"/></td>
+                            <td>
+                                <apex:outputText rendered="{!NOT(ISNULL(c.ClosedDate))}">
+                                    <apex:outputField value="{!c.ClosedDate}" style="font-size:11px;"/>
+                                </apex:outputText>
+                                <apex:outputText rendered="{!ISNULL(c.ClosedDate)}">—</apex:outputText>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+
+                    <!-- Group subtotal -->
+                    <tr class="subtotal-row">
+                        <td colspan="5" style="text-align:right; padding-right:16px;">
+                            Subtotal for <apex:outputText value="{!group.recordTypeName}"/>:
+                        </td>
+                        <td style="text-align:center;">
+                            <apex:outputText value="{!group.caseCount}"/>
+                        </td>
+                    </tr>
+                </apex:repeat>
+
+                <!-- Empty state -->
+                <apex:outputText rendered="{!closedCaseGroups.size == 0}">
+                    <tr class="empty-row">
+                        <td colspan="6">No closed cases found for <apex:outputText value="{!monthLabel}"/>.</td>
+                    </tr>
+                </apex:outputText>
+
+                <!-- Grand total -->
+                <apex:outputText rendered="{!closedCaseGroups.size > 0}">
+                    <tr class="total-row">
+                        <td colspan="5" style="text-align:right; padding-right:16px; color:#ffffff;">Total Closed Cases</td>
+                        <td style="text-align:center;"><apex:outputText value="{!totalClosedCases}"/></td>
+                    </tr>
+                </apex:outputText>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         TABLE 2 — IN-PROGRESS CASES
+    ═══════════════════════════════════════════ -->
+    <div class="section-wrap" style="padding-top:8px; padding-bottom:28px;">
+        <div class="section-title" style="border-top-color:#FF9900;">⚠ &nbsp;In-Progress Cases — <apex:outputText value="{!monthLabel}"/></div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:13%;">Case #</th>
+                    <th style="width:37%;">Subject</th>
+                    <th style="width:16%;">Record Type</th>
+                    <th style="width:12%;" class="center">Priority</th>
+                    <th style="width:12%;">Status</th>
+                    <th style="width:10%;">Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- In-progress sub-header row -->
+                <apex:outputText rendered="{!inProgressCases.size > 0}">
+                    <tr class="group-header-open">
+                        <td colspan="6">⚠&nbsp; Open / In-Progress Cases</td>
+                    </tr>
+                </apex:outputText>
+
+                <apex:repeat value="{!inProgressCases}" var="c">
+                    <tr class="{!IF(MOD(FIND(c.Id, inProgressCases[0].Id), 2) = 0, 'row-even', 'row-odd')}">
+                        <td class="mono"><apex:outputText value="{!c.CaseNumber}"/></td>
+                        <td><apex:outputText value="{!IF(ISBLANK(c.Subject), '(no subject)', c.Subject)}"/></td>
+                        <td>
+                            <apex:outputText value="{!IF(c.RecordType == null, '—', c.RecordType.Name)}"/>
+                        </td>
+                        <td class="center">
+                            <apex:outputText rendered="{!c.Priority == 'High'}">
+                                <span class="pill pill-high">High</span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!c.Priority == 'Medium'}">
+                                <span class="pill pill-medium">Medium</span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!c.Priority == 'Low'}">
+                                <span class="pill pill-low">Low</span>
+                            </apex:outputText>
+                            <apex:outputText rendered="{!AND(c.Priority != 'High', c.Priority != 'Medium', c.Priority != 'Low')}">
+                                <span class="pill pill-other"><apex:outputText value="{!IF(ISBLANK(c.Priority),'—',c.Priority)}"/></span>
+                            </apex:outputText>
+                        </td>
+                        <td><apex:outputText value="{!c.Status}"/></td>
+                        <td><apex:outputField value="{!c.CreatedDate}" style="font-size:11px;"/></td>
+                    </tr>
+                </apex:repeat>
+
+                <!-- Empty state -->
+                <apex:outputText rendered="{!inProgressCases.size == 0}">
+                    <tr class="empty-row">
+                        <td colspan="6">No in-progress cases found for <apex:outputText value="{!monthLabel}"/>.</td>
+                    </tr>
+                </apex:outputText>
+
+                <!-- Total row -->
+                <apex:outputText rendered="{!inProgressCases.size > 0}">
+                    <tr class="total-row-open">
+                        <td colspan="5" style="text-align:right; padding-right:16px;">Total In-Progress Cases</td>
+                        <td style="text-align:center;"><apex:outputText value="{!totalOpenCases}"/></td>
+                    </tr>
+                </apex:outputText>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════════ -->
+    <div class="footer">
+        <div class="footer-tagline">
+            Account Management&nbsp;·&nbsp;Suspensions&nbsp;·&nbsp;Listing Violations&nbsp;·&nbsp;Advertising&nbsp;·&nbsp;Trademarks
+        </div>
+        <div class="footer-contact">
+            800 SE 4th Ave, Hallandale Beach FL 33009&nbsp;&nbsp;|&nbsp;&nbsp;786.259.0027&nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="mailto:Team@appealsdoctor.com">Team@appealsdoctor.com</a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="https://www.appealsdoctor.com">www.appealsdoctor.com</a>
+        </div>
+    </div>
+
+</div><!-- /card -->
+</div><!-- /page-wrap -->
+
+</body>
+</html>
+</apex:page>

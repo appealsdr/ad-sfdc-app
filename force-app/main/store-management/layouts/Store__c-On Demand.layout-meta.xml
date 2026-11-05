@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <excludeButtons>GenerateKnowledge</excludeButtons>
     <excludeButtons>Submit</excludeButtons>
     <layoutSections>
         <customLabel>false</customLabel>
@@ -37,14 +38,38 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Total_Revenue_Recovered__c</field>
+                <field>Active_Daily_Store_Check__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>Store_Health__c</field>
+                <field>appealsdoctor_vuid__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Service_Contract__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Total_Cases__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Total_Open_Cases__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Total_Closed_Cases__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Amazon_Seller_Page__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Amazon_Notification_Email__c</field>
+            </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>RecordTypeId</field>
@@ -167,20 +192,6 @@
         <style>TwoColumnsLeftToRight</style>
     </layoutSections>
     <layoutSections>
-        <customLabel>true</customLabel>
-        <detailHeading>true</detailHeading>
-        <editHeading>true</editHeading>
-        <label>App Information</label>
-        <layoutColumns>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>appealsdoctor_vuid__c</field>
-            </layoutItems>
-        </layoutColumns>
-        <layoutColumns/>
-        <style>TwoColumnsLeftToRight</style>
-    </layoutSections>
-    <layoutSections>
         <customLabel>false</customLabel>
         <detailHeading>true</detailHeading>
         <editHeading>true</editHeading>
@@ -248,15 +259,6 @@
         </platformActionListItems>
     </platformActionList>
     <relatedLists>
-        <fields>CONTRACT.NAME</fields>
-        <fields>CONTRACT.STARTDATE</fields>
-        <fields>CONTRACT.ENDDATE</fields>
-        <fields>CONTRACT.APPROVALSTATUS</fields>
-        <fields>CONTRACT.STATUS</fields>
-        <fields>CONTRACT.STATUSINDICATOR</fields>
-        <relatedList>ServiceContract.Store__c</relatedList>
-    </relatedLists>
-    <relatedLists>
         <relatedList>RelatedEntityHistoryList</relatedList>
     </relatedLists>
     <relatedLists>
@@ -267,7 +269,6 @@
         <fields>CASES.PRIORITY</fields>
         <fields>CASES.STATUS</fields>
         <fields>OWNER_NAME</fields>
-        <fields>CASES.CLOSED_DATE</fields>
         <relatedList>Case.Store__c</relatedList>
     </relatedLists>
     <relatedLists>
@@ -305,6 +306,26 @@
         <fields>Contract_For_Month__c</fields>
         <fields>Price__c</fields>
         <relatedList>Service__c.Store_Services__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>NAME</fields>
+        <relatedList>Daily_Store_Check__c.Store__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>ORDERS.ORDER_NUMBER</fields>
+        <fields>SALES.ACCOUNT.NAME</fields>
+        <fields>ORDERS.STATUS</fields>
+        <fields>ORDERS.TOTAL_AMOUNT</fields>
+        <relatedList>Order.Store__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>CONTRACT.NAME</fields>
+        <fields>CONTRACT.STARTDATE</fields>
+        <fields>CONTRACT.ENDDATE</fields>
+        <fields>CONTRACT.APPROVALSTATUS</fields>
+        <fields>CONTRACT.STATUS</fields>
+        <fields>CONTRACT.STATUSINDICATOR</fields>
+        <relatedList>ServiceContract.Store__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>OPPORTUNITY.NAME</fields>

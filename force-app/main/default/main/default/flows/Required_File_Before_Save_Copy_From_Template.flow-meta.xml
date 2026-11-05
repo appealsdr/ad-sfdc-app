@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Copy_From_Template</name>
+        <label>Copy From Template</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Instructions__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Document_Template__r.Instructions__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.Accepted_Format__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Document_Template__r.Accepted_Format__c</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Has_Document_Template</name>
+        <label>Has Document Template</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>No Template</defaultConnectorLabel>
+        <rules>
+            <name>Template_Set</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Document_Template__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Copy_From_Template</targetReference>
+            </connector>
+            <label>Template Set</label>
+        </rules>
+    </decisions>
+    <description>When a Required File is created with a Document Template lookup, copy Instructions and Accepted Format from the template.</description>
+    <environments>Default</environments>
+    <interviewLabel>Required File - Before Save Copy From Template {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Required File - Before Save Copy From Template</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Has_Document_Template</targetReference>
+        </connector>
+        <object>Required_File__c</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

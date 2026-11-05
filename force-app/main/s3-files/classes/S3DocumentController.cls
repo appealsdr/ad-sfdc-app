@@ -70,21 +70,20 @@ public with sharing class S3DocumentController {
                 LIMIT 1
             ];
 
-            if (requiredFile.Last_Version__c != null) {
-                Id lastVersionId = requiredFile.Last_Version__c;
-                return [
-                    SELECT Id, File_Name__c, Content_Type__c, File_Extension__c, File_Size_Bytes__c,
-                           Is_Previewable__c, Preview_Type__c, Preview_Status__c, Description__c,
-                           Uploaded_Date__c, Thumbnail_URL__c, Uploaded_By__r.Name
-                    FROM S3_Document__c
-                    WHERE Status__c = 'Active'
-                      AND (
-                          Related_Record_Id__c = :recordIdText
-                          OR Id = :lastVersionId
-                      )
-                    ORDER BY Uploaded_Date__c DESC NULLS LAST, CreatedDate DESC
-                ];
-            }
+            Id lastVersionId = requiredFile.Last_Version__c;
+            return [
+                SELECT Id, File_Name__c, Content_Type__c, File_Extension__c, File_Size_Bytes__c,
+                       Is_Previewable__c, Preview_Type__c, Preview_Status__c, Description__c,
+                       Uploaded_Date__c, Thumbnail_URL__c, Uploaded_By__r.Name
+                FROM S3_Document__c
+                WHERE Status__c = 'Active'
+                  AND (
+                      Required_File__c = :recordId
+                      OR Related_Record_Id__c = :recordIdText
+                      OR Id = :lastVersionId
+                  )
+                ORDER BY Uploaded_Date__c DESC NULLS LAST, CreatedDate DESC
+            ];
         }
 
         return [
