@@ -1,5 +1,5 @@
 <template>
-    <lightning-card title="Required Files" icon-name="standard:file">
+    <lightning-card title={cardTitle} icon-name="standard:file">
         <div slot="actions">
             <lightning-button-icon
                 class="slds-m-right_x-small"
@@ -49,8 +49,11 @@
                         column-widths-mode="fixed"
                         expanded-rows={expandedRows}
                         hide-checkbox-column
+                        resize-column-disabled
+                        onfileaction={handleFileAction}
                         onrowaction={handleRowAction}
                         ontoggle={handleRowToggle}>
+                        <c-required-files-data-types slot="customdatatypes"></c-required-files-data-types>
                     </lightning-tree-grid>
                 </div>
             </template>

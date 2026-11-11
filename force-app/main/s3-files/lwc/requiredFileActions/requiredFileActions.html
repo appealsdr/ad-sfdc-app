@@ -1,0 +1,21 @@
+<template>
+    <template if:true={hasActions}>
+        <lightning-button-menu
+            alternative-text="File actions"
+            icon-name="utility:down"
+            icon-size="x-small"
+            variant="bare"
+            menu-alignment="auto"
+            tabindex={internalTabIndex}
+            data-navigation="enable"
+            onselect={handleSelect}>
+            <template for:each={actions} for:item="action">
+                <lightning-menu-item
+                    key={action.name}
+                    label={action.label}
+                    value={action.name}>
+                </lightning-menu-item>
+            </template>
+        </lightning-button-menu>
+    </template>
+</template>

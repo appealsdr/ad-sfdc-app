@@ -141,8 +141,8 @@ function openRow(element, row) {
 }
 
 function runRowAction(element, name, row) {
-    tree(element).dispatchEvent(new CustomEvent('rowaction', {
-        detail: { action: { name }, row }
+    tree(element).dispatchEvent(new CustomEvent('fileaction', {
+        detail: { action: { name }, documentId: row.documentId }
     }));
 }
 
@@ -165,9 +165,11 @@ describe('c-required-files tree view', () => {
         expect(grid.hideCheckboxColumn).toBe(true);
         expect(grid.columnWidthsMode).toBe('fixed');
         expect(grid.columns.map((column) => column.label)).toEqual([
-            'File Name', 'Short Description', 'Uploaded', undefined
+            '', 'File Name', 'Short Description', 'Uploaded'
         ]);
-        expect(grid.columns[0].initialWidth).toBe(420);
+        expect(grid.columns[0].type).toBe('fileActions');
+        expect(grid.columns[1].initialWidth).toBe(420);
+        expect(element.shadowRoot.querySelector('lightning-card').title).toBe('Required Files (4 uploaded)');
         expect(grid.data).toHaveLength(4);
         expect(grid.data[0].rowType).toBe('requiredFile');
         expect(grid.data[0].iconName).toBe('utility:open_folder');
@@ -203,6 +205,7 @@ describe('c-required-files tree view', () => {
         expect(tree(element).data[0].documentId).toBe('standalone-evidence');
         expect(tree(element).data[0]._children).toBeUndefined();
         expect(element.shadowRoot.querySelector('.empty-state')).toBeNull();
+        expect(element.shadowRoot.querySelector('lightning-card').title).toBe('Required Files (1 uploaded)');
     });
 
     it('refreshes the file tree from the card action', async () => {
@@ -242,6 +245,7 @@ describe('c-required-files tree view', () => {
         expect(tree(element).data.map((row) => row.id)).toEqual(['identity']);
         expect(tree(element).data[0]._children.map((row) => row.documentId)).toEqual(['passport']);
         expect(tree(element).expandedRows).toEqual(['identity']);
+        expect(element.shadowRoot.querySelector('lightning-card').title).toBe('Required Files (4 uploaded)');
     });
 
     it('searches uploaded descriptions while excluding nonmatching sibling uploads', async () => {
@@ -544,6 +548,7 @@ describe('c-required-files tree view', () => {
         getRequiredFiles.error({ message: 'Unable to load required files' });
         await flushPromises();
         expect(tree(element)).toBeNull();
+        expect(element.shadowRoot.querySelector('lightning-card').title).toBe('Required Files (0 uploaded)');
 
         getRequiredFiles.emit(FILES);
         await flushPromises();

@@ -26,6 +26,16 @@ const DOCUMENT_ACTIONS = [
 
 const COLUMNS = [
     {
+        label: '',
+        type: 'fileActions',
+        initialWidth: 120,
+        cellAttributes: { alignment: 'left' },
+        typeAttributes: {
+            documentId: { fieldName: 'documentId' },
+            rowActions: { fieldName: 'rowActions' }
+        }
+    },
+    {
         label: 'File Name',
         fieldName: 'name',
         type: 'button',
@@ -45,12 +55,7 @@ const COLUMNS = [
         wrapText: true,
         initialWidth: 300
     },
-    { label: 'Uploaded', fieldName: 'uploadedLabel', type: 'text', initialWidth: 100 },
-    {
-        type: 'action',
-        initialWidth: 70,
-        typeAttributes: { rowActions: { fieldName: 'rowActions' } }
-    }
+    { label: 'Uploaded', fieldName: 'uploadedLabel', type: 'text', initialWidth: 100 }
 ];
 
 export default class RequiredFiles extends NavigationMixin(LightningElement) {
@@ -156,6 +161,13 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
         } else if (error) {
             this.templates = [];
         }
+    }
+
+    get cardTitle() {
+        const uploadedFileCount = this.requiredFiles.reduce((total, row) =>
+            total + (row.rowType === 'uploadedFile' ? 1 : row.uploadCount), 0
+        );
+        return `Required Files (${uploadedFileCount} uploaded)`;
     }
 
     get hasFiles() {
@@ -320,6 +332,14 @@ export default class RequiredFiles extends NavigationMixin(LightningElement) {
     handleTemplateSelection(event) {
         const selectedRows = event.detail.selectedRows || [];
         this.selectedTemplateId = selectedRows.length ? selectedRows[0].id : null;
+    }
+
+    handleFileAction(event) {
+        const { documentId, action } = event.detail;
+        const row = this.findDocumentRow(documentId);
+        if (row) {
+            this.handleRowAction({ detail: { action, row } });
+        }
     }
 
     handleRowAction(event) {

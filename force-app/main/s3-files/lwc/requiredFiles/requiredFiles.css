@@ -16,8 +16,10 @@
 }
 
 .table-wrap {
+    box-sizing: border-box;
+    max-height: 400px;
     padding: 0 1rem 1rem;
-    overflow-x: auto;
+    overflow: auto;
 }
 
 .preview-modal-container {
