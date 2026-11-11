@@ -5,12 +5,12 @@
     <fieldName>StageName</fieldName>
     <masterLabel>Default</masterLabel>
     <pathAssistantSteps>
-        <fieldNames>AccountId</fieldNames>
+        <fieldNames>Meeting_Completed_DateTime__c</fieldNames>
         <fieldNames>Opportunity_Opener__c</fieldNames>
         <fieldNames>Opportunity_Closer__c</fieldNames>
         <fieldNames>Technical_expert__c</fieldNames>
         <fieldNames>NextStep</fieldNames>
-        <info>&lt;p&gt;&lt;b&gt;Qualify the opportunity and assign the deal team.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Assign the Opportunity Opener who sourced or qualified the deal.&lt;/li&gt;&lt;li&gt;Assign the Opportunity Closer responsible for advancing the sale.&lt;/li&gt;&lt;li&gt;Add a Technical expert when solution or implementation expertise is needed.&lt;/li&gt;&lt;li&gt;Confirm the client and agree on a clear next step before advancing.&lt;/li&gt;&lt;/ul&gt;</info>
+        <info>&lt;p&gt;&lt;b&gt;Qualify the opportunity and assign the deal team.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Record the first completed meeting date and time.&lt;/li&gt;&lt;li&gt;Assign the Opportunity Opener who sourced or qualified the deal.&lt;/li&gt;&lt;li&gt;Assign the Opportunity Closer responsible for advancing the sale.&lt;/li&gt;&lt;li&gt;Add a Technical expert when solution or implementation expertise is needed.&lt;/li&gt;&lt;li&gt;Agree on a clear next step before advancing.&lt;/li&gt;&lt;/ul&gt;</info>
         <picklistValueName>Meeting Booked</picklistValueName>
     </pathAssistantSteps>
     <pathAssistantSteps>
