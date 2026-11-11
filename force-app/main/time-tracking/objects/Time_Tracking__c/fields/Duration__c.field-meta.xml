@@ -4,7 +4,7 @@
     <externalId>false</externalId>
     <formula>IF(
     AND(NOT(ISBLANK(Start_Time__c)), NOT(ISBLANK(End_Time__c))),
-    (End_Time__c - Start_Time__c) * 24 * 60,
+    CEILING((End_Time__c - Start_Time__c) * 24 * 60),
     NULL
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

@@ -13,6 +13,7 @@ public with sharing class TimeTrackingController {
         @AuraEnabled public Decimal durationMinutes { get; set; }
         @AuraEnabled public String status { get; set; }
         @AuraEnabled public String comments { get; set; }
+        @AuraEnabled public Id relatedRecordId { get; set; }
         @AuraEnabled public String relatedRecordName { get; set; }
     }
 
@@ -55,15 +56,18 @@ public with sharing class TimeTrackingController {
             for (Time_Tracking__c record : records) {
                 TimeTrackingWrapper wrapper = toWrapper(record);
                 data.records.add(wrapper);
-                data.totalMinutes += getDurationMinutes(record);
+                data.totalMinutes += wrapper.durationMinutes;
 
                 if (record.Status__c == STATUS_IN_PROGRESS && record.Assignee__c == currentUserId) {
-                    if (isSameRelatedRecord(record, recordId, objectType)) {
+                    if (data.activeTimer == null && isSameRelatedRecord(record, recordId, objectType)) {
                         data.activeTimer = wrapper;
-                    } else if (data.blockingTimer == null) {
-                        data.blockingTimer = wrapper;
                     }
                 }
+            }
+
+            Time_Tracking__c blockingRecord = queryBlockingTimer(recordId, objectType);
+            if (blockingRecord != null) {
+                data.blockingTimer = toWrapper(blockingRecord);
             }
 
             return data;
@@ -305,6 +309,35 @@ public with sharing class TimeTrackingController {
         ];
     }
 
+    private static Time_Tracking__c queryBlockingTimer(Id recordId, String objectType) {
+        Id currentUserId = UserInfo.getUserId();
+        List<Time_Tracking__c> records;
+        if (objectType == 'Case') {
+            records = [
+                SELECT Id, Assignee__c, Case__c, Store__c, Start_Time__c, End_Time__c, Duration__c,
+                       Status__c, Comments__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name
+                FROM Time_Tracking__c
+                WHERE Assignee__c = :currentUserId
+                  AND Status__c = :STATUS_IN_PROGRESS
+                  AND (Case__c = null OR Case__c != :recordId)
+                ORDER BY Start_Time__c DESC
+                LIMIT 1
+            ];
+        } else {
+            records = [
+                SELECT Id, Assignee__c, Case__c, Store__c, Start_Time__c, End_Time__c, Duration__c,
+                       Status__c, Comments__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name
+                FROM Time_Tracking__c
+                WHERE Assignee__c = :currentUserId
+                  AND Status__c = :STATUS_IN_PROGRESS
+                  AND (Store__c = null OR Store__c != :recordId OR Case__c != null)
+                ORDER BY Start_Time__c DESC
+                LIMIT 1
+            ];
+        }
+        return records.isEmpty() ? null : records[0];
+    }
+
     private static TimeTrackingWrapper toWrapper(Time_Tracking__c record) {
         TimeTrackingWrapper wrapper = new TimeTrackingWrapper();
         wrapper.id = record.Id;
@@ -314,6 +347,7 @@ public with sharing class TimeTrackingController {
         wrapper.durationMinutes = getDurationMinutes(record);
         wrapper.status = record.Status__c;
         wrapper.comments = record.Comments__c;
+        wrapper.relatedRecordId = record.Case__c != null ? record.Case__c : record.Store__c;
         wrapper.relatedRecordName = getRelatedRecordName(record);
         return wrapper;
     }
@@ -333,10 +367,10 @@ public with sharing class TimeTrackingController {
             return record.Duration__c;
         }
         if (record.Start_Time__c != null && record.End_Time__c != null) {
-            return ((record.End_Time__c.getTime() - record.Start_Time__c.getTime()) / 60000.0);
+            return ((record.End_Time__c.getTime() - record.Start_Time__c.getTime()) / 60000.0).setScale(0, RoundingMode.CEILING);
         }
         if (record.Status__c == STATUS_IN_PROGRESS && record.Start_Time__c != null) {
-            return ((System.now().getTime() - record.Start_Time__c.getTime()) / 60000.0);
+            return ((System.now().getTime() - record.Start_Time__c.getTime()) / 60000.0).setScale(0, RoundingMode.CEILING);
         }
         return 0;
     }

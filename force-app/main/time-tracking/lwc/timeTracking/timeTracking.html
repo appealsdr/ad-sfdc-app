@@ -1,64 +1,104 @@
 <template>
     <lightning-card title="Time Tracking" icon-name="standard:timesheet">
+        <div slot="actions" class="card-actions">
+            <template if:true={showStartButton}>
+                <lightning-button-icon
+                    icon-name="utility:play"
+                    variant="brand"
+                    alternative-text="Start timer"
+                    title="Start timer"
+                    aria-label="Start timer"
+                    onclick={handleStartClick}
+                    disabled={actionsDisabled}>
+                </lightning-button-icon>
+            </template>
+            <template if:true={hasActiveTimer}>
+                <button
+                    type="button"
+                    data-action="stop"
+                    title="Stop timer"
+                    aria-label="Stop timer"
+                    class="slds-button slds-button_icon stop-button"
+                    onclick={handleCompleteClick}
+                    disabled={actionsDisabled}>
+                    <lightning-icon icon-name="utility:stop" variant="inverse" size="x-small"></lightning-icon>
+                    <span class="slds-assistive-text">Stop timer</span>
+                </button>
+            </template>
+            <lightning-button-icon
+                icon-name="utility:add"
+                alternative-text="Add manual entry"
+                title="Add manual entry"
+                aria-label="Add manual entry"
+                onclick={handleAddManualClick}
+                disabled={actionsDisabled}>
+            </lightning-button-icon>
+            <lightning-button-icon
+                icon-name="utility:refresh"
+                alternative-text="Refresh time tracking"
+                title="Refresh time tracking"
+                aria-label="Refresh time tracking"
+                onclick={handleRefresh}
+                disabled={actionsDisabled}>
+            </lightning-button-icon>
+        </div>
         <template if:true={isLoading}>
-            <div class="slds-p-around_medium slds-align_absolute-center">
+            <div class="loading-section slds-p-around_medium">
                 <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
             </div>
         </template>
 
         <template if:false={isLoading}>
-            <div class="timer-section slds-p-around_medium slds-text-align_center">
-                <template if:true={hasActiveTimer}>
-                    <p class="slds-text-heading_large timer-display">{elapsedDisplay}</p>
-                    <p class="slds-text-body_small slds-m-bottom_medium">Timer in progress</p>
+            <div class="tracking-body slds-p-horizontal_medium slds-p-bottom_small">
+                <template if:true={isRefreshing}>
+                    <lightning-spinner alternative-text="Refreshing time tracking" size="small"></lightning-spinner>
+                </template>
+                <template if:true={showTimerSummary}>
+                    <div class="tracking-summary slds-m-bottom_small">
+                        <div class="timer-section">
+                            <template if:true={hasActiveTimer}>
+                                <span class="timer-display">{elapsedDisplay}</span>
+                                <span class="slds-text-body_small slds-text-color_weak">Timer in progress</span>
+                            </template>
+                            <template if:true={hasBlockingTimer}>
+                                <span class="blocking-timer-notice" role="status">
+                                    <template if:true={blockingRecordUrl}>
+                                        <a class="other-record-badge" href={blockingRecordUrl} title={blockingMessage} aria-label={blockingTimerBadgeDescription}>
+                                            <span class="timer-display">{blockingElapsedDisplay}</span>
+                                            <span class="other-record-label">{blockingTimerBadgeLabel}</span>
+                                        </a>
+                                    </template>
+                                    <template if:false={blockingRecordUrl}>
+                                        <span class="other-record-badge" title={blockingMessage} aria-label={blockingTimerBadgeDescription}>
+                                            <span class="timer-display">{blockingElapsedDisplay}</span>
+                                            <span class="other-record-label">{blockingTimerBadgeLabel}</span>
+                                        </span>
+                                    </template>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
                 </template>
 
-                <div class="button-row slds-m-vertical_medium">
-                    <template if:true={showStartButton}>
-                        <lightning-button
-                            label="Start"
-                            variant="brand"
-                            onclick={handleStartClick}
-                            disabled={isProcessing}
-                            class="timer-button">
-                        </lightning-button>
-                    </template>
-
-                    <template if:true={hasActiveTimer}>
-                        <lightning-button
-                            label="Complete"
-                            variant="success"
-                            onclick={handleCompleteClick}
-                            disabled={isProcessing}
-                            class="timer-button">
-                        </lightning-button>
-                    </template>
-                </div>
-            </div>
-
-            <div class="slds-p-horizontal_medium slds-p-bottom_medium">
-                <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
-                    <p class="slds-text-title_bold">
-                        Total Minutes: {formattedTotalMinutes}
-                    </p>
-                    <lightning-button
-                        label="Add Manual Entry"
-                        variant="neutral"
-                        onclick={handleAddManualClick}>
-                    </lightning-button>
-                </div>
-
-                <lightning-datatable
-                    key-field="id"
-                    data={tableData}
-                    columns={columns}
-                    hide-checkbox-column
-                    onrowaction={handleRowAction}>
-                </lightning-datatable>
-
-                <template if:false={tableData.length}>
-                    <p class="slds-p-vertical_small slds-text-color_weak">No time tracking records found.</p>
-                </template>
+                <lightning-accordion
+                    allow-multiple-sections-open
+                    active-section-name={activeSections}
+                    onsectiontoggle={handleSectionToggle}>
+                    <lightning-accordion-section name="logged-time" label="Logged Time">
+                        <lightning-badge slot="actions" label={loggedRecordCount} title={loggedRecordCountLabel}></lightning-badge>
+                        <p class="logged-total slds-text-title_bold slds-m-bottom_small">Total logged time: {formattedLoggedTime}</p>
+                        <lightning-datatable
+                            key-field="id"
+                            data={tableData}
+                            columns={columns}
+                            hide-checkbox-column
+                            onrowaction={handleRowAction}>
+                        </lightning-datatable>
+                        <template if:false={tableData.length}>
+                            <p class="slds-p-vertical_small slds-text-color_weak">No time tracking records found.</p>
+                        </template>
+                    </lightning-accordion-section>
+                </lightning-accordion>
             </div>
         </template>
     </lightning-card>
