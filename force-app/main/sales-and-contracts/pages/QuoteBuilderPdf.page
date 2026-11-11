@@ -15,13 +15,9 @@
         color: #14213d;
         font-size: 10pt;
       }
-      .brand {
-        font-size: 22pt;
-        font-weight: bold;
-        color: #0b2b55;
-      }
-      .accent {
-        color: #f39a1e;
+      .brand-logo {
+        width: 210px;
+        height: auto;
       }
       .title {
         font-size: 18pt;
@@ -71,7 +67,11 @@
     </style>
   </head>
   <body>
-    <div class="brand">appeals<span class="accent">dr.</span></div>
+    <apex:image
+      url="{!$Resource.AppealDoctorLogo}"
+      styleClass="brand-logo"
+      alt="Appeals Doctor"
+    />
     <div class="title">{!Quote.Name}</div>
     <table class="meta">
       <tr>

@@ -25,6 +25,10 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   error;
   editorOpen = false;
   choosingPricebook = false;
+  pdfModalOpen = false;
+  pdfLoading = false;
+  pdfUrl;
+  pdfError;
   pendingNewQuote = false;
   selectedPricebookId;
   editingQuoteId;
@@ -374,15 +378,30 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   async handleViewPdf(event) {
     const quote = this.findQuote(event.currentTarget.dataset.id);
+    this.pdfModalOpen = true;
+    this.pdfError = undefined;
     if (quote.pdfId) {
-      this.openPdf(quote.pdfId);
+      this.pdfUrl = this.pdfDownloadUrl(quote.pdfId);
       return;
     }
-    await this.run(async () => {
+    this.pdfLoading = true;
+    try {
       const pdfId = await generatePdf({ quoteId: quote.quoteId });
       this.applyContext(await getContext({ opportunityId: this.recordId }));
-      this.openPdf(pdfId);
-    });
+      this.pdfUrl = this.pdfDownloadUrl(pdfId);
+    } catch (error) {
+      this.pdfError = this.message(error);
+      this.toast("error", "PDF could not be generated", this.pdfError);
+    } finally {
+      this.pdfLoading = false;
+    }
+  }
+
+  handleClosePdf() {
+    this.pdfModalOpen = false;
+    this.pdfLoading = false;
+    this.pdfUrl = undefined;
+    this.pdfError = undefined;
   }
 
   async handleSendQuote(event) {
@@ -435,11 +454,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     });
   }
 
-  openPdf(pdfId) {
-    this[NavigationMixin.Navigate]({
-      type: "standard__webPage",
-      attributes: { url: `/servlet/servlet.FileDownload?file=${pdfId}` }
-    });
+  pdfDownloadUrl(pdfId) {
+    return `/servlet/servlet.FileDownload?file=${pdfId}`;
   }
 
   findQuote(quoteId) {

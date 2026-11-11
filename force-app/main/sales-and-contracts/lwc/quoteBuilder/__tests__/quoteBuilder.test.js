@@ -154,6 +154,12 @@ describe("c-quote-builder quote-first workspace", () => {
 
     buttonByText(element, "+ New quote").click();
     await flushPromises();
+    expect(element.shadowRoot.querySelector(".modal_medium")).toBeTruthy();
+    expect(
+      element.shadowRoot
+        .querySelector('[role="dialog"]')
+        .getAttribute("aria-modal")
+    ).toBe("true");
     element.shadowRoot.querySelector("button[data-id]").click();
     await flushPromises();
     buttonByText(element, "Save quote").click();
@@ -182,6 +188,7 @@ describe("c-quote-builder quote-first workspace", () => {
 
     buttonByText(element, "Edit").click();
     await flushPromises();
+    expect(element.shadowRoot.querySelector(".modal_medium")).toBeTruthy();
     expect(element.shadowRoot.textContent).toContain(
       "Edit Acme appeal – Proposal v1"
     );
@@ -216,6 +223,27 @@ describe("c-quote-builder quote-first workspace", () => {
     await flushPromises();
 
     expect(generatePdf).toHaveBeenCalledWith({ quoteId: QUOTE_ID });
+    expect(element.shadowRoot.querySelector(".pdf-modal")).toBeTruthy();
+    expect(
+      element.shadowRoot.querySelector(".pdf-frame").getAttribute("src")
+    ).toBe(`/servlet/servlet.FileDownload?file=${PDF_ID}`);
+  });
+
+  it("views an existing PDF in a medium modal without regenerating it", async () => {
+    const element = await render(
+      context({ quotes: [quote({ pdfId: PDF_ID })] })
+    );
+
+    buttonByText(element, "View PDF").click();
+    await flushPromises();
+
+    expect(generatePdf).not.toHaveBeenCalled();
+    expect(
+      element.shadowRoot.querySelector(".pdf-modal .modal_medium")
+    ).toBeTruthy();
+    expect(
+      element.shadowRoot.querySelector(".pdf-frame").getAttribute("src")
+    ).toBe(`/servlet/servlet.FileDownload?file=${PDF_ID}`);
   });
 
   it("confirms and sends the quote to its recipient", async () => {
