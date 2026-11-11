@@ -381,14 +381,14 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.pdfModalOpen = true;
     this.pdfError = undefined;
     if (quote.pdfId) {
-      this.pdfUrl = this.pdfDownloadUrl(quote.pdfId);
+      this.pdfUrl = this.pdfPreviewUrl(quote.quoteId);
       return;
     }
     this.pdfLoading = true;
     try {
-      const pdfId = await generatePdf({ quoteId: quote.quoteId });
+      await generatePdf({ quoteId: quote.quoteId });
       this.applyContext(await getContext({ opportunityId: this.recordId }));
-      this.pdfUrl = this.pdfDownloadUrl(pdfId);
+      this.pdfUrl = this.pdfPreviewUrl(quote.quoteId);
     } catch (error) {
       this.pdfError = this.message(error);
       this.toast("error", "PDF could not be generated", this.pdfError);
@@ -454,8 +454,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     });
   }
 
-  pdfDownloadUrl(pdfId) {
-    return `/servlet/servlet.FileDownload?file=${pdfId}`;
+  pdfPreviewUrl(quoteId) {
+    return `/apex/QuoteBuilderPdf?id=${quoteId}`;
   }
 
   findQuote(quoteId) {

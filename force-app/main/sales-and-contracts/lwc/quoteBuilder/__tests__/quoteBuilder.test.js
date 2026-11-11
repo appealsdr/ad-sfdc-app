@@ -226,7 +226,7 @@ describe("c-quote-builder quote-first workspace", () => {
     expect(element.shadowRoot.querySelector(".pdf-modal")).toBeTruthy();
     expect(
       element.shadowRoot.querySelector(".pdf-frame").getAttribute("src")
-    ).toBe(`/servlet/servlet.FileDownload?file=${PDF_ID}`);
+    ).toBe(`/apex/QuoteBuilderPdf?id=${QUOTE_ID}`);
   });
 
   it("views an existing PDF in a medium modal without regenerating it", async () => {
@@ -243,7 +243,7 @@ describe("c-quote-builder quote-first workspace", () => {
     ).toBeTruthy();
     expect(
       element.shadowRoot.querySelector(".pdf-frame").getAttribute("src")
-    ).toBe(`/servlet/servlet.FileDownload?file=${PDF_ID}`);
+    ).toBe(`/apex/QuoteBuilderPdf?id=${QUOTE_ID}`);
   });
 
   it("confirms and sends the quote to its recipient", async () => {
