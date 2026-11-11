@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Quote Builder</masterLabel>
+    <description
+  >Simple product picker and quote builder for Opportunities: price book catalogue, quantity and discount per line, totals, and one-click Quote + PDF.</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>Opportunity</object>
+            </objects>
+            <property
+        name="cardTitle"
+        type="String"
+        label="Title"
+        default="Quote builder"
+      />
+            <property
+        name="quoteTemplateId"
+        type="String"
+        label="Quote Template Id"
+        description="Id of the Quote Template used for the PDF (Setup → Quote Templates). Leave blank to create quotes without a PDF."
+      />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

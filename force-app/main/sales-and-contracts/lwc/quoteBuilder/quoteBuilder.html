@@ -1,0 +1,402 @@
+<template>
+  <article class="qb">
+    <header class="qb__head">
+      <div class="qb__title">
+        <h2>{cardTitle}</h2>
+        <template lwc:if={hasPricebook}>
+          <span class="chip">{context.pricebookName} price book</span>
+          <template lwc:if={canChangePricebook}>
+            <button
+              type="button"
+              class="link-btn"
+              onclick={handleChangePricebook}
+            >
+              Change
+            </button>
+          </template>
+        </template>
+      </div>
+      <template lwc:if={hasLines}>
+        <div class="qb__sum" aria-live="polite">
+          <span>{totals.count} line(s)</span>
+          <strong
+            ><lightning-formatted-number
+              value={totals.total}
+              format-style="currency"
+              currency-code="USD"
+            ></lightning-formatted-number
+          ></strong>
+        </div>
+      </template>
+    </header>
+
+    <template lwc:if={loading}>
+      <div class="qb__state">
+        <lightning-spinner
+          alternative-text="Loading quote builder"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+
+    <template lwc:elseif={error}>
+      <div class="qb__state qb__state_error" role="alert">{error}</div>
+    </template>
+
+    <template lwc:elseif={showPricebookPicker}>
+      <section class="qb__pick" aria-labelledby="qb-pick-title">
+        <div class="qb__pickhead">
+          <h3 id="qb-pick-title" class="qb__picktitle">{pickerTitle}</h3>
+          <p class="muted">
+            The price book decides which products and prices this deal can
+            quote. You can change it until products are saved.
+          </p>
+        </div>
+        <template lwc:if={pricebookEmpty}>
+          <p class="muted">
+            No active price books are available to you. Ask an admin to activate
+            one.
+          </p>
+        </template>
+        <div class="pbs" role="radiogroup" aria-labelledby="qb-pick-title">
+          <template for:each={pricebookCards} for:item="p">
+            <button
+              key={p.id}
+              type="button"
+              role="radio"
+              class={p.className}
+              aria-checked={p.ariaChecked}
+              data-id={p.id}
+              data-disabled={p.disabled}
+              disabled={p.disabled}
+              onclick={handlePricebookPick}
+            >
+              <span class="pb__top">
+                <span class="pb__radio" aria-hidden="true"></span>
+                <span class="pb__name">{p.name}</span>
+                <template lwc:if={p.isCurrent}
+                  ><span class="chip">Current</span></template
+                >
+              </span>
+              <span class="pb__desc">{p.descriptionLabel}</span>
+              <span class="pb__count">{p.countLabel}</span>
+            </button>
+          </template>
+        </div>
+        <div class="actions">
+          <template lwc:if={choosingPricebook}>
+            <button
+              type="button"
+              class="btn"
+              onclick={handleCancelPricebook}
+              disabled={busy}
+            >
+              Cancel
+            </button>
+          </template>
+          <button
+            type="button"
+            class="btn btn_primary"
+            onclick={handleSetPricebook}
+            disabled={pickDisabled}
+          >
+            Use this price book
+          </button>
+        </div>
+      </section>
+    </template>
+
+    <template lwc:else>
+      <div class="qb__body">
+        <!-- Catalogue -->
+        <section class="pane pane_catalog" aria-label="Products">
+          <lightning-input
+            type="search"
+            label="Search products"
+            variant="label-hidden"
+            placeholder="Search products"
+            value={search}
+            onchange={handleSearch}
+          ></lightning-input>
+          <div class="pills" role="group" aria-label="Filter by family">
+            <template for:each={familyPills} for:item="p">
+              <button
+                key={p.value}
+                type="button"
+                class={p.className}
+                aria-pressed={p.pressed}
+                data-family={p.value}
+                onclick={handleFamily}
+              >
+                {p.label}
+              </button>
+            </template>
+          </div>
+          <ul class="products">
+            <template for:each={catalogView} for:item="c">
+              <li key={c.pricebookEntryId} class={c.rowClass}>
+                <div class="product__text">
+                  <span class="product__name">{c.name}</span>
+                  <span class="product__meta">{c.familyLabel}</span>
+                </div>
+                <div class="product__right">
+                  <span class="product__price"
+                    ><lightning-formatted-number
+                      value={c.listPrice}
+                      format-style="currency"
+                      currency-code="USD"
+                    ></lightning-formatted-number
+                  ></span>
+                  <button
+                    type="button"
+                    class="btn btn_small"
+                    data-id={c.pricebookEntryId}
+                    onclick={handleAdd}
+                    aria-label={c.addLabel}
+                    title={c.addLabel}
+                  >
+                    + Add
+                  </button>
+                </div>
+              </li>
+            </template>
+          </ul>
+          <template lwc:if={catalogEmpty}>
+            <p class="muted">No products match.</p>
+          </template>
+        </section>
+
+        <!-- Quote -->
+        <section class="pane pane_quote" aria-label="Quote lines">
+          <template lwc:if={hasLines}>
+            <ul class="lines">
+              <template for:each={cartView} for:item="l">
+                <li key={l.key} class={l.lineClass}>
+                  <div class="line__top">
+                    <div class="line__name">
+                      <span class="product__name">{l.name}</span>
+                      <span class="product__meta"
+                        >List
+                        <lightning-formatted-number
+                          value={l.listPrice}
+                          format-style="currency"
+                          currency-code="USD"
+                        ></lightning-formatted-number>
+                        each</span
+                      >
+                    </div>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      data-key={l.key}
+                      onclick={handleRemove}
+                      aria-label="Remove line"
+                      title="Remove line"
+                    >
+                      <lightning-icon
+                        icon-name="utility:close"
+                        size="x-small"
+                        alternative-text="Remove"
+                      ></lightning-icon>
+                    </button>
+                  </div>
+                  <div class="line__controls">
+                    <div class="stepper" role="group" aria-label="Quantity">
+                      <button
+                        type="button"
+                        class="stepper__btn"
+                        data-key={l.key}
+                        data-step="-1"
+                        onclick={handleStep}
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </button>
+                      <input
+                        class="stepper__input"
+                        type="number"
+                        min="1"
+                        max="9999"
+                        value={l.quantity}
+                        data-key={l.key}
+                        onchange={handleQty}
+                        aria-label="Quantity"
+                      />
+                      <button
+                        type="button"
+                        class="stepper__btn"
+                        data-key={l.key}
+                        data-step="1"
+                        onclick={handleStep}
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <label class="disc">
+                      <span>Discount</span>
+                      <input
+                        class="disc__input"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={l.discountPct}
+                        data-key={l.key}
+                        onchange={handleDiscount}
+                      />
+                      <span>%</span>
+                    </label>
+                    <span class="line__total"
+                      ><lightning-formatted-number
+                        value={l.net}
+                        format-style="currency"
+                        currency-code="USD"
+                      ></lightning-formatted-number
+                    ></span>
+                  </div>
+                  <input
+                    class="line__note"
+                    type="text"
+                    placeholder="Note for the client (ASIN, scope…)"
+                    value={l.description}
+                    data-key={l.key}
+                    onchange={handleNote}
+                    aria-label="Line note"
+                    maxlength="255"
+                  />
+                  <template lwc:if={l.overLimit}>
+                    <p class="warn">
+                      <template lwc:if={l.needsApproval}
+                        >Above {maxDiscount}%: needs manager approval.</template
+                      >
+                      <template lwc:else
+                        >Above {maxDiscount}%: allowed by your override
+                        permission.</template
+                      >
+                    </p>
+                  </template>
+                </li>
+              </template>
+            </ul>
+
+            <dl class="totals">
+              <div>
+                <dt>Subtotal</dt>
+                <dd>
+                  <lightning-formatted-number
+                    value={totals.subtotal}
+                    format-style="currency"
+                    currency-code="USD"
+                  ></lightning-formatted-number>
+                </dd>
+              </div>
+              <div>
+                <dt>Discount</dt>
+                <dd>
+                  −
+                  <lightning-formatted-number
+                    value={totals.discount}
+                    format-style="currency"
+                    currency-code="USD"
+                  ></lightning-formatted-number>
+                </dd>
+              </div>
+              <div class="totals__grand">
+                <dt>Total</dt>
+                <dd>
+                  <lightning-formatted-number
+                    value={totals.total}
+                    format-style="currency"
+                    currency-code="USD"
+                  ></lightning-formatted-number>
+                </dd>
+              </div>
+            </dl>
+          </template>
+          <template lwc:else>
+            <div class="empty">
+              <p class="product__name">No products yet</p>
+              <p class="muted">
+                Pick services from the list to start the quote.
+              </p>
+            </div>
+          </template>
+
+          <div class="actions">
+            <button
+              type="button"
+              class="btn"
+              onclick={handleReset}
+              disabled={busy}
+            >
+              Undo changes
+            </button>
+            <button
+              type="button"
+              class="btn btn_primary"
+              onclick={handleSave}
+              disabled={saveDisabled}
+            >
+              Save products
+            </button>
+          </div>
+
+          <div class="quote">
+            <div class="quote__opts">
+              <lightning-combobox
+                label="Valid for"
+                options={validityOptions}
+                value={validDays}
+                onchange={handleValidity}
+              ></lightning-combobox>
+              <lightning-textarea
+                label="Notes on the quote"
+                value={notes}
+                onchange={handleNotes}
+                max-length="2000"
+              ></lightning-textarea>
+            </div>
+            <div class="quote__go">
+              <p class="muted">{quoteHint}</p>
+              <button
+                type="button"
+                class="btn btn_dark"
+                onclick={handleCreateQuote}
+                disabled={quoteDisabled}
+              >
+                Create quote
+              </button>
+            </div>
+            <template lwc:if={latestQuote}>
+              <div class="latest">
+                <div>
+                  <span class="product__name">{latestQuote.name}</span>
+                  <span class="product__meta"
+                    >{latestQuote.quoteNumber} · {latestQuote.status} · expires
+                    <lightning-formatted-date-time
+                      value={latestQuote.expirationDate}
+                    ></lightning-formatted-date-time
+                  ></span>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn_small"
+                  onclick={handleOpenQuote}
+                >
+                  Open quote
+                </button>
+              </div>
+            </template>
+          </div>
+        </section>
+      </div>
+      <template lwc:if={busy}>
+        <lightning-spinner
+          alternative-text="Working"
+          size="small"
+        ></lightning-spinner>
+      </template>
+    </template>
+  </article>
+</template>
