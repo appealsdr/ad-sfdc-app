@@ -101,18 +101,14 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
     private void processAfterUpdate(List<Opportunity> opportunities, Map<Id, Opportunity> oldMap) {
         try {
             List<Opportunity> accountChangedOpps = new List<Opportunity>();
-            Set<Id> oppIds = new Set<Id>();
-            Set<Id> storeAccessOppIds = new Set<Id>();
+            Set<Id> contractSentOppIds = new Set<Id>();
             for (Opportunity opp : opportunities) {
                 Opportunity oldOpp = oldMap.get(opp.Id);
                 if (oldOpp != null && opp.AccountId != oldOpp.AccountId) {
                     accountChangedOpps.add(opp);
                 }
-                if(opp.StageName == 'Invoiced' && oldOpp.StageName != 'Invoiced') {
-                    oppIds.add(opp.Id);
-                }
-                if (opp.StageName == 'Store Access' && oldOpp.StageName != 'Store Access') {
-                    storeAccessOppIds.add(opp.Id);
+                if (opp.StageName == 'Contract Sent' && oldOpp.StageName != 'Contract Sent') {
+                    contractSentOppIds.add(opp.Id);
                 }
             }
             
@@ -120,15 +116,16 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
                 removeOldShares(accountChangedOpps, oldMap);
                 shareWithCaseTeamMembers(accountChangedOpps);
             }
-            Set<Id> contractCreationOppIds = OpportunityServiceContractService.getContractCreationTransitionIds(opportunities, oldMap);
-            if (!contractCreationOppIds.isEmpty()) {
-                OpportunityServiceContractService.createServiceContractsFromOpportunities(contractCreationOppIds);
-            }
-            if(!oppIds.isEmpty() && !skipWebhookFiring) {
-                callOpportunityApi(oppIds);
-            }
-            if (!storeAccessOppIds.isEmpty() && !skipWebhookFiring) {
-                OpportunityDataSendersApi.sendOpportunityDatabyTrigger(storeAccessOppIds, 'Update');
+            // Data migrations set skipWebhookFiring to suppress every stage side effect,
+            // including ServiceContract creation as well as outbound webhooks.
+            if (!skipWebhookFiring) {
+                Set<Id> contractCreationOppIds = OpportunityServiceContractService.getContractCreationTransitionIds(opportunities, oldMap);
+                if (!contractCreationOppIds.isEmpty()) {
+                    OpportunityServiceContractService.createServiceContractsFromOpportunities(contractCreationOppIds);
+                }
+                if (!contractSentOppIds.isEmpty()) {
+                    callOpportunityApi(contractSentOppIds);
+                }
             }
         } catch (Exception ex) {
             Logger.logException(ex, TRIGGER_HANDLER_NAME);

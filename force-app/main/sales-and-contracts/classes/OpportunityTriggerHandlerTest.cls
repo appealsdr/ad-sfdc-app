@@ -51,23 +51,23 @@ private class OpportunityTriggerHandlerTest {
     }
 
     // -----------------------------------------------------------------------
-    // Store Access stage change — triggers webhook callout
+    // Contract Sent stage change — triggers webhook callout
     // -----------------------------------------------------------------------
 
-    private class StoreAccessMockHttp implements HttpCalloutMock {
+    private class ContractSentMockHttp implements HttpCalloutMock {
         public HTTPResponse respond(HTTPRequest req) {
             System.assertEquals('POST', req.getMethod());
             HttpResponse res = new HttpResponse();
             res.setHeader('Content-Type', 'application/json');
-            res.setBody('{"status": "success", "message": "store_access_processed"}');
+            res.setBody('{"status": "success", "message": "contract_sent_processed"}');
             res.setStatusCode(200);
             return res;
         }
     }
 
     @isTest
-    private static void storeAccessStageChangeFiresWebhookTest() {
-        Test.setMock(HttpCalloutMock.class, new StoreAccessMockHttp());
+    private static void contractSentStageChangeFiresWebhookTest() {
+        Test.setMock(HttpCalloutMock.class, new ContractSentMockHttp());
 
         insert new Appeals_WebhookApi__c(
             Name = 'Default',
@@ -76,19 +76,38 @@ private class OpportunityTriggerHandlerTest {
         );
 
         Opportunity opp = [SELECT Id, StageName FROM Opportunity LIMIT 1];
-        System.assertNotEquals('Store Access', opp.StageName,
-            'Test setup Opportunity should not start at Store Access stage');
+        System.assertNotEquals('Contract Sent', opp.StageName,
+            'Test setup Opportunity should not start at Contract Sent stage');
 
         Test.startTest();
-        opp.StageName = 'Store Access';
+        opp.StageName = 'Contract Sent';
         update opp;
         Test.stopTest();
 
         List<Application_Log__c> logs = [SELECT Id, Body__c, Response__c FROM Application_Log__c];
         System.assert(logs.size() > 0,
-            'Store Access stage change should trigger webhook and create Application_Log__c');
+            'Contract Sent stage change should trigger webhook and create Application_Log__c');
         System.assert(logs[0].Body__c.contains('Opportunity'),
             'Log body should contain Opportunity data');
+    }
+
+    @isTest
+    private static void migrationGuardSuppressesStageSideEffectsTest() {
+        Opportunity opp = [SELECT Id, StageName FROM Opportunity LIMIT 1];
+        Integer serviceContractsBefore = [SELECT COUNT() FROM ServiceContract WHERE Opportunity__c = :opp.Id];
+
+        Test.startTest();
+        OpportunityTriggerHandler.skipWebhookFiring = true;
+        opp.StageName = 'Contract Sent';
+        update opp;
+        OpportunityTriggerHandler.skipWebhookFiring = false;
+        Test.stopTest();
+
+        System.assertEquals(0, [SELECT COUNT() FROM Application_Log__c],
+            'Migration guard should suppress the outbound stage webhook');
+        System.assertEquals(serviceContractsBefore,
+            [SELECT COUNT() FROM ServiceContract WHERE Opportunity__c = :opp.Id],
+            'Migration guard should suppress ServiceContract creation');
     }
     
 }
