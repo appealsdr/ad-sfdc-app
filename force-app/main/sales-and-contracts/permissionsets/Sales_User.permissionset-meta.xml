@@ -21,6 +21,10 @@
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Sales User</label>
+    <pageAccesses>
+        <apexPage>QuoteBuilderPdf</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
     <userPermissions>
         <enabled>true</enabled>
         <name>CampaignInfluence2</name>

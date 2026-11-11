@@ -1,0 +1,148 @@
+<apex:page
+  standardController="Quote"
+  renderAs="pdf"
+  applyBodyTag="false"
+  showHeader="false"
+>
+  <head>
+    <style type="text/css">
+      @page {
+        size: letter;
+        margin: 0.55in;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        color: #14213d;
+        font-size: 10pt;
+      }
+      .brand {
+        font-size: 22pt;
+        font-weight: bold;
+        color: #0b2b55;
+      }
+      .accent {
+        color: #f39a1e;
+      }
+      .title {
+        font-size: 18pt;
+        margin-top: 24px;
+      }
+      .meta {
+        width: 100%;
+        margin: 18px 0;
+      }
+      .meta td {
+        padding: 3px 0;
+      }
+      .label {
+        color: #657080;
+        width: 120px;
+      }
+      table.lines {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      .lines th {
+        background: #0b2b55;
+        color: white;
+        text-align: left;
+        padding: 8px;
+      }
+      .lines td {
+        border-bottom: 1px solid #d9dee7;
+        padding: 8px;
+        vertical-align: top;
+      }
+      .number {
+        text-align: right;
+      }
+      .total {
+        font-size: 14pt;
+        font-weight: bold;
+        margin-top: 16px;
+        text-align: right;
+      }
+      .notes {
+        margin-top: 24px;
+        padding: 12px;
+        background: #f5f7fa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">appeals<span class="accent">dr.</span></div>
+    <div class="title">{!Quote.Name}</div>
+    <table class="meta">
+      <tr>
+        <td class="label">Quote number</td>
+        <td>{!Quote.QuoteNumber}</td>
+      </tr>
+      <tr>
+        <td class="label">Opportunity</td>
+        <td>{!Quote.Opportunity.Name}</td>
+      </tr>
+      <tr>
+        <td class="label">Account</td>
+        <td>{!Quote.Opportunity.Account.Name}</td>
+      </tr>
+      <tr>
+        <td class="label">Status</td>
+        <td>{!Quote.Status}</td>
+      </tr>
+      <tr>
+        <td class="label">Expiration</td>
+        <td>
+          <apex:outputText value="{0,date,MMMM d, yyyy}"
+            ><apex:param value="{!Quote.ExpirationDate}"
+          /></apex:outputText>
+        </td>
+      </tr>
+    </table>
+    <table class="lines">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Details</th>
+          <th class="number">Qty</th>
+          <th class="number">Price</th>
+          <th class="number">Discount</th>
+          <th class="number">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <apex:repeat value="{!Quote.QuoteLineItems}" var="line">
+          <tr>
+            <td>{!line.Product2.Name}</td>
+            <td>{!line.Description}</td>
+            <td class="number">{!line.Quantity}</td>
+            <td class="number">
+              <apex:outputText value="{0,number,currency}"
+                ><apex:param value="{!line.UnitPrice}"
+              /></apex:outputText>
+            </td>
+            <td class="number">{!line.Discount}%</td>
+            <td class="number">
+              <apex:outputText value="{0,number,currency}"
+                ><apex:param value="{!line.TotalPrice}"
+              /></apex:outputText>
+            </td>
+          </tr>
+        </apex:repeat>
+      </tbody>
+    </table>
+    <div class="total">
+      Total:
+      <apex:outputText value="{0,number,currency}"
+        ><apex:param value="{!Quote.TotalPrice}"
+      /></apex:outputText>
+    </div>
+    <apex:outputPanel
+      rendered="{!NOT(ISBLANK(Quote.Description))}"
+      layout="block"
+      styleClass="notes"
+    >
+      <strong>Notes</strong><br />{!Quote.Description}
+    </apex:outputPanel>
+  </body>
+</apex:page>

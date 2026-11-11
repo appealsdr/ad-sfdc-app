@@ -1,41 +1,39 @@
 import { LightningElement, api } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import LightningConfirm from "lightning/confirm";
 import { NavigationMixin } from "lightning/navigation";
 import { notifyRecordUpdateAvailable } from "lightning/uiRecordApi";
 import getContext from "@salesforce/apex/QuoteBuilderController.getContext";
 import setPricebook from "@salesforce/apex/QuoteBuilderController.setPricebook";
-import saveLines from "@salesforce/apex/QuoteBuilderController.saveLines";
-import createQuote from "@salesforce/apex/QuoteBuilderController.createQuote";
+import saveQuote from "@salesforce/apex/QuoteBuilderController.saveQuote";
 import generatePdf from "@salesforce/apex/QuoteBuilderController.generatePdf";
+import sendQuote from "@salesforce/apex/QuoteBuilderController.sendQuote";
+import syncQuoteToOpportunity from "@salesforce/apex/QuoteBuilderController.syncQuoteToOpportunity";
 
 const ALL = "__all__";
-const VALIDITY_OPTIONS = [
-  { label: "7 days", value: "7" },
-  { label: "14 days", value: "14" },
-  { label: "30 days", value: "30" }
-];
-
-let keySeq = 0;
+let keySequence = 0;
 
 export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   @api recordId;
-  /** Quote Template Id (Setup → Quote Templates). Blank = create the Quote without a PDF. */
+  @api cardTitle = "Quotes";
+  // Retained because Salesforce blocks removing a design property while the component is in use.
   @api quoteTemplateId;
-  @api cardTitle = "Quote builder";
 
   context;
+  loading = true;
+  busy = false;
+  error;
+  editorOpen = false;
+  choosingPricebook = false;
+  pendingNewQuote = false;
+  selectedPricebookId;
+  editingQuoteId;
+  editorTitle = "New quote";
+  expirationDate;
+  notes = "";
   cart = [];
   search = "";
   family = ALL;
-  validDays = "14";
-  notes = "";
-  selectedPricebookId;
-  choosingPricebook = false;
-  loading = true;
-  busy = false;
-  dirty = false;
-  error;
-  validityOptions = VALIDITY_OPTIONS;
 
   connectedCallback() {
     this.load();
@@ -45,142 +43,101 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.loading = true;
     try {
       this.applyContext(await getContext({ opportunityId: this.recordId }));
-    } catch (e) {
-      this.error = this.message(e);
+    } catch (error) {
+      this.error = this.message(error);
     } finally {
       this.loading = false;
     }
   }
 
-  applyContext(ctx) {
-    this.context = ctx;
+  applyContext(context) {
+    this.context = context;
     this.error = undefined;
-    this.dirty = false;
-    this.cart = (ctx.lines || []).map((l) => ({
-      key: `k${++keySeq}`,
-      pricebookEntryId: l.pricebookEntryId,
-      name: l.name,
-      family: l.family,
-      listPrice: Number(l.listPrice) || 0,
-      quantity: Number(l.quantity) || 1,
-      discountPct: Number(l.discountPct) || 0,
-      description: l.description || ""
+  }
+
+  get hasQuotes() {
+    return (this.context?.quotes || []).length > 0;
+  }
+
+  get quoteCards() {
+    return (this.context?.quotes || []).map((quote, index) => ({
+      ...quote,
+      sequence: (this.context.quotes || []).length - index,
+      lineCount: (quote.lines || []).length,
+      hasLines: (quote.lines || []).length > 0,
+      pdfLabel: quote.pdfId ? "View PDF" : "Generate PDF",
+      syncLabel: quote.isSynced
+        ? "Synced to Opportunity"
+        : "Sync to Opportunity",
+      syncDisabled: this.busy || quote.isSynced,
+      sendDisabled: this.busy || !quote.recipientEmail,
+      statusClass: `status status_${(quote.status || "draft").toLowerCase().replaceAll(" ", "-")}`
     }));
   }
 
-  // ------------------------------------------------------------ view state
-
-  get hasPricebook() {
-    return !!this.context?.pricebookId;
-  }
-
-  get needsPricebook() {
-    return !!this.context && !this.context.pricebookId;
-  }
-
-  /** Price book screen: shown when none is set, or when the user asked to change it. */
-  get showPricebookPicker() {
-    return this.needsPricebook || this.choosingPricebook;
-  }
-
-  /** Salesforce only allows a switch while the Opportunity has no saved products. */
-  get canChangePricebook() {
-    return (
-      this.hasPricebook &&
-      (this.context.lines || []).length === 0 &&
-      this.cart.length === 0
-    );
+  get quoteCountLabel() {
+    const count = (this.context?.quotes || []).length;
+    return `${count} quote${count === 1 ? "" : "s"}`;
   }
 
   get pricebookCards() {
-    const picked = this.selectedPricebookId;
-    return (this.context?.pricebooks || []).map((p) => {
-      const selected = p.id === picked;
-      const empty = !p.productCount;
+    return (this.context?.pricebooks || []).map((pricebook) => {
+      const selected = pricebook.id === this.selectedPricebookId;
       return {
-        ...p,
+        ...pricebook,
         selected,
+        disabled: !pricebook.productCount,
         ariaChecked: selected ? "true" : "false",
-        disabled: empty,
-        countLabel: empty
-          ? "No active products"
-          : `${p.productCount} product${p.productCount === 1 ? "" : "s"}`,
-        descriptionLabel: p.description || "No description",
-        className: [
-          "pb",
-          selected ? "pb_selected" : "",
-          empty ? "pb_empty" : ""
-        ]
-          .join(" ")
-          .trim()
+        className: `pb${selected ? " pb_selected" : ""}${!pricebook.productCount ? " pb_empty" : ""}`,
+        countLabel: `${pricebook.productCount || 0} product${pricebook.productCount === 1 ? "" : "s"}`,
+        descriptionLabel: pricebook.description || "No description"
       };
     });
   }
 
-  get pricebookEmpty() {
-    return (this.context?.pricebooks || []).length === 0;
-  }
-
-  get pickerTitle() {
-    return this.needsPricebook ? "Choose a price book" : "Change price book";
-  }
-
   get pickDisabled() {
-    return (
-      this.busy ||
-      !this.selectedPricebookId ||
-      this.selectedPricebookId === this.context?.pricebookId
-    );
-  }
-
-  get maxDiscount() {
-    return Number(this.context?.maxDiscount) || 0;
+    return this.busy || !this.selectedPricebookId;
   }
 
   get familyPills() {
     const families = new Set();
-    (this.context?.catalog || []).forEach((c) =>
-      families.add(c.family || "Other")
+    (this.context?.catalog || []).forEach((item) =>
+      families.add(item.family || "Other")
     );
-    const pills = [
+    return [
       { value: ALL, label: "All" },
-      ...[...families].map((f) => ({ value: f, label: f }))
-    ];
-    return pills.map((p) => ({
-      ...p,
-      className: p.value === this.family ? "pill pill_active" : "pill",
-      pressed: p.value === this.family ? "true" : "false"
+      ...[...families].map((value) => ({ value, label: value }))
+    ].map((pill) => ({
+      ...pill,
+      className: pill.value === this.family ? "pill pill_active" : "pill",
+      pressed: pill.value === this.family ? "true" : "false"
     }));
   }
 
   get catalogView() {
     const term = this.search.trim().toLowerCase();
-    const qtyByEntry = new Map(
-      this.cart.map((l) => [l.pricebookEntryId, l.quantity])
+    const quantities = new Map(
+      this.cart.map((line) => [line.pricebookEntryId, line.quantity])
     );
     return (this.context?.catalog || [])
       .filter(
-        (c) => this.family === ALL || (c.family || "Other") === this.family
+        (item) =>
+          this.family === ALL || (item.family || "Other") === this.family
       )
       .filter(
-        (c) =>
+        (item) =>
           !term ||
-          (c.name || "").toLowerCase().includes(term) ||
-          (c.code || "").toLowerCase().includes(term) ||
-          (c.description || "").toLowerCase().includes(term)
+          (item.name || "").toLowerCase().includes(term) ||
+          (item.code || "").toLowerCase().includes(term) ||
+          (item.description || "").toLowerCase().includes(term)
       )
-      .map((c) => {
-        const inCart = qtyByEntry.get(c.pricebookEntryId);
-        return {
-          ...c,
-          familyLabel: c.family || "Other",
-          inCart: !!inCart,
-          addLabel: inCart
-            ? `Add another (${inCart} in quote)`
-            : "Add to quote",
-          rowClass: inCart ? "product product_selected" : "product"
-        };
-      });
+      .map((item) => ({
+        ...item,
+        familyLabel: item.family || "Other",
+        rowClass: quantities.has(item.pricebookEntryId)
+          ? "product product_selected"
+          : "product"
+      }));
   }
 
   get catalogEmpty() {
@@ -188,12 +145,12 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   get cartView() {
-    return this.cart.map((l) => {
-      const gross = l.listPrice * l.quantity;
-      const net = gross * (1 - l.discountPct / 100);
-      const overLimit = l.discountPct > this.maxDiscount;
+    return this.cart.map((line) => {
+      const gross = line.listPrice * line.quantity;
+      const net = gross * (1 - line.discountPct / 100);
+      const overLimit = line.discountPct > this.maxDiscount;
       return {
-        ...l,
+        ...line,
         gross,
         net,
         overLimit,
@@ -208,39 +165,74 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   get totals() {
-    const view = this.cartView;
-    const subtotal = view.reduce((s, l) => s + l.gross, 0);
-    const total = view.reduce((s, l) => s + l.net, 0);
-    return { subtotal, discount: subtotal - total, total, count: view.length };
+    const lines = this.cartView;
+    const subtotal = lines.reduce((sum, line) => sum + line.gross, 0);
+    const total = lines.reduce((sum, line) => sum + line.net, 0);
+    return { subtotal, discount: subtotal - total, total, count: lines.length };
+  }
+
+  get maxDiscount() {
+    return Number(this.context?.maxDiscount) || 0;
   }
 
   get blockedByApproval() {
-    return this.cartView.some((l) => l.needsApproval);
+    return this.cartView.some((line) => line.needsApproval);
+  }
+
+  get hasCartLines() {
+    return this.cart.length > 0;
+  }
+
+  get totals() {
+    const lines = this.cartView;
+    const subtotal = lines.reduce((sum, line) => sum + line.gross, 0);
+    const total = lines.reduce((sum, line) => sum + line.net, 0);
+    return { subtotal, discount: subtotal - total, total };
   }
 
   get saveDisabled() {
-    return this.busy || !this.dirty || this.blockedByApproval;
+    return this.busy || !this.hasLines || this.blockedByApproval;
   }
 
-  get quoteDisabled() {
-    return this.busy || this.dirty || !this.hasLines || this.blockedByApproval;
+  handleNewQuote() {
+    if (!this.context?.pricebookId) {
+      this.pendingNewQuote = true;
+      this.choosingPricebook = true;
+      return;
+    }
+    this.openEditor();
   }
 
-  get quoteHint() {
-    if (!this.hasLines) return "Add products to build a quote.";
-    if (this.blockedByApproval)
-      return `Discounts above ${this.maxDiscount}% need manager approval.`;
-    if (this.dirty) return "Save the lines before creating the quote.";
-    return this.quoteTemplateId
-      ? "Creates the Quote and its PDF."
-      : "Creates the Quote (no PDF template set on this component).";
+  handleEditQuote(event) {
+    const quote = this.findQuote(event.currentTarget.dataset.id);
+    this.openEditor(quote);
   }
 
-  get latestQuote() {
-    return this.context?.latestQuote;
+  openEditor(quote) {
+    this.editingQuoteId = quote?.quoteId;
+    this.editorTitle = quote ? `Edit ${quote.name}` : "New quote";
+    this.expirationDate = quote?.expirationDate || this.defaultExpirationDate();
+    this.notes = quote?.notes || "";
+    this.cart = (quote?.lines || []).map((line) => ({
+      key: `line-${++keySequence}`,
+      pricebookEntryId: line.pricebookEntryId,
+      name: line.name,
+      family: line.family,
+      listPrice: Number(line.listPrice) || 0,
+      quantity: Number(line.quantity) || 1,
+      discountPct: Number(line.discountPct) || 0,
+      description: line.description || ""
+    }));
+    this.search = "";
+    this.family = ALL;
+    this.editorOpen = true;
   }
 
-  // ------------------------------------------------------------ catalogue
+  handleCancelEditor() {
+    this.editorOpen = false;
+    this.editingQuoteId = undefined;
+    this.cart = [];
+  }
 
   handleSearch(event) {
     this.search = event.target.value || "";
@@ -252,56 +244,59 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   handleAdd(event) {
     const id = event.currentTarget.dataset.id;
-    const existing = this.cart.find((l) => l.pricebookEntryId === id);
+    const existing = this.cart.find((line) => line.pricebookEntryId === id);
     if (existing) {
-      this.cart = this.cart.map((l) =>
-        l === existing ? { ...l, quantity: l.quantity + 1 } : l
+      this.cart = this.cart.map((line) =>
+        line === existing ? { ...line, quantity: line.quantity + 1 } : line
       );
-    } else {
-      const c = this.context.catalog.find((x) => x.pricebookEntryId === id);
-      this.cart = [
-        ...this.cart,
-        {
-          key: `k${++keySeq}`,
-          pricebookEntryId: c.pricebookEntryId,
-          name: c.name,
-          family: c.family,
-          listPrice: Number(c.listPrice) || 0,
-          quantity: 1,
-          discountPct: 0,
-          description: ""
-        }
-      ];
+      return;
     }
-    this.dirty = true;
+    const item = this.context.catalog.find(
+      (catalogItem) => catalogItem.pricebookEntryId === id
+    );
+    this.cart = [
+      ...this.cart,
+      {
+        key: `line-${++keySequence}`,
+        pricebookEntryId: item.pricebookEntryId,
+        name: item.name,
+        family: item.family,
+        listPrice: Number(item.listPrice) || 0,
+        quantity: 1,
+        discountPct: 0,
+        description: ""
+      }
+    ];
   }
 
-  // ------------------------------------------------------------ lines
-
   updateLine(key, patch) {
-    this.cart = this.cart.map((l) => (l.key === key ? { ...l, ...patch } : l));
-    this.dirty = true;
+    this.cart = this.cart.map((line) =>
+      line.key === key ? { ...line, ...patch } : line
+    );
   }
 
   handleQty(event) {
-    const value = Math.max(
+    const quantity = Math.max(
       1,
       Math.min(9999, Math.round(Number(event.target.value) || 1))
     );
-    this.updateLine(event.target.dataset.key, { quantity: value });
+    this.updateLine(event.target.dataset.key, { quantity });
   }
 
   handleStep(event) {
     const { key, step } = event.currentTarget.dataset;
-    const line = this.cart.find((l) => l.key === key);
+    const line = this.cart.find((item) => item.key === key);
     this.updateLine(key, {
       quantity: Math.max(1, line.quantity + Number(step))
     });
   }
 
   handleDiscount(event) {
-    const value = Math.max(0, Math.min(100, Number(event.target.value) || 0));
-    this.updateLine(event.target.dataset.key, { discountPct: value });
+    const discountPct = Math.max(
+      0,
+      Math.min(100, Number(event.target.value) || 0)
+    );
+    this.updateLine(event.target.dataset.key, { discountPct });
   }
 
   handleNote(event) {
@@ -312,18 +307,11 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   handleRemove(event) {
     const key = event.currentTarget.dataset.key;
-    this.cart = this.cart.filter((l) => l.key !== key);
-    this.dirty = true;
+    this.cart = this.cart.filter((line) => line.key !== key);
   }
 
-  handleReset() {
-    this.applyContext(this.context);
-  }
-
-  // ------------------------------------------------------------ quote options
-
-  handleValidity(event) {
-    this.validDays = event.detail.value;
+  handleExpiration(event) {
+    this.expirationDate = event.target.value;
   }
 
   handleNotes(event) {
@@ -331,22 +319,15 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   handlePricebookPick(event) {
-    const card = event.currentTarget;
-    if (card.dataset.disabled === "true") return;
-    this.selectedPricebookId = card.dataset.id;
-  }
-
-  handleChangePricebook() {
-    this.selectedPricebookId = this.context?.pricebookId;
-    this.choosingPricebook = true;
+    if (event.currentTarget.dataset.disabled === "true") return;
+    this.selectedPricebookId = event.currentTarget.dataset.id;
   }
 
   handleCancelPricebook() {
     this.choosingPricebook = false;
+    this.pendingNewQuote = false;
     this.selectedPricebookId = undefined;
   }
-
-  // ------------------------------------------------------------ server calls
 
   async handleSetPricebook() {
     if (!this.selectedPricebookId) return;
@@ -359,82 +340,124 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       );
       this.choosingPricebook = false;
       this.selectedPricebookId = undefined;
-      this.family = ALL;
-      this.search = "";
+      const shouldOpen = this.pendingNewQuote;
+      this.pendingNewQuote = false;
+      if (shouldOpen) this.openEditor();
+      this.toast("success", "Price book selected", this.context.pricebookName);
+    });
+  }
+
+  async handleSaveQuote() {
+    await this.run(async () => {
+      const lines = this.cart.map((line) => ({
+        pricebookEntryId: line.pricebookEntryId,
+        quantity: line.quantity,
+        discountPct: line.discountPct,
+        description: line.description
+      }));
+      const quote = await saveQuote({
+        opportunityId: this.recordId,
+        quoteId: this.editingQuoteId,
+        expirationDate: this.expirationDate,
+        notes: this.notes,
+        lines
+      });
+      this.applyContext(await getContext({ opportunityId: this.recordId }));
+      this.handleCancelEditor();
       this.toast(
         "success",
-        "Price book set",
-        `Products now come from ${this.context.pricebookName}.`
+        "Quote saved",
+        `${quote.name} now has ${lines.length} product(s).`
       );
     });
   }
 
-  async handleSave() {
+  async handleViewPdf(event) {
+    const quote = this.findQuote(event.currentTarget.dataset.id);
+    if (quote.pdfId) {
+      this.openPdf(quote.pdfId);
+      return;
+    }
     await this.run(async () => {
-      const lines = this.cart.map((l) => ({
-        pricebookEntryId: l.pricebookEntryId,
-        quantity: l.quantity,
-        discountPct: l.discountPct,
-        description: l.description
-      }));
+      const pdfId = await generatePdf({ quoteId: quote.quoteId });
+      this.applyContext(await getContext({ opportunityId: this.recordId }));
+      this.openPdf(pdfId);
+    });
+  }
+
+  async handleSendQuote(event) {
+    const quote = this.findQuote(event.currentTarget.dataset.id);
+    const confirmed = await LightningConfirm.open({
+      label: "Send quote",
+      message: `Send ${quote.name} as a PDF to ${quote.recipientEmail}?`,
+      theme: "info"
+    });
+    if (!confirmed) return;
+    await this.run(async () => {
+      await sendQuote({ quoteId: quote.quoteId });
+      this.applyContext(await getContext({ opportunityId: this.recordId }));
+      this.toast("success", "Quote sent", `Sent to ${quote.recipientEmail}.`);
+    });
+  }
+
+  async handleSyncQuote(event) {
+    const quote = this.findQuote(event.currentTarget.dataset.id);
+    const confirmed = await LightningConfirm.open({
+      label: "Sync to Opportunity",
+      message: `Replace the Opportunity products with the products from ${quote.name}?`,
+      theme: "warning"
+    });
+    if (!confirmed) return;
+    await this.run(async () => {
       this.applyContext(
-        await saveLines({ opportunityId: this.recordId, lines })
+        await syncQuoteToOpportunity({
+          opportunityId: this.recordId,
+          quoteId: quote.quoteId
+        })
       );
       await notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
       this.toast(
         "success",
-        "Products saved",
-        `${lines.length} line(s) saved to the Opportunity.`
+        "Quote synced",
+        "Opportunity products and amount now match this quote."
       );
     });
   }
 
-  async handleCreateQuote() {
-    await this.run(async () => {
-      const info = await createQuote({
-        opportunityId: this.recordId,
-        validDays: Number(this.validDays),
-        notes: this.notes
-      });
-      let pdfMessage = "";
-      if (this.quoteTemplateId) {
-        try {
-          await generatePdf({
-            quoteId: info.quoteId,
-            templateId: this.quoteTemplateId
-          });
-          pdfMessage = " PDF attached.";
-        } catch (e) {
-          pdfMessage = ` PDF failed: ${this.message(e)}`;
-        }
-      }
-      this.applyContext(await getContext({ opportunityId: this.recordId }));
-      this.notes = "";
-      this.toast(
-        "success",
-        `${info.name} created`,
-        `Quote ${info.quoteNumber}.${pdfMessage}`
-      );
-    });
-  }
-
-  handleOpenQuote() {
+  handleOpenQuote(event) {
     this[NavigationMixin.Navigate]({
       type: "standard__recordPage",
       attributes: {
-        recordId: this.latestQuote.quoteId,
+        recordId: event.currentTarget.dataset.id,
         objectApiName: "Quote",
         actionName: "view"
       }
     });
   }
 
-  async run(fn) {
+  openPdf(pdfId) {
+    this[NavigationMixin.Navigate]({
+      type: "standard__webPage",
+      attributes: { url: `/servlet/servlet.FileDownload?file=${pdfId}` }
+    });
+  }
+
+  findQuote(quoteId) {
+    return (this.context?.quotes || []).find(
+      (quote) => quote.quoteId === quoteId
+    );
+  }
+
+  defaultExpirationDate() {
+    return new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
+  }
+
+  async run(callback) {
     this.busy = true;
     try {
-      await fn();
-    } catch (e) {
-      this.toast("error", "Something went wrong", this.message(e));
+      await callback();
+    } catch (error) {
+      this.toast("error", "Something went wrong", this.message(error));
     } finally {
       this.busy = false;
     }
@@ -444,8 +467,9 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.dispatchEvent(new ShowToastEvent({ variant, title, message }));
   }
 
-  message(e) {
-    if (Array.isArray(e?.body)) return e.body.map((b) => b.message).join(", ");
-    return e?.body?.message || e?.message || "Unknown error";
+  message(error) {
+    if (Array.isArray(error?.body))
+      return error.body.map((item) => item.message).join(", ");
+    return error?.body?.message || error?.message || "Unknown error";
   }
 }

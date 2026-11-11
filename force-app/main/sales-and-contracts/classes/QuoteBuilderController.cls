@@ -1,32 +1,16 @@
 /**
- * QuoteBuilderController — backs the quoteBuilder LWC on the Opportunity record page.
- *
- * A simpler alternative to the standard "Add Products" / "Edit Products" / "New Quote" screens:
- *   1. getContext      — Opportunity, its price book, the price book catalogue, current lines, latest quote
- *   2. setPricebook    — pick or switch the price book (only while the Opportunity has no products)
- *   3. saveLines       — replace the Opportunity's products in one call (qty, discount %, note per line)
- *   4. createQuote     — copy the saved lines into a new Quote + QuoteLineItems
- *   5. generatePdf     — render the Quote with a Quote Template into a QuoteDocument (separate
- *                        transaction: getContentAsPDF counts as a callout and cannot follow DML)
- *
- * Rules enforced here, never in the browser:
- *   - prices always come from the Opportunity's price book (UnitPrice = list price, standard Discount field = %)
- *   - every product must be active in that price book
- *   - a discount above MAX_DISCOUNT_WITHOUT_APPROVAL needs the Quote_Discount_Override custom permission
- *
- * POC scope: no approval process, no email sending, no Opportunity stage change. See README.
+ * Quote-first workspace for the Opportunity record page.
+ * Quotes own their lines; Opportunity products change only through explicit quote sync.
  */
 public with sharing class QuoteBuilderController {
   @TestVisible
-  static final Decimal MAX_DISCOUNT_WITHOUT_APPROVAL = 15;
+  private static final Decimal MAX_DISCOUNT_WITHOUT_APPROVAL = 15;
   @TestVisible
-  static final String OVERRIDE_PERMISSION = 'Quote_Discount_Override';
+  private static final String OVERRIDE_PERMISSION = 'Quote_Discount_Override';
   @TestVisible
-  static final Integer MAX_LINES = 50;
+  private static final Integer MAX_LINES = 50;
   @TestVisible
-  static Boolean overrideForTest; // lets tests simulate the custom permission
-
-  // ------------------------------------------------------------------ DTOs
+  private static Boolean overrideForTest;
 
   public class Context {
     @AuraEnabled
@@ -42,17 +26,15 @@ public with sharing class QuoteBuilderController {
     @AuraEnabled
     public String pricebookName;
     @AuraEnabled
+    public Id syncedQuoteId;
+    @AuraEnabled
     public Decimal maxDiscount = MAX_DISCOUNT_WITHOUT_APPROVAL;
     @AuraEnabled
     public Boolean canOverrideDiscount = false;
     @AuraEnabled
     public List<CatalogItem> catalog = new List<CatalogItem>();
     @AuraEnabled
-    public List<Line> lines = new List<Line>();
-    @AuraEnabled
-    public QuoteInfo latestQuote;
-    @AuraEnabled
-    public Integer quoteCount = 0;
+    public List<QuoteInfo> quotes = new List<QuoteInfo>();
     @AuraEnabled
     public List<PricebookOption> pricebooks = new List<PricebookOption>();
   }
@@ -76,6 +58,8 @@ public with sharing class QuoteBuilderController {
 
   public class Line {
     @AuraEnabled
+    public Id lineId;
+    @AuraEnabled
     public Id pricebookEntryId;
     @AuraEnabled
     public String name;
@@ -89,6 +73,8 @@ public with sharing class QuoteBuilderController {
     public Decimal discountPct;
     @AuraEnabled
     public String description;
+    @AuraEnabled
+    public Decimal totalPrice;
   }
 
   public class QuoteInfo {
@@ -105,7 +91,23 @@ public with sharing class QuoteBuilderController {
     @AuraEnabled
     public Decimal totalPrice;
     @AuraEnabled
+    public String notes;
+    @AuraEnabled
+    public Id pricebookId;
+    @AuraEnabled
+    public String pricebookName;
+    @AuraEnabled
+    public String recipientEmail;
+    @AuraEnabled
+    public Datetime createdDate;
+    @AuraEnabled
+    public Datetime lastModifiedDate;
+    @AuraEnabled
     public Id pdfId;
+    @AuraEnabled
+    public Boolean isSynced = false;
+    @AuraEnabled
+    public List<Line> lines = new List<Line>();
   }
 
   public class PricebookOption {
@@ -132,8 +134,6 @@ public with sharing class QuoteBuilderController {
     public String description { get; set; }
   }
 
-  // ------------------------------------------------------------------ reads
-
   @AuraEnabled
   public static Context getContext(Id opportunityId) {
     Opportunity opp = loadOpportunity(opportunityId);
@@ -144,14 +144,332 @@ public with sharing class QuoteBuilderController {
     ctx.stageName = opp.StageName;
     ctx.pricebookId = opp.Pricebook2Id;
     ctx.pricebookName = opp.Pricebook2?.Name;
+    ctx.syncedQuoteId = opp.SyncedQuoteId;
     ctx.canOverrideDiscount = canOverride();
     ctx.pricebooks = pricebookOptions(opp.Pricebook2Id);
-
-    if (opp.Pricebook2Id == null) {
-      return ctx;
+    if (opp.Pricebook2Id != null) {
+      ctx.catalog = catalogFor(opp.Pricebook2Id);
     }
+    for (Quote quoteRecord : [
+      SELECT
+        Id,
+        Name,
+        QuoteNumber,
+        Status,
+        ExpirationDate,
+        TotalPrice,
+        Description,
+        Pricebook2Id,
+        Pricebook2.Name,
+        Email,
+        Contact.Email,
+        CreatedDate,
+        LastModifiedDate,
+        (SELECT Id FROM QuoteDocuments ORDER BY CreatedDate DESC LIMIT 1),
+        (
+          SELECT
+            Id,
+            PricebookEntryId,
+            Product2.Name,
+            Product2.Family,
+            ListPrice,
+            UnitPrice,
+            Quantity,
+            Discount,
+            Description,
+            TotalPrice
+          FROM QuoteLineItems
+          ORDER BY SortOrder, CreatedDate
+        )
+      FROM Quote
+      WHERE OpportunityId = :opp.Id
+      WITH USER_MODE
+      ORDER BY CreatedDate DESC
+      LIMIT 100
+    ]) {
+      ctx.quotes.add(toInfo(quoteRecord, opp.SyncedQuoteId));
+    }
+    return ctx;
+  }
 
-    for (PricebookEntry pbe : [
+  @AuraEnabled
+  public static Context setPricebook(Id opportunityId, Id pricebookId) {
+    Opportunity opp = loadOpportunity(opportunityId);
+    if (opp.Pricebook2Id == pricebookId) {
+      return getContext(opportunityId);
+    }
+    Integer lineCount = [
+      SELECT COUNT()
+      FROM OpportunityLineItem
+      WHERE OpportunityId = :opp.Id
+      WITH USER_MODE
+    ];
+    if (lineCount > 0) {
+      throw new AuraHandledException(
+        'Opportunity products already use the ' +
+          opp.Pricebook2?.Name +
+          ' price book. Remove or sync them before changing price books.'
+      );
+    }
+    validatePricebook(pricebookId);
+    update as user new Opportunity(Id = opp.Id, Pricebook2Id = pricebookId);
+    return getContext(opportunityId);
+  }
+
+  @AuraEnabled
+  public static QuoteInfo saveQuote(
+    Id opportunityId,
+    Id quoteId,
+    Date expirationDate,
+    String notes,
+    List<LineInput> lines
+  ) {
+    Opportunity opp = loadOpportunity(opportunityId);
+    if (opp.Pricebook2Id == null) {
+      throw new AuraHandledException(
+        'Choose a price book before building a quote.'
+      );
+    }
+    Map<Id, PricebookEntry> entries = validateLines(opp.Pricebook2Id, lines);
+    Id contactId = primaryContactId(opp.Id);
+    Quote quoteRecord;
+    Savepoint sp = Database.setSavepoint();
+    try {
+      if (quoteId == null) {
+        Integer version =
+          [
+            SELECT COUNT()
+            FROM Quote
+            WHERE OpportunityId = :opp.Id
+            WITH USER_MODE
+          ] + 1;
+        quoteRecord = new Quote(
+          Name = (opp.Name + ' – Proposal v' + version).left(255),
+          OpportunityId = opp.Id,
+          Pricebook2Id = opp.Pricebook2Id,
+          ContactId = contactId,
+          ExpirationDate = expirationDate == null
+            ? Date.today().addDays(14)
+            : expirationDate,
+          Description = cleanNotes(notes),
+          Status = 'Draft'
+        );
+        insert as user quoteRecord;
+      } else {
+        quoteRecord = loadQuoteForUpdate(quoteId, opp.Id);
+        List<QuoteLineItem> existing = [
+          SELECT Id
+          FROM QuoteLineItem
+          WHERE QuoteId = :quoteRecord.Id
+          WITH USER_MODE
+        ];
+        if (!existing.isEmpty()) {
+          delete as user existing;
+        }
+        quoteRecord.ExpirationDate = expirationDate;
+        quoteRecord.Description = cleanNotes(notes);
+        if (quoteRecord.ContactId == null) {
+          quoteRecord.ContactId = contactId;
+        }
+        update as user quoteRecord;
+      }
+      List<QuoteLineItem> quoteLines = new List<QuoteLineItem>();
+      for (LineInput input : lines) {
+        PricebookEntry entry = entries.get(input.pricebookEntryId);
+        Decimal discount = input.discountPct == null
+          ? 0
+          : input.discountPct.setScale(2);
+        quoteLines.add(
+          new QuoteLineItem(
+            QuoteId = quoteRecord.Id,
+            PricebookEntryId = entry.Id,
+            Quantity = input.quantity,
+            UnitPrice = entry.UnitPrice,
+            Discount = discount == 0 ? null : discount,
+            Description = input.description == null
+              ? null
+              : input.description.trim().left(255)
+          )
+        );
+      }
+      insert as user quoteLines;
+    } catch (Exception error) {
+      Database.rollback(sp);
+      throw handled('Could not save the quote', error);
+    }
+    return queryQuoteInfo(quoteRecord.Id, opp.SyncedQuoteId);
+  }
+
+  @AuraEnabled
+  public static Context syncQuoteToOpportunity(Id opportunityId, Id quoteId) {
+    Opportunity opp = loadOpportunity(opportunityId);
+    Quote quoteRecord = loadQuoteForUpdate(quoteId, opp.Id);
+    Integer lineCount = [
+      SELECT COUNT()
+      FROM QuoteLineItem
+      WHERE QuoteId = :quoteRecord.Id
+      WITH USER_MODE
+    ];
+    if (lineCount == 0) {
+      throw new AuraHandledException(
+        'Add at least one product before syncing this quote.'
+      );
+    }
+    try {
+      update as user new Opportunity(
+        Id = opp.Id,
+        SyncedQuoteId = quoteRecord.Id
+      );
+    } catch (Exception error) {
+      throw handled('Could not sync the quote to the Opportunity', error);
+    }
+    return getContext(opportunityId);
+  }
+
+  @AuraEnabled
+  public static Id generatePdf(Id quoteId) {
+    Quote quoteRecord = loadQuoteForAccess(quoteId);
+    Blob pdf = renderPdf(quoteRecord.Id);
+    QuoteDocument document = new QuoteDocument(
+      QuoteId = quoteRecord.Id,
+      Document = pdf
+    );
+    insert as user document;
+    return document.Id;
+  }
+
+  @AuraEnabled
+  public static QuoteInfo sendQuote(Id quoteId) {
+    Quote quoteRecord = loadQuoteForAccess(quoteId);
+    String recipient = resolveRecipient(quoteRecord);
+    if (String.isBlank(recipient)) {
+      throw new AuraHandledException(
+        'Add an email to the Quote, its Contact, or the Opportunity primary contact before sending.'
+      );
+    }
+    Blob pdf = renderPdf(quoteRecord.Id);
+    Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
+    attachment.setFileName(
+      (quoteRecord.QuoteNumber == null ? 'Quote' : quoteRecord.QuoteNumber) +
+      '.pdf'
+    );
+    attachment.setContentType('application/pdf');
+    attachment.setBody(pdf);
+    Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+    email.setToAddresses(new List<String>{ recipient });
+    email.setSubject(quoteRecord.Name);
+    email.setPlainTextBody(
+      'Hello,\n\nPlease find your quote for ' +
+        quoteRecord.Opportunity.Name +
+        ' attached.\n\nThank you,\nAppeals Doctor'
+    );
+    email.setFileAttachments(
+      new List<Messaging.EmailFileAttachment>{ attachment }
+    );
+    Messaging.SendEmailResult[] results = Messaging.sendEmail(
+      new List<Messaging.SingleEmailMessage>{ email }
+    );
+    if (results.isEmpty() || !results[0].isSuccess()) {
+      String reason = results.isEmpty()
+        ? 'Unknown email error.'
+        : results[0].getErrors()[0].getMessage();
+      throw new AuraHandledException(
+        'The quote email could not be sent: ' + reason
+      );
+    }
+    insert as user new QuoteDocument(QuoteId = quoteRecord.Id, Document = pdf);
+    update as user new Quote(Id = quoteRecord.Id, Status = 'Presented');
+    Opportunity opp = [
+      SELECT SyncedQuoteId
+      FROM Opportunity
+      WHERE Id = :quoteRecord.OpportunityId
+      WITH USER_MODE
+    ];
+    return queryQuoteInfo(quoteRecord.Id, opp.SyncedQuoteId);
+  }
+
+  @TestVisible
+  private static Blob renderPdf(Id quoteId) {
+    if (Test.isRunningTest()) {
+      return Blob.valueOf('quote pdf');
+    }
+    PageReference page = Page.QuoteBuilderPdf;
+    page.getParameters().put('id', quoteId);
+    return page.getContentAsPDF();
+  }
+
+  private static Map<Id, PricebookEntry> validateLines(
+    Id pricebookId,
+    List<LineInput> lines
+  ) {
+    lines = lines == null ? new List<LineInput>() : lines;
+    if (lines.isEmpty()) {
+      throw new AuraHandledException('Add at least one product to the quote.');
+    }
+    if (lines.size() > MAX_LINES) {
+      throw new AuraHandledException(
+        'A quote can have at most ' + MAX_LINES + ' lines.'
+      );
+    }
+    Set<Id> entryIds = new Set<Id>();
+    for (LineInput input : lines) {
+      if (input == null || input.pricebookEntryId == null) {
+        throw new AuraHandledException('A quote line is missing its product.');
+      }
+      entryIds.add(input.pricebookEntryId);
+    }
+    Map<Id, PricebookEntry> entries = new Map<Id, PricebookEntry>(
+      [
+        SELECT Id, UnitPrice, Product2.Name
+        FROM PricebookEntry
+        WHERE
+          Id IN :entryIds
+          AND Pricebook2Id = :pricebookId
+          AND IsActive = TRUE
+          AND Product2.IsActive = TRUE
+        WITH USER_MODE
+      ]
+    );
+    if (entries.size() != entryIds.size()) {
+      throw new AuraHandledException(
+        'One or more products are not active in this price book.'
+      );
+    }
+    Boolean mayOverride = canOverride();
+    for (LineInput input : lines) {
+      PricebookEntry entry = entries.get(input.pricebookEntryId);
+      Decimal quantity = input.quantity == null ? 0 : input.quantity;
+      Decimal discount = input.discountPct == null ? 0 : input.discountPct;
+      if (quantity <= 0 || quantity > 9999) {
+        throw new AuraHandledException(
+          'Quantity for "' +
+            entry.Product2.Name +
+            '" must be between 1 and 9999.'
+        );
+      }
+      if (discount < 0 || discount > 100) {
+        throw new AuraHandledException(
+          'Discount for "' +
+            entry.Product2.Name +
+            '" must be between 0% and 100%.'
+        );
+      }
+      if (discount > MAX_DISCOUNT_WITHOUT_APPROVAL && !mayOverride) {
+        throw new AuraHandledException(
+          'Discount for "' +
+            entry.Product2.Name +
+            '" is above ' +
+            MAX_DISCOUNT_WITHOUT_APPROVAL +
+            '% and needs manager approval.'
+        );
+      }
+    }
+    return entries;
+  }
+
+  private static List<CatalogItem> catalogFor(Id pricebookId) {
+    List<CatalogItem> result = new List<CatalogItem>();
+    for (PricebookEntry entry : [
       SELECT
         Id,
         UnitPrice,
@@ -162,390 +480,30 @@ public with sharing class QuoteBuilderController {
         Product2.Description
       FROM PricebookEntry
       WHERE
-        Pricebook2Id = :opp.Pricebook2Id
+        Pricebook2Id = :pricebookId
         AND IsActive = TRUE
         AND Product2.IsActive = TRUE
       WITH USER_MODE
       ORDER BY Product2.Family NULLS LAST, Product2.Name
       LIMIT 1000
     ]) {
-      CatalogItem c = new CatalogItem();
-      c.pricebookEntryId = pbe.Id;
-      c.productId = pbe.Product2Id;
-      c.name = pbe.Product2.Name;
-      c.code = pbe.Product2.ProductCode;
-      c.family = pbe.Product2.Family;
-      c.description = pbe.Product2.Description;
-      c.listPrice = pbe.UnitPrice;
-      ctx.catalog.add(c);
+      CatalogItem item = new CatalogItem();
+      item.pricebookEntryId = entry.Id;
+      item.productId = entry.Product2Id;
+      item.name = entry.Product2.Name;
+      item.code = entry.Product2.ProductCode;
+      item.family = entry.Product2.Family;
+      item.description = entry.Product2.Description;
+      item.listPrice = entry.UnitPrice;
+      result.add(item);
     }
-
-    for (OpportunityLineItem oli : [
-      SELECT
-        PricebookEntryId,
-        Product2.Name,
-        Product2.Family,
-        ListPrice,
-        UnitPrice,
-        Quantity,
-        Discount,
-        Description
-      FROM OpportunityLineItem
-      WHERE OpportunityId = :opp.Id
-      WITH USER_MODE
-      ORDER BY SortOrder, CreatedDate
-    ]) {
-      Line l = new Line();
-      l.pricebookEntryId = oli.PricebookEntryId;
-      l.name = oli.Product2.Name;
-      l.family = oli.Product2.Family;
-      l.listPrice = oli.ListPrice != null ? oli.ListPrice : oli.UnitPrice;
-      l.quantity = oli.Quantity;
-      l.discountPct = oli.Discount == null ? 0 : oli.Discount;
-      l.description = oli.Description;
-      ctx.lines.add(l);
-    }
-
-    List<Quote> quotes = [
-      SELECT Id, Name, QuoteNumber, Status, ExpirationDate, TotalPrice
-      FROM Quote
-      WHERE OpportunityId = :opp.Id
-      WITH USER_MODE
-      ORDER BY CreatedDate DESC
-      LIMIT 1
-    ];
-    ctx.quoteCount = [
-      SELECT COUNT()
-      FROM Quote
-      WHERE OpportunityId = :opp.Id
-      WITH USER_MODE
-    ];
-    if (!quotes.isEmpty()) {
-      ctx.latestQuote = toInfo(quotes[0]);
-    }
-    return ctx;
+    return result;
   }
 
-  // ------------------------------------------------------------------ writes
-
-  @AuraEnabled
-  public static Context setPricebook(Id opportunityId, Id pricebookId) {
-    Opportunity opp = loadOpportunity(opportunityId);
-    if (opp.Pricebook2Id == pricebookId) {
-      return getContext(opportunityId);
-    }
-    // Salesforce only allows a price book change while the Opportunity has no products.
-    Integer lineCount = [
-      SELECT COUNT()
-      FROM OpportunityLineItem
-      WHERE OpportunityId = :opp.Id
-      WITH USER_MODE
-    ];
-    if (lineCount > 0) {
-      throw new AuraHandledException(
-        'Remove the ' +
-          lineCount +
-          ' product(s) on this Opportunity before switching from the ' +
-          opp.Pricebook2?.Name +
-          ' price book.'
-      );
-    }
-    List<Pricebook2> books = [
-      SELECT Id
-      FROM Pricebook2
-      WHERE Id = :pricebookId AND IsActive = TRUE AND IsStandard = FALSE
-      WITH USER_MODE
-    ];
-    if (books.isEmpty()) {
-      throw new AuraHandledException('Choose an active price book.');
-    }
-    update as user new Opportunity(Id = opp.Id, Pricebook2Id = pricebookId);
-    return getContext(opportunityId);
-  }
-
-  @AuraEnabled
-  public static Context saveLines(Id opportunityId, List<LineInput> lines) {
-    Opportunity opp = loadOpportunity(opportunityId);
-    if (opp.Pricebook2Id == null) {
-      throw new AuraHandledException('Choose a price book first.');
-    }
-    lines = lines == null ? new List<LineInput>() : lines;
-    if (lines.size() > MAX_LINES) {
-      throw new AuraHandledException(
-        'A quote can have at most ' + MAX_LINES + ' lines.'
-      );
-    }
-
-    Set<Id> entryIds = new Set<Id>();
-    for (LineInput l : lines) {
-      if (l.pricebookEntryId == null) {
-        throw new AuraHandledException('A line is missing its product.');
-      }
-      entryIds.add(l.pricebookEntryId);
-    }
-    Map<Id, PricebookEntry> entries = new Map<Id, PricebookEntry>(
-      [
-        SELECT Id, UnitPrice, Product2.Name
-        FROM PricebookEntry
-        WHERE
-          Id IN :entryIds
-          AND Pricebook2Id = :opp.Pricebook2Id
-          AND IsActive = TRUE
-          AND Product2.IsActive = TRUE
-        WITH USER_MODE
-      ]
-    );
-    if (entries.size() != entryIds.size()) {
-      throw new AuraHandledException(
-        'One or more products are not active in the ' +
-          opp.Pricebook2?.Name +
-          ' price book.'
-      );
-    }
-
-    Boolean mayOverride = canOverride();
-    List<OpportunityLineItem> items = new List<OpportunityLineItem>();
-    for (LineInput l : lines) {
-      PricebookEntry pbe = entries.get(l.pricebookEntryId);
-      Decimal qty = l.quantity == null ? 0 : l.quantity;
-      Decimal disc = l.discountPct == null ? 0 : l.discountPct.setScale(2);
-      if (qty <= 0 || qty > 9999) {
-        throw new AuraHandledException(
-          'Quantity for "' + pbe.Product2.Name + '" must be between 1 and 9999.'
-        );
-      }
-      if (disc < 0 || disc > 100) {
-        throw new AuraHandledException(
-          'Discount for "' +
-            pbe.Product2.Name +
-            '" must be between 0% and 100%.'
-        );
-      }
-      if (disc > MAX_DISCOUNT_WITHOUT_APPROVAL && !mayOverride) {
-        throw new AuraHandledException(
-          'Discount for "' +
-            pbe.Product2.Name +
-            '" is ' +
-            disc.stripTrailingZeros().toPlainString() +
-            '%. Above ' +
-            MAX_DISCOUNT_WITHOUT_APPROVAL +
-            '% needs manager approval.'
-        );
-      }
-      items.add(
-        new OpportunityLineItem(
-          OpportunityId = opp.Id,
-          PricebookEntryId = pbe.Id,
-          Quantity = qty,
-          UnitPrice = pbe.UnitPrice, // list price from the price book, never from the browser
-          Discount = disc == 0 ? null : disc, // standard field: TotalPrice = Qty × UnitPrice × (1 − Discount)
-          Description = l.description == null
-            ? null
-            : l.description.trim().left(255)
-        )
-      );
-    }
-
-    Savepoint sp = Database.setSavepoint();
-    try {
-      List<OpportunityLineItem> existing = [
-        SELECT Id
-        FROM OpportunityLineItem
-        WHERE OpportunityId = :opp.Id
-        WITH USER_MODE
-      ];
-      if (!existing.isEmpty()) {
-        delete as user existing;
-      }
-      if (!items.isEmpty()) {
-        insert as user items;
-      }
-    } catch (Exception e) {
-      Database.rollback(sp);
-      throw new AuraHandledException(
-        'Could not save the products: ' + e.getMessage()
-      );
-    }
-    return getContext(opportunityId);
-  }
-
-  @AuraEnabled
-  public static QuoteInfo createQuote(
-    Id opportunityId,
-    Integer validDays,
-    String notes
-  ) {
-    Opportunity opp = loadOpportunity(opportunityId);
-    List<OpportunityLineItem> olis = [
-      SELECT
-        PricebookEntryId,
-        Product2Id,
-        Quantity,
-        UnitPrice,
-        Discount,
-        Description
-      FROM OpportunityLineItem
-      WHERE OpportunityId = :opp.Id
-      WITH USER_MODE
-      ORDER BY SortOrder, CreatedDate
-    ];
-    if (olis.isEmpty()) {
-      throw new AuraHandledException(
-        'Add and save at least one product before creating a quote.'
-      );
-    }
-    if (!canOverride()) {
-      for (OpportunityLineItem oli : olis) {
-        if (
-          oli.Discount != null &&
-          oli.Discount > MAX_DISCOUNT_WITHOUT_APPROVAL
-        ) {
-          throw new AuraHandledException(
-            'A line has a discount above ' +
-              MAX_DISCOUNT_WITHOUT_APPROVAL +
-              '%; it needs approval first.'
-          );
-        }
-      }
-    }
-
-    Integer days = validDays == null
-      ? 14
-      : Math.max(1, Math.min(validDays, 90));
-    Integer version =
-      [SELECT COUNT() FROM Quote WHERE OpportunityId = :opp.Id WITH USER_MODE] +
-      1;
-
-    Id contactId;
-    for (OpportunityContactRole r : [
-      SELECT ContactId
-      FROM OpportunityContactRole
-      WHERE OpportunityId = :opp.Id
-      WITH USER_MODE
-      ORDER BY IsPrimary DESC, CreatedDate
-      LIMIT 1
-    ]) {
-      contactId = r.ContactId;
-    }
-
-    Quote q = new Quote(
-      Name = (opp.Name + ' – Proposal v' + version).left(255),
-      OpportunityId = opp.Id,
-      Pricebook2Id = opp.Pricebook2Id,
-      ExpirationDate = Date.today().addDays(days),
-      Description = notes == null ? null : notes.trim().left(32000),
-      ContactId = contactId
-    );
-
-    Savepoint sp = Database.setSavepoint();
-    try {
-      insert as user q;
-      List<QuoteLineItem> qlis = new List<QuoteLineItem>();
-      for (OpportunityLineItem oli : olis) {
-        qlis.add(
-          new QuoteLineItem(
-            QuoteId = q.Id,
-            PricebookEntryId = oli.PricebookEntryId,
-            Quantity = oli.Quantity,
-            UnitPrice = oli.UnitPrice,
-            Discount = oli.Discount,
-            Description = oli.Description
-          )
-        );
-      }
-      insert as user qlis;
-    } catch (Exception e) {
-      Database.rollback(sp);
-      throw new AuraHandledException(
-        'Could not create the quote: ' + e.getMessage()
-      );
-    }
-
-    return toInfo(
-      [
-        SELECT Id, Name, QuoteNumber, Status, ExpirationDate, TotalPrice
-        FROM Quote
-        WHERE Id = :q.Id
-        WITH USER_MODE
-      ]
-    );
-  }
-
-  /**
-   * Renders the quote with a Quote Template (Setup → Quote Templates; copy the template Id into
-   * the component's "Quote Template Id" property) and saves it as a QuoteDocument.
-   * Must run in its own transaction, after createQuote has committed.
-   */
-  @AuraEnabled
-  public static Id generatePdf(Id quoteId, String templateId) {
-    if (String.isBlank(templateId)) {
-      return null;
-    }
-    Id template;
-    try {
-      template = Id.valueOf(templateId.trim());
-    } catch (Exception e) {
-      throw new AuraHandledException(
-        'The Quote Template Id on this component is not valid.'
-      );
-    }
-    List<Quote> quotes = [
-      SELECT Id
-      FROM Quote
-      WHERE Id = :quoteId
-      WITH USER_MODE
-    ];
-    if (quotes.isEmpty()) {
-      throw new AuraHandledException('Quote not found.');
-    }
-    Blob pdf = renderPdf(quoteId, template);
-    QuoteDocument doc = new QuoteDocument(QuoteId = quoteId, Document = pdf);
-    insert as user doc;
-    return doc.Id;
-  }
-
-  // ------------------------------------------------------------------ helpers
-
-  @TestVisible
-  private static Blob renderPdf(Id quoteId, Id templateId) {
-    if (Test.isRunningTest()) {
-      return Blob.valueOf('test pdf');
-    }
-    PageReference page = new PageReference(
-      '/quote/quoteTemplateDataViewer.apexp?id=' +
-        quoteId +
-        '&summlid=' +
-        templateId
-    );
-    return page.getContentAsPDF();
-  }
-
-  private static Opportunity loadOpportunity(Id opportunityId) {
-    if (
-      opportunityId == null ||
-      opportunityId.getSobjectType() != Opportunity.SObjectType
-    ) {
-      throw new AuraHandledException(
-        'Quote Builder only works on Opportunity records.'
-      );
-    }
-    List<Opportunity> opps = [
-      SELECT Id, Name, StageName, Pricebook2Id, Pricebook2.Name, Account.Name
-      FROM Opportunity
-      WHERE Id = :opportunityId
-      WITH USER_MODE
-    ];
-    if (opps.isEmpty()) {
-      throw new AuraHandledException('Opportunity not found.');
-    }
-    return opps[0];
-  }
-
-  /** Active, non-standard price books with their description and number of active products. */
   private static List<PricebookOption> pricebookOptions(Id currentId) {
     Map<Id, Integer> counts = new Map<Id, Integer>();
-    for (AggregateResult ar : [
-      SELECT Pricebook2Id pb, COUNT(Id) n
+    for (AggregateResult row : [
+      SELECT Pricebook2Id pricebookId, COUNT(Id) productCount
       FROM PricebookEntry
       WHERE
         IsActive = TRUE
@@ -555,10 +513,13 @@ public with sharing class QuoteBuilderController {
       WITH USER_MODE
       GROUP BY Pricebook2Id
     ]) {
-      counts.put((Id) ar.get('pb'), (Integer) ar.get('n'));
+      counts.put(
+        (Id) row.get('pricebookId'),
+        (Integer) row.get('productCount')
+      );
     }
     List<PricebookOption> result = new List<PricebookOption>();
-    for (Pricebook2 pb : [
+    for (Pricebook2 pricebook : [
       SELECT Id, Name, Description
       FROM Pricebook2
       WHERE IsActive = TRUE AND IsStandard = FALSE
@@ -566,42 +527,226 @@ public with sharing class QuoteBuilderController {
       ORDER BY Name
       LIMIT 50
     ]) {
-      PricebookOption o = new PricebookOption();
-      o.id = pb.Id;
-      o.name = pb.Name;
-      o.description = pb.Description;
-      o.productCount = counts.containsKey(pb.Id) ? counts.get(pb.Id) : 0;
-      o.isCurrent = pb.Id == currentId;
-      result.add(o);
+      PricebookOption option = new PricebookOption();
+      option.id = pricebook.Id;
+      option.name = pricebook.Name;
+      option.description = pricebook.Description;
+      option.productCount = counts.containsKey(pricebook.Id)
+        ? counts.get(pricebook.Id)
+        : 0;
+      option.isCurrent = pricebook.Id == currentId;
+      result.add(option);
     }
     return result;
   }
 
-  private static Boolean canOverride() {
-    if (overrideForTest != null) {
-      return overrideForTest;
-    }
-    return FeatureManagement.checkPermission(OVERRIDE_PERMISSION);
+  private static QuoteInfo queryQuoteInfo(Id quoteId, Id syncedQuoteId) {
+    Quote quoteRecord = [
+      SELECT
+        Id,
+        Name,
+        QuoteNumber,
+        Status,
+        ExpirationDate,
+        TotalPrice,
+        Description,
+        Pricebook2Id,
+        Pricebook2.Name,
+        Email,
+        Contact.Email,
+        CreatedDate,
+        LastModifiedDate,
+        (SELECT Id FROM QuoteDocuments ORDER BY CreatedDate DESC LIMIT 1),
+        (
+          SELECT
+            Id,
+            PricebookEntryId,
+            Product2.Name,
+            Product2.Family,
+            ListPrice,
+            UnitPrice,
+            Quantity,
+            Discount,
+            Description,
+            TotalPrice
+          FROM QuoteLineItems
+          ORDER BY SortOrder, CreatedDate
+        )
+      FROM Quote
+      WHERE Id = :quoteId
+      WITH USER_MODE
+    ];
+    return toInfo(quoteRecord, syncedQuoteId);
   }
 
-  private static QuoteInfo toInfo(Quote q) {
+  private static QuoteInfo toInfo(Quote quoteRecord, Id syncedQuoteId) {
     QuoteInfo info = new QuoteInfo();
-    info.quoteId = q.Id;
-    info.name = q.Name;
-    info.quoteNumber = q.QuoteNumber;
-    info.status = q.Status;
-    info.expirationDate = q.ExpirationDate;
-    info.totalPrice = q.TotalPrice;
-    for (QuoteDocument d : [
-      SELECT Id
-      FROM QuoteDocument
-      WHERE QuoteId = :q.Id
-      WITH USER_MODE
-      ORDER BY CreatedDate DESC
-      LIMIT 1
-    ]) {
-      info.pdfId = d.Id;
+    info.quoteId = quoteRecord.Id;
+    info.name = quoteRecord.Name;
+    info.quoteNumber = quoteRecord.QuoteNumber;
+    info.status = quoteRecord.Status;
+    info.expirationDate = quoteRecord.ExpirationDate;
+    info.totalPrice = quoteRecord.TotalPrice;
+    info.notes = quoteRecord.Description;
+    info.pricebookId = quoteRecord.Pricebook2Id;
+    info.pricebookName = quoteRecord.Pricebook2?.Name;
+    info.recipientEmail = String.isNotBlank(quoteRecord.Email)
+      ? quoteRecord.Email
+      : quoteRecord.Contact?.Email;
+    info.createdDate = quoteRecord.CreatedDate;
+    info.lastModifiedDate = quoteRecord.LastModifiedDate;
+    info.isSynced = quoteRecord.Id == syncedQuoteId;
+    if (
+      quoteRecord.QuoteDocuments != null &&
+      !quoteRecord.QuoteDocuments.isEmpty()
+    ) {
+      info.pdfId = quoteRecord.QuoteDocuments[0].Id;
+    }
+    if (quoteRecord.QuoteLineItems != null) {
+      for (QuoteLineItem quoteLine : quoteRecord.QuoteLineItems) {
+        Line line = new Line();
+        line.lineId = quoteLine.Id;
+        line.pricebookEntryId = quoteLine.PricebookEntryId;
+        line.name = quoteLine.Product2.Name;
+        line.family = quoteLine.Product2.Family;
+        line.listPrice = quoteLine.ListPrice == null
+          ? quoteLine.UnitPrice
+          : quoteLine.ListPrice;
+        line.quantity = quoteLine.Quantity;
+        line.discountPct = quoteLine.Discount == null ? 0 : quoteLine.Discount;
+        line.description = quoteLine.Description;
+        line.totalPrice = quoteLine.TotalPrice;
+        info.lines.add(line);
+      }
     }
     return info;
+  }
+
+  private static Opportunity loadOpportunity(Id opportunityId) {
+    if (
+      opportunityId == null ||
+      opportunityId.getSObjectType() != Opportunity.SObjectType
+    ) {
+      throw new AuraHandledException(
+        'Quote Builder only works on Opportunity records.'
+      );
+    }
+    List<Opportunity> opportunities = [
+      SELECT
+        Id,
+        Name,
+        StageName,
+        Pricebook2Id,
+        Pricebook2.Name,
+        Account.Name,
+        SyncedQuoteId
+      FROM Opportunity
+      WHERE Id = :opportunityId
+      WITH USER_MODE
+    ];
+    if (opportunities.isEmpty()) {
+      throw new AuraHandledException('Opportunity not found.');
+    }
+    return opportunities[0];
+  }
+
+  private static Quote loadQuoteForUpdate(Id quoteId, Id opportunityId) {
+    if (quoteId == null || quoteId.getSObjectType() != Quote.SObjectType) {
+      throw new AuraHandledException('Choose a valid quote.');
+    }
+    List<Quote> quotes = [
+      SELECT Id, OpportunityId, Pricebook2Id, ContactId
+      FROM Quote
+      WHERE Id = :quoteId AND OpportunityId = :opportunityId
+      WITH USER_MODE
+    ];
+    if (quotes.isEmpty()) {
+      throw new AuraHandledException('Quote not found on this Opportunity.');
+    }
+    return quotes[0];
+  }
+
+  private static Quote loadQuoteForAccess(Id quoteId) {
+    if (quoteId == null || quoteId.getSObjectType() != Quote.SObjectType) {
+      throw new AuraHandledException('Choose a valid quote.');
+    }
+    List<Quote> quotes = [
+      SELECT
+        Id,
+        Name,
+        QuoteNumber,
+        Status,
+        Email,
+        Contact.Email,
+        OpportunityId,
+        Opportunity.Name
+      FROM Quote
+      WHERE Id = :quoteId
+      WITH USER_MODE
+    ];
+    if (quotes.isEmpty()) {
+      throw new AuraHandledException('Quote not found.');
+    }
+    return quotes[0];
+  }
+
+  private static void validatePricebook(Id pricebookId) {
+    if (
+      pricebookId == null ||
+      [
+        SELECT COUNT()
+        FROM Pricebook2
+        WHERE Id = :pricebookId AND IsActive = TRUE AND IsStandard = FALSE
+        WITH USER_MODE
+      ] == 0
+    ) {
+      throw new AuraHandledException('Choose an active price book.');
+    }
+  }
+
+  private static Id primaryContactId(Id opportunityId) {
+    for (OpportunityContactRole role : [
+      SELECT ContactId
+      FROM OpportunityContactRole
+      WHERE OpportunityId = :opportunityId
+      WITH USER_MODE
+      ORDER BY IsPrimary DESC, CreatedDate
+      LIMIT 1
+    ]) {
+      return role.ContactId;
+    }
+    return null;
+  }
+
+  private static String resolveRecipient(Quote quoteRecord) {
+    if (String.isNotBlank(quoteRecord.Email))
+      return quoteRecord.Email;
+    if (String.isNotBlank(quoteRecord.Contact?.Email))
+      return quoteRecord.Contact.Email;
+    for (OpportunityContactRole role : [
+      SELECT Contact.Email
+      FROM OpportunityContactRole
+      WHERE OpportunityId = :quoteRecord.OpportunityId AND Contact.Email != NULL
+      WITH USER_MODE
+      ORDER BY IsPrimary DESC, CreatedDate
+      LIMIT 1
+    ]) {
+      return role.Contact.Email;
+    }
+    return null;
+  }
+
+  private static String cleanNotes(String notes) {
+    return String.isBlank(notes) ? null : notes.trim().left(32000);
+  }
+
+  private static Boolean canOverride() {
+    return overrideForTest == null
+      ? FeatureManagement.checkPermission(OVERRIDE_PERMISSION)
+      : overrideForTest;
+  }
+
+  private static AuraHandledException handled(String prefix, Exception error) {
+    return new AuraHandledException(prefix + ': ' + error.getMessage());
   }
 }
