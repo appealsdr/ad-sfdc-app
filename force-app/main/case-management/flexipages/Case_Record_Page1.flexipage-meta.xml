@@ -264,6 +264,12 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>c:productOnboardingConfig</componentName>
+                <identifier>c_productOnboardingConfig</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentInstanceProperties>
                     <name>columns</name>
                     <value>Facet-41c1a2af-31e0-497f-98df-bb25f120b5ac</value>
@@ -531,10 +537,6 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
-                <componentInstanceProperties>
-                    <name>label</name>
-                    <value>Tabs</value>
-                </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>tabs</name>
                     <value>tabs</value>

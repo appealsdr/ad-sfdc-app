@@ -7,7 +7,8 @@ trigger CaseTrigger on Case (before insert, before update, after insert, after u
     /* --------------------------
        BEFORE LOGIC
     ---------------------------*/
-    if (Trigger.isbefore && Trigger.isInsert) {
+    if (Trigger.isBefore && Trigger.isInsert) {
+        CaseTriggerHandler.copyProductOnboardingConfig(Trigger.new);
         if (CaseTriggerControl.isValidateCaseLimitEnabled()){
             StoreToRetainerCaseHandler.validateCaseLimit(Trigger.new,Trigger.isUpdate ? Trigger.oldMap : null);     
         }
@@ -17,10 +18,8 @@ trigger CaseTrigger on Case (before insert, before update, after insert, after u
     ---------------------------*/
     if (Trigger.isAfter) {
         if (CaseTriggerControl.isUpdateTotalCaseEnabled()) {
-            
             List<Case> caseList = Trigger.isDelete ? Trigger.old : Trigger.new;
             Map<Id, Case> oldMap =Trigger.isInsert || Trigger.isUndelete ? null: Trigger.oldMap;
-            
             CaseTriggerHandler.updateTotalCases(caseList, oldMap); 
             CaseTriggerHandler.updateStoreCaseCounts(caseList, oldMap);
         }
