@@ -109,6 +109,167 @@ private class TimeTrackingControllerTest {
         System.assertEquals(null, data.activeTimer, 'A case timer must not appear as an active store timer.');
         System.assertEquals(2, caseData.records.size(), 'Case entries should remain visible on their case.');
         System.assertNotEquals(null, caseData.activeTimer);
+        System.assertNotEquals(null, data.blockingTimer, 'A case timer must be reported while viewing its store.');
+        System.assertEquals(caseData.activeTimer.id, data.blockingTimer.id);
+        System.assertEquals(testCase.Id, data.blockingTimer.relatedRecordId, 'A case timer must link to the case, not its store.');
+        System.assertEquals(null, caseData.blockingTimer, 'The same case timer must not block itself.');
+    }
+
+    @IsTest
+    static void testGetDataFindsOtherCaseTimerWithoutMixingTotals() {
+        Case primaryCase = getPrimaryCase();
+        Case otherCase = getOtherCase();
+        User otherUser = getAdminUser();
+        Datetime now = System.now();
+        Time_Tracking__c localEntry = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Case__c = primaryCase.Id,
+            Start_Time__c = now.addMinutes(-15),
+            End_Time__c = now,
+            Status__c = TimeTrackingController.STATUS_COMPLETED
+        );
+        Time_Tracking__c otherTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Case__c = otherCase.Id,
+            Start_Time__c = now.addMinutes(-20),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+        );
+        insert new List<Time_Tracking__c>{
+            localEntry,
+            otherTimer,
+            new Time_Tracking__c(
+                Assignee__c = otherUser.Id,
+                Case__c = otherCase.Id,
+                Start_Time__c = now.addMinutes(-1),
+                Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+            ),
+            new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Case__c = otherCase.Id,
+                Start_Time__c = now.addMinutes(-5),
+                End_Time__c = now,
+                Status__c = TimeTrackingController.STATUS_COMPLETED
+            )
+        };
+
+        Test.startTest();
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(primaryCase.Id);
+        Test.stopTest();
+
+        System.assertEquals(1, data.records.size(), 'The table must contain only records for the viewed case.');
+        System.assertEquals(localEntry.Id, data.records[0].id);
+        System.assertEquals(15, data.totalMinutes, 'A timer on another case must not inflate the viewed case total.');
+        System.assertEquals(null, data.activeTimer);
+        System.assertNotEquals(null, data.blockingTimer);
+        System.assertEquals(otherTimer.Id, data.blockingTimer.id, 'Only the current user\'s in-progress timer should be reported.');
+        System.assertEquals(otherCase.Id, data.blockingTimer.relatedRecordId);
+        System.assertEquals([SELECT CaseNumber FROM Case WHERE Id = :otherCase.Id].CaseNumber,
+            data.blockingTimer.relatedRecordName);
+    }
+
+    @IsTest
+    static void testGetDataShowsDirectStoreTimerWhileViewingCase() {
+        Case primaryCase = getPrimaryCase();
+        Time_Tracking__c storeTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Store__c = primaryCase.Store__c,
+            Start_Time__c = System.now().addMinutes(-10),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+        );
+        insert storeTimer;
+
+        Test.startTest();
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(primaryCase.Id);
+        Test.stopTest();
+
+        System.assertEquals(0, data.records.size());
+        System.assertEquals(0, data.totalMinutes);
+        System.assertEquals(null, data.activeTimer);
+        System.assertNotEquals(null, data.blockingTimer);
+        System.assertEquals(storeTimer.Id, data.blockingTimer.id);
+        System.assertEquals(primaryCase.Store__c, data.blockingTimer.relatedRecordId);
+        System.assertEquals('Primary Store', data.blockingTimer.relatedRecordName);
+    }
+
+    @IsTest
+    static void testGetDataIgnoresSameCaseOtherUsersAndCompletedTimers() {
+        Case primaryCase = getPrimaryCase();
+        Case otherCase = getOtherCase();
+        User otherUser = getAdminUser();
+        Datetime now = System.now();
+        Time_Tracking__c localTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Case__c = primaryCase.Id,
+            Store__c = primaryCase.Store__c,
+            Start_Time__c = now.addMinutes(-10),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+        );
+        insert new List<Time_Tracking__c>{
+            localTimer,
+            new Time_Tracking__c(
+                Assignee__c = otherUser.Id,
+                Case__c = otherCase.Id,
+                Start_Time__c = now.addMinutes(-1),
+                Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+            ),
+            new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Case__c = otherCase.Id,
+                Start_Time__c = now.addMinutes(-5),
+                End_Time__c = now,
+                Status__c = TimeTrackingController.STATUS_COMPLETED
+            )
+        };
+
+        Test.startTest();
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(primaryCase.Id);
+        Test.stopTest();
+
+        System.assertEquals(localTimer.Id, data.activeTimer.id);
+        System.assertEquals(primaryCase.Id, data.activeTimer.relatedRecordId);
+        System.assertEquals(null, data.blockingTimer, 'A current timer on this case, other users\' timers, and completed timers must not block it.');
+    }
+
+    @IsTest
+    static void testGetDataFindsLatestOtherStoreTimer() {
+        Store__c primaryStore = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        Store__c otherStore = [SELECT Id FROM Store__c WHERE Name = 'Secondary Store' LIMIT 1];
+        Case primaryCase = getPrimaryCase();
+        Datetime now = System.now();
+        Time_Tracking__c latestOtherTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Store__c = otherStore.Id,
+            Start_Time__c = now.addMinutes(-5),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+        );
+        Time_Tracking__c localTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Store__c = primaryStore.Id,
+            Start_Time__c = now.addMinutes(-1),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+        );
+        insert new List<Time_Tracking__c>{
+            latestOtherTimer,
+            localTimer,
+            new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Case__c = primaryCase.Id,
+                Store__c = primaryStore.Id,
+                Start_Time__c = now.addMinutes(-20),
+                Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+            )
+        };
+
+        Test.startTest();
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(primaryStore.Id);
+        Test.stopTest();
+
+        System.assertEquals(1, data.records.size(), 'Store records must exclude even a case timer on the same store.');
+        System.assertEquals(localTimer.Id, data.activeTimer.id);
+        System.assertNotEquals(null, data.blockingTimer);
+        System.assertEquals(latestOtherTimer.Id, data.blockingTimer.id, 'The newest timer outside this store must be reported.');
+        System.assertEquals(otherStore.Id, data.blockingTimer.relatedRecordId);
+        System.assertEquals('Secondary Store', data.blockingTimer.relatedRecordName);
     }
 
     @IsTest
@@ -132,6 +293,8 @@ private class TimeTrackingControllerTest {
         System.assertEquals(1, data.records.size());
         System.assertNotEquals(null, data.activeTimer);
         System.assertEquals(result.timeTrackingId, data.activeTimer.id);
+        System.assertEquals(store.Id, data.activeTimer.relatedRecordId);
+        System.assertEquals(null, data.blockingTimer, 'The same direct store timer must not block itself.');
         System.assertEquals(true, resumed.success);
         System.assertEquals(result.timeTrackingId, resumed.timeTrackingId);
     }
@@ -666,6 +829,106 @@ private class TimeTrackingControllerTest {
         System.assertEquals(1, data.records.size());
         System.assertEquals(newId, data.records[0].id);
         System.assertEquals(20, data.totalMinutes);
+    }
+
+    @IsTest
+    static void testManualEntryRoundsEveryPartialMinuteUp() {
+        Case testCase = getPrimaryCase();
+        Datetime startTime = Datetime.newInstanceGMT(2026, 1, 15, 10, 0, 0);
+        List<Integer> durationsInSeconds = new List<Integer>{ 1, 29, 30, 59, 60, 61, 119, 120 };
+        List<Decimal> expectedMinutes = new List<Decimal>{ 1, 1, 1, 1, 1, 2, 2, 2 };
+        Map<Id, Decimal> expectedById = new Map<Id, Decimal>();
+        Map<Id, Datetime> expectedEndTimes = new Map<Id, Datetime>();
+
+        Test.startTest();
+        for (Integer index = 0; index < durationsInSeconds.size(); index++) {
+            Datetime endTime = startTime.addSeconds(durationsInSeconds[index]);
+            Id entryId = TimeTrackingController.createManualEntry(testCase.Id, startTime, endTime, null);
+            expectedById.put(entryId, expectedMinutes[index]);
+            expectedEndTimes.put(entryId, endTime);
+        }
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(testCase.Id);
+        Test.stopTest();
+
+        List<Time_Tracking__c> entries = [
+            SELECT Id, Start_Time__c, End_Time__c, Duration__c
+            FROM Time_Tracking__c
+            WHERE Id IN :expectedById.keySet()
+        ];
+        System.assertEquals(durationsInSeconds.size(), entries.size());
+        for (Time_Tracking__c entry : entries) {
+            System.assertEquals(startTime, entry.Start_Time__c, 'Rounding duration must preserve the entered start time.');
+            System.assertEquals(expectedEndTimes.get(entry.Id), entry.End_Time__c,
+                'Rounding duration must preserve the entered end time.');
+            System.assertEquals(expectedById.get(entry.Id), entry.Duration__c,
+                'Each partial minute must round up, while exact minutes must stay unchanged.');
+        }
+
+        System.assertEquals(durationsInSeconds.size(), data.records.size());
+        Decimal displayedTotal = 0;
+        for (TimeTrackingController.TimeTrackingWrapper entry : data.records) {
+            System.assertEquals(expectedById.get(entry.id), entry.durationMinutes,
+                'The component must receive the same rounded duration as the formula field.');
+            displayedTotal += entry.durationMinutes;
+        }
+        System.assertEquals(11, displayedTotal, 'Round each entry before adding the logged total.');
+        System.assertEquals(displayedTotal, data.totalMinutes, 'The total must match the sum of the rounded entries.');
+    }
+
+    @IsTest
+    static void testCompletingShortTimerLogsAtLeastOneMinute() {
+        Case testCase = getPrimaryCase();
+        Time_Tracking__c timer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Case__c = testCase.Id,
+            Start_Time__c = System.now().addSeconds(-1),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+        );
+        insert timer;
+
+        Test.startTest();
+        TimeTrackingController.completeTimer(timer.Id, null);
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(testCase.Id);
+        Test.stopTest();
+
+        Time_Tracking__c completed = [
+            SELECT Status__c, Duration__c
+            FROM Time_Tracking__c
+            WHERE Id = :timer.Id
+        ];
+        System.assertEquals(TimeTrackingController.STATUS_COMPLETED, completed.Status__c);
+        System.assert(completed.Duration__c >= 1, 'A completed timer with any elapsed seconds must log at least one minute.');
+        System.assertEquals(1, data.records.size());
+        System.assertEquals(completed.Duration__c, data.records[0].durationMinutes);
+        System.assertEquals(completed.Duration__c, data.totalMinutes);
+    }
+
+    @IsTest
+    static void testEditingManualEntryRoundsPartialMinuteUp() {
+        Case testCase = getPrimaryCase();
+        Datetime startTime = Datetime.newInstanceGMT(2026, 1, 15, 10, 0, 0);
+        Id entryId = TimeTrackingController.createManualEntry(testCase.Id, startTime, startTime.addMinutes(1), null);
+        User adminUser = getAdminUser();
+        TimeTrackingController.TimeTrackingData data;
+
+        Test.startTest();
+        System.runAs(adminUser) {
+            TimeTrackingController.updateTimeTracking(entryId, startTime, startTime.addSeconds(61), null);
+            data = TimeTrackingController.getTimeTrackingData(testCase.Id);
+        }
+        Test.stopTest();
+
+        Time_Tracking__c updated = [
+            SELECT Start_Time__c, End_Time__c, Duration__c
+            FROM Time_Tracking__c
+            WHERE Id = :entryId
+        ];
+        System.assertEquals(startTime, updated.Start_Time__c);
+        System.assertEquals(startTime.addSeconds(61), updated.End_Time__c);
+        System.assertEquals(2, updated.Duration__c, 'Editing an entry to 61 seconds must log two minutes.');
+        System.assertEquals(1, data.records.size());
+        System.assertEquals(2, data.records[0].durationMinutes);
+        System.assertEquals(2, data.totalMinutes);
     }
 
     @IsTest

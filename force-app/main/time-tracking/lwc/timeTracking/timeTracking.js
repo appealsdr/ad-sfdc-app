@@ -12,7 +12,7 @@ const BASE_COLUMNS = [
     { label: 'Assignee', fieldName: 'assigneeName', type: 'text' },
     { label: 'Start Time', fieldName: 'formattedStartTime', type: 'text' },
     { label: 'End Time', fieldName: 'formattedEndTime', type: 'text' },
-    { label: 'Duration (min)', fieldName: 'durationDisplay', type: 'text' },
+    { label: 'Duration', fieldName: 'durationDisplay', type: 'text' },
     { label: 'Status', fieldName: 'status', type: 'text' },
     { label: 'Comments', fieldName: 'comments', type: 'text' }
 ];
@@ -35,7 +35,8 @@ export default class TimeTracking extends LightningElement {
     @track blockingTimer;
     @track totalMinutes = 0;
     @track displayTotalMinutes = 0;
-    @track elapsedDisplay = '00:00:00';
+    @track elapsedDisplay = '0d 0h 0m';
+    blockingElapsedDisplay = '0d 0h 0m';
     @track showCommentModal = false;
     @track showBlockingModal = false;
     @track showManualModal = false;
@@ -44,6 +45,8 @@ export default class TimeTracking extends LightningElement {
     @track selectedRecordId;
     @track isLoading = true;
     @track isProcessing = false;
+    isRefreshing = false;
+    activeSections = [];
     @track isAdmin = false;
     @track columns = BASE_COLUMNS;
 
@@ -59,10 +62,10 @@ export default class TimeTracking extends LightningElement {
     @wire(getTimeTrackingData, { recordId: '$recordId' })
     wiredTimeTracking(result) {
         this.wiredDataResult = result;
-        this.isLoading = false;
 
         const { data, error } = result;
         if (data) {
+            this.isLoading = false;
             this.activeTimer = data.activeTimer;
             this.blockingTimer = data.blockingTimer;
             this.totalMinutes = data.totalMinutes || 0;
@@ -72,11 +75,16 @@ export default class TimeTracking extends LightningElement {
                 ...record,
                 formattedStartTime: this.formatDateTime(record.startTime),
                 formattedEndTime: this.formatDateTime(record.endTime),
-                durationDisplay: this.formatMinutes(record.durationMinutes)
+                durationDisplay: this.formatDuration(record.durationMinutes)
             }));
             this.syncTimerDisplay();
         } else if (error) {
+            this.isLoading = false;
             this.tableData = [];
+            this.activeTimer = null;
+            this.blockingTimer = null;
+            this.totalMinutes = 0;
+            this.syncTimerDisplay();
             this.showToast('Error', this.getErrorMessage(error), 'error');
         }
     }
@@ -101,8 +109,65 @@ export default class TimeTracking extends LightningElement {
         return !this.hasActiveTimer;
     }
 
-    get formattedTotalMinutes() {
-        return this.formatMinutes(this.displayTotalMinutes);
+    get actionsDisabled() {
+        return this.isLoading || this.isProcessing || this.isRefreshing;
+    }
+
+    get loggedRecordCount() {
+        return this.tableData.length;
+    }
+
+    get loggedRecordCountLabel() {
+        return `${this.loggedRecordCount} time tracking records`;
+    }
+
+    get hasBlockingTimer() {
+        return this.blockingTimer != null;
+    }
+
+    get blockingRecordName() {
+        return this.blockingTimer?.relatedRecordName || 'another record';
+    }
+
+    get blockingRecordUrl() {
+        return this.blockingTimer?.relatedRecordId
+            ? `/lightning/r/${this.blockingTimer.relatedRecordId}/view`
+            : undefined;
+    }
+
+    get blockingTimerBadgeLabel() {
+        const prefix = this.hasActiveTimer ? 'Also running on' : 'Running on';
+        return `${prefix} ${this.blockingRecordName}`;
+    }
+
+    get blockingTimerBadgeDescription() {
+        return `${this.blockingElapsedDisplay} ${this.blockingTimerBadgeLabel}`;
+    }
+
+    get showTimerSummary() {
+        return this.hasActiveTimer || this.hasBlockingTimer;
+    }
+
+    handleSectionToggle(event) {
+        this.activeSections = [...event.detail.openSections];
+    }
+
+    async handleRefresh() {
+        if (this.actionsDisabled || !this.wiredDataResult) {
+            return;
+        }
+        this.isRefreshing = true;
+        try {
+            await refreshApex(this.wiredDataResult);
+        } catch (error) {
+            this.showToast('Error', this.getErrorMessage(error), 'error');
+        } finally {
+            this.isRefreshing = false;
+        }
+    }
+
+    get formattedLoggedTime() {
+        return this.formatDuration(this.displayTotalMinutes);
     }
 
     get modalTitle() {
@@ -123,8 +188,7 @@ export default class TimeTracking extends LightningElement {
     }
 
     get blockingMessage() {
-        const relatedName = this.blockingTimer?.relatedRecordName || 'another record';
-        return `You cannot start new time until other timer not completed. Active timer is on ${relatedName}.`;
+        return `You have a timer running on ${this.blockingRecordName}. Complete it before starting a new timer here.`;
     }
 
     handleStartClick() {
@@ -379,16 +443,25 @@ export default class TimeTracking extends LightningElement {
     }
 
     syncTimerDisplay() {
+        const blockingElapsedMs = this.blockingTimer?.startTime
+            ? Date.now() - new Date(this.blockingTimer.startTime).getTime()
+            : 0;
+        this.blockingElapsedDisplay = this.formatElapsed(blockingElapsedMs);
+
+        const runningTimer = this.activeTimer || this.blockingTimer;
+        const runningElapsedMs = runningTimer?.startTime
+            ? Date.now() - new Date(runningTimer.startTime).getTime()
+            : 0;
+        this.elapsedDisplay = this.formatElapsed(runningElapsedMs);
+
         if (!this.activeTimer || !this.activeTimer.startTime) {
-            this.elapsedDisplay = '00:00:00';
             this.displayTotalMinutes = this.totalMinutes;
             return;
         }
 
-        const elapsedMs = Date.now() - new Date(this.activeTimer.startTime).getTime();
-        this.elapsedDisplay = this.formatElapsed(elapsedMs);
+        const elapsedMs = Math.max(0, Date.now() - new Date(this.activeTimer.startTime).getTime());
 
-        const activeDurationMinutes = elapsedMs / 60000;
+        const activeDurationMinutes = Math.ceil(elapsedMs / 60000);
         const activeRecordId = this.activeTimer.id;
         const completedTotal = (this.tableData || []).reduce((sum, record) => {
             if (record.id === activeRecordId) {
@@ -400,11 +473,7 @@ export default class TimeTracking extends LightningElement {
     }
 
     formatElapsed(elapsedMs) {
-        const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(seconds)}`;
+        return this.formatDuration(elapsedMs / 60000);
     }
 
     formatDateTime(value) {
@@ -421,11 +490,13 @@ export default class TimeTracking extends LightningElement {
         });
     }
 
-    formatMinutes(value) {
-        if (value == null || value === '') {
-            return '0';
-        }
-        return String(Math.round(Number(value)));
+    formatDuration(value) {
+        const minutes = Number(value);
+        const totalMinutes = Number.isFinite(minutes) ? Math.max(0, Math.ceil(minutes)) : 0;
+        const days = Math.floor(totalMinutes / (24 * 60));
+        const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+        const remainingMinutes = totalMinutes % 60;
+        return `${days}d ${hours}h ${remainingMinutes}m`;
     }
 
     combineDateTime(dateStr, timeStr) {
