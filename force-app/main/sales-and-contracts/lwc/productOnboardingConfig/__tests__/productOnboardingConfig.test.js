@@ -8,6 +8,7 @@ import {
 } from "lightning/uiRecordApi";
 
 const PRODUCT_ID = "01t000000000001AAA";
+const CASE_ID = "500000000000001AAA";
 const LAST_MODIFIED = "2026-11-03T20:00:00.000Z";
 const CASE_FIELDS = {
   Subject: { apiName: "Subject", label: "Subject" },
@@ -20,20 +21,60 @@ const SAVED_ROWS = [
 ];
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-function record(value, lastModified = LAST_MODIFIED, id = PRODUCT_ID) {
+function record(
+  value,
+  lastModified = LAST_MODIFIED,
+  id = PRODUCT_ID,
+  objectApiName = "Product2"
+) {
   return {
-    apiName: "Product2",
+    apiName: objectApiName,
     id,
     fields: {
-      Onboarding_Config__c: { value },
+      [objectApiName === "Case"
+        ? "Case_Onboarding__c"
+        : "Onboarding_Config__c"]: { value },
       LastModifiedDate: { value: lastModified }
     }
   };
 }
 
+function emitObjectInfo({
+  objectApiName = "Product2",
+  updateable = true,
+  fieldUpdateable = true,
+  maxLength = 32768
+} = {}) {
+  const configApiName =
+    objectApiName === "Case" ? "Case_Onboarding__c" : "Onboarding_Config__c";
+  const hostFields = {
+    ...(objectApiName === "Case" ? CASE_FIELDS : {}),
+    [configApiName]: {
+      apiName: configApiName,
+      label: "Onboarding configuration",
+      updateable: fieldUpdateable,
+      length: maxLength
+    }
+  };
+  if (objectApiName !== "Case") {
+    getObjectInfo.emit(
+      { apiName: "Case", fields: CASE_FIELDS },
+      (config) =>
+        (config.objectApiName.objectApiName || config.objectApiName) === "Case"
+    );
+  }
+  getObjectInfo.emit(
+    { apiName: objectApiName, updateable, fields: hostFields },
+    (config) =>
+      (config.objectApiName.objectApiName || config.objectApiName) ===
+      objectApiName
+  );
+}
+
 async function mount({
   rows = SAVED_ROWS,
   rawValue,
+  objectApiName = "Product2",
   updateable = true,
   fieldUpdateable = true,
   maxLength = 32768
@@ -41,28 +82,19 @@ async function mount({
   const element = createElement("c-product-onboarding-config", {
     is: ProductOnboardingConfig
   });
-  element.recordId = PRODUCT_ID;
+  if (objectApiName !== "Product2") element.objectApiName = objectApiName;
+  const recordId = objectApiName === "Case" ? CASE_ID : PRODUCT_ID;
+  element.recordId = recordId;
   document.body.appendChild(element);
   await flushPromises();
-  getObjectInfo.emit(
-    { apiName: "Case", fields: CASE_FIELDS },
-    (config) =>
-      (config.objectApiName.objectApiName || config.objectApiName) === "Case"
-  );
-  getObjectInfo.emit(
-    {
-      apiName: "Product2",
-      updateable,
-      fields: {
-        Onboarding_Config__c: { updateable: fieldUpdateable, length: maxLength }
-      }
-    },
-    (config) =>
-      (config.objectApiName.objectApiName || config.objectApiName) ===
-      "Product2"
-  );
+  emitObjectInfo({ objectApiName, updateable, fieldUpdateable, maxLength });
   getRecord.emit(
-    record(rawValue === undefined ? JSON.stringify(rows) : rawValue)
+    record(
+      rawValue === undefined ? JSON.stringify(rows) : rawValue,
+      LAST_MODIFIED,
+      recordId,
+      objectApiName
+    )
   );
   await flushPromises();
   return element;
@@ -510,5 +542,211 @@ describe("c-product-onboarding-config", () => {
     expect(
       element.shadowRoot.querySelector('[role="alert"]').textContent
     ).toContain("field limit of 10 characters");
+  });
+
+  describe("Case record pages", () => {
+    it("loads and edits Case onboarding without needing Product metadata", async () => {
+      const element = await mount({ objectApiName: "Case" });
+      const fields = getRecord
+        .getLastConfig()
+        .fields.map((field) =>
+          typeof field === "string"
+            ? field
+            : `${field.objectApiName}.${field.fieldApiName}`
+        );
+      expect(fields).toEqual(
+        expect.arrayContaining([
+          "Case.Case_Onboarding__c",
+          "Case.LastModifiedDate"
+        ])
+      );
+      expect(fields).not.toContain("Product2.Onboarding_Config__c");
+      expect(element.shadowRoot.querySelector("lightning-spinner")).toBeNull();
+      expect(element.shadowRoot.querySelectorAll(".detail-row")).toHaveLength(
+        2
+      );
+      expect(element.shadowRoot.textContent).toContain("Issue");
+      expect(button(element, "Edit").disabled).toBe(false);
+      await click(element, "Edit");
+      expect(editorRows(element)).toHaveLength(2);
+    });
+
+    it("saves edits only to Case_Onboarding__c with the Case edit timestamp", async () => {
+      const element = await mount({ objectApiName: "Case" });
+      await click(element, "Edit");
+      await changeInput(element, 0, "text", "  Case-specific issue  ");
+      await changeInput(element, 1, "checkbox", true);
+      editorRows(element)[0].querySelector('[data-direction="1"]').click();
+      getRecord.emit(
+        record(
+          JSON.stringify(SAVED_ROWS),
+          "2026-11-03T20:05:00.000Z",
+          CASE_ID,
+          "Case"
+        )
+      );
+      await flushPromises();
+      await save(element);
+      expect(updateRecord).toHaveBeenCalledTimes(1);
+      const savedRows = [
+        { fieldapiname: "Description", fieldlabel: "", required: true },
+        {
+          fieldapiname: "Subject",
+          fieldlabel: "Case-specific issue",
+          required: true
+        }
+      ];
+      expect(updateRecord).toHaveBeenCalledWith(
+        {
+          fields: {
+            Id: CASE_ID,
+            Case_Onboarding__c: JSON.stringify(savedRows)
+          }
+        },
+        { ifUnmodifiedSince: LAST_MODIFIED }
+      );
+      expect(element.shadowRoot.querySelector("lightning-combobox")).toBeNull();
+      expect(element.shadowRoot.textContent).toContain("Case-specific issue");
+    });
+
+    it.each([
+      { updateable: false, fieldUpdateable: true },
+      { updateable: true, fieldUpdateable: false }
+    ])(
+      "blocks editing when Case or Case_Onboarding__c is read-only (%j)",
+      async (permissions) => {
+        const element = await mount({ objectApiName: "Case", ...permissions });
+        expect(button(element, "Edit").disabled).toBe(true);
+        expect(element.shadowRoot.textContent).toContain("read-only access");
+        expect(element.shadowRoot.querySelectorAll(".detail-row")).toHaveLength(
+          2
+        );
+        await click(element, "Edit");
+        expect(editorRows(element)).toHaveLength(0);
+        expect(updateRecord).not.toHaveBeenCalled();
+      }
+    );
+
+    it("checks the Case field storage limit before saving", async () => {
+      const element = await mount({ objectApiName: "Case", maxLength: 10 });
+      await click(element, "Edit");
+      await save(element);
+      expect(updateRecord).not.toHaveBeenCalled();
+      expect(
+        element.shadowRoot.querySelector('[role="alert"]').textContent
+      ).toContain("field limit of 10 characters");
+    });
+
+    it("identifies Case_Onboarding__c when saved Case JSON is invalid", async () => {
+      const element = await mount({
+        objectApiName: "Case",
+        rawValue: "{broken"
+      });
+      const message =
+        element.shadowRoot.querySelector('[role="alert"]').textContent;
+      expect(message).toContain("saved onboarding configuration is invalid");
+      expect(message).toContain("Case_Onboarding__c");
+      expect(message).not.toContain("Correct Onboarding_Config__c");
+      expect(button(element, "Edit").disabled).toBe(true);
+      expect(updateRecord).not.toHaveBeenCalled();
+    });
+
+    it("refreshes a conflicting Case while retaining the draft, then saves the latest configuration", async () => {
+      const latestDate = "2026-11-03T20:10:00.000Z";
+      const serverRows = [
+        {
+          fieldapiname: "Status",
+          fieldlabel: "Updated Case setting",
+          required: false
+        }
+      ];
+      updateRecord.mockRejectedValueOnce({ status: 412 });
+      notifyRecordUpdateAvailable.mockImplementationOnce(async () => {
+        getRecord.emit(
+          record(JSON.stringify(serverRows), latestDate, CASE_ID, "Case")
+        );
+      });
+      const element = await mount({ objectApiName: "Case" });
+      await click(element, "Edit");
+      await changeInput(element, 0, "text", "Unsaved Case draft");
+      await save(element);
+      expect(
+        element.shadowRoot.querySelector('[role="alert"]').textContent
+      ).toContain("This Case was changed by another user");
+      expect(rowInput(element, 0, "text").value).toBe("Unsaved Case draft");
+      expect(notifyRecordUpdateAvailable).toHaveBeenCalledWith([
+        { recordId: CASE_ID }
+      ]);
+      await click(element, "Cancel");
+      expect(element.shadowRoot.textContent).toContain("Updated Case setting");
+      await click(element, "Edit");
+      await save(element);
+      expect(updateRecord.mock.calls[1]).toEqual([
+        {
+          fields: {
+            Id: CASE_ID,
+            Case_Onboarding__c: JSON.stringify(serverRows)
+          }
+        },
+        { ifUnmodifiedSince: latestDate }
+      ]);
+    });
+
+    it("uses Case messaging when reloading after a conflict fails", async () => {
+      updateRecord.mockRejectedValueOnce({ status: 412 });
+      notifyRecordUpdateAvailable.mockRejectedValueOnce({
+        body: { message: "Reload unavailable." }
+      });
+      const element = await mount({ objectApiName: "Case" });
+      await click(element, "Edit");
+      await save(element);
+      expect(
+        element.shadowRoot.querySelector('[role="alert"]').textContent
+      ).toContain("Unable to reload this Case");
+      expect(
+        element.shadowRoot.querySelector('[role="alert"]').textContent
+      ).toContain("Reload unavailable.");
+      expect(editorRows(element)).toHaveLength(2);
+    });
+
+    it("resets Product edits on Case navigation and ignores the old Product save completion", async () => {
+      let finishOldSave;
+      updateRecord.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishOldSave = resolve;
+          })
+      );
+      const element = await mount();
+      const toastHandler = jest.fn();
+      element.addEventListener("lightning__showtoast", toastHandler);
+      await click(element, "Edit");
+      await changeInput(element, 0, "text", "Old Product draft");
+      await save(element);
+
+      element.objectApiName = "Case";
+      element.recordId = CASE_ID;
+      await flushPromises();
+      expect(editorRows(element)).toHaveLength(0);
+      expect(button(element, "Edit").disabled).toBe(true);
+      emitObjectInfo({ objectApiName: "Case" });
+      getRecord.emit(
+        record(JSON.stringify(SAVED_ROWS), LAST_MODIFIED, CASE_ID, "Case")
+      );
+      await flushPromises();
+      await click(element, "Edit");
+      await changeInput(element, 0, "text", "New Case draft");
+      finishOldSave({ id: PRODUCT_ID });
+      await flushPromises();
+      expect(rowInput(element, 0, "text").value).toBe("New Case draft");
+      expect(button(element, "Save").disabled).toBe(false);
+      expect(toastHandler).not.toHaveBeenCalled();
+      await save(element);
+      expect(updateRecord.mock.calls[1][0].fields.Id).toBe(CASE_ID);
+      expect(
+        JSON.parse(updateRecord.mock.calls[1][0].fields.Case_Onboarding__c)[0]
+          .fieldlabel
+      ).toBe("New Case draft");
+    });
   });
 });

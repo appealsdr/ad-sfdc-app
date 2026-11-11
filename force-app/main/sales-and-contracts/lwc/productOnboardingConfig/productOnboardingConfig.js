@@ -8,11 +8,27 @@ import {
 } from "lightning/uiRecordApi";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import CASE_OBJECT from "@salesforce/schema/Case";
-import PRODUCT_OBJECT from "@salesforce/schema/Product2";
-import CONFIG_FIELD from "@salesforce/schema/Product2.Onboarding_Config__c";
-import LAST_MODIFIED_FIELD from "@salesforce/schema/Product2.LastModifiedDate";
+import PRODUCT_CONFIG_FIELD from "@salesforce/schema/Product2.Onboarding_Config__c";
+import PRODUCT_LAST_MODIFIED_FIELD from "@salesforce/schema/Product2.LastModifiedDate";
+import CASE_CONFIG_FIELD from "@salesforce/schema/Case.Case_Onboarding__c";
+import CASE_LAST_MODIFIED_FIELD from "@salesforce/schema/Case.LastModifiedDate";
 
-const CONFIG_API_NAME = "Onboarding_Config__c";
+const RECORD_CONFIGS = {
+  Product2: {
+    configApiName: "Onboarding_Config__c",
+    configField: PRODUCT_CONFIG_FIELD,
+    lastModifiedField: PRODUCT_LAST_MODIFIED_FIELD,
+    fields: [PRODUCT_CONFIG_FIELD, PRODUCT_LAST_MODIFIED_FIELD],
+    label: "Product"
+  },
+  Case: {
+    configApiName: "Case_Onboarding__c",
+    configField: CASE_CONFIG_FIELD,
+    lastModifiedField: CASE_LAST_MODIFIED_FIELD,
+    fields: [CASE_CONFIG_FIELD, CASE_LAST_MODIFIED_FIELD],
+    label: "Case"
+  }
+};
 
 function errorMessage(error) {
   const messages = [
@@ -64,18 +80,19 @@ function parseConfig(value) {
 
 export default class ProductOnboardingConfig extends LightningElement {
   _recordId;
+  _objectApiName = "Product2";
   recordVersion = 0;
   savedRows = [];
   draftRows = [];
   caseFields = {};
-  productInfo;
+  recordInfo;
   recordLoaded = false;
   caseInfoLoaded = false;
   isEditing = false;
   isSaving = false;
   recordError;
   caseInfoError;
-  productInfoError;
+  recordInfoError;
   configError;
   saveError;
   lastModifiedDate;
@@ -91,19 +108,46 @@ export default class ProductOnboardingConfig extends LightningElement {
   set recordId(value) {
     if (value !== this._recordId) {
       this._recordId = value;
-      this.recordVersion++;
-      this.savedRows = [];
-      this.draftRows = [];
-      this.recordLoaded = false;
-      this.recordError = undefined;
-      this.configError = undefined;
-      this.saveError = undefined;
-      this.lastModifiedDate = undefined;
-      this.editLastModifiedDate = undefined;
-      this.isEditing = false;
-      this.isSaving = false;
-      this.draggedKey = undefined;
+      this.resetRecordState();
     }
+  }
+
+  @api
+  get objectApiName() {
+    return this._objectApiName;
+  }
+
+  set objectApiName(value) {
+    const objectApiName = value || "Product2";
+    if (objectApiName !== this._objectApiName) {
+      this._objectApiName = objectApiName;
+      this.recordInfo = undefined;
+      this.recordInfoError = undefined;
+      this.resetRecordState();
+    }
+  }
+
+  resetRecordState() {
+    this.recordVersion++;
+    this.savedRows = [];
+    this.draftRows = [];
+    this.recordLoaded = false;
+    this.recordError = undefined;
+    this.configError = undefined;
+    this.saveError = undefined;
+    this.lastModifiedDate = undefined;
+    this.editLastModifiedDate = undefined;
+    this.isEditing = false;
+    this.isSaving = false;
+    this.draggedKey = undefined;
+  }
+
+  get recordConfig() {
+    return RECORD_CONFIGS[this.objectApiName];
+  }
+
+  get recordFields() {
+    return this.recordConfig?.fields;
   }
 
   @wire(getObjectInfo, { objectApiName: CASE_OBJECT })
@@ -119,32 +163,41 @@ export default class ProductOnboardingConfig extends LightningElement {
     }
   }
 
-  @wire(getObjectInfo, { objectApiName: PRODUCT_OBJECT })
-  wiredProductInfo({ data, error }) {
-    if (data) {
-      this.productInfo = data;
-      this.productInfoError = undefined;
+  @wire(getObjectInfo, { objectApiName: "$objectApiName" })
+  wiredRecordInfo({ data, error }) {
+    if (data && data.apiName === this.objectApiName) {
+      this.recordInfo = data;
+      this.recordInfoError = undefined;
     } else if (error) {
-      this.productInfo = undefined;
-      this.productInfoError = `Unable to load Product permissions. ${errorMessage(error)}`;
+      this.recordInfo = undefined;
+      this.recordInfoError = `Unable to load ${this.recordConfig?.label || "record"} permissions. ${errorMessage(error)}`;
     }
   }
 
   @wire(getRecord, {
     recordId: "$recordId",
-    fields: [CONFIG_FIELD, LAST_MODIFIED_FIELD]
+    fields: "$recordFields"
   })
-  wiredProduct({ data, error }) {
-    if (data && data.id === this.recordId) {
+  wiredRecord({ data, error }) {
+    if (
+      data &&
+      data.id === this.recordId &&
+      data.apiName === this.objectApiName
+    ) {
       this.recordLoaded = true;
       this.recordError = undefined;
-      this.lastModifiedDate = getFieldValue(data, LAST_MODIFIED_FIELD);
+      this.lastModifiedDate = getFieldValue(
+        data,
+        this.recordConfig.lastModifiedField
+      );
       try {
-        this.savedRows = parseConfig(getFieldValue(data, CONFIG_FIELD));
+        this.savedRows = parseConfig(
+          getFieldValue(data, this.recordConfig.configField)
+        );
         this.configError = undefined;
       } catch (parseError) {
         this.savedRows = [];
-        this.configError = `The saved onboarding configuration is invalid. ${parseError.message} Correct Onboarding_Config__c before editing here.`;
+        this.configError = `The saved onboarding configuration is invalid. ${parseError.message} Correct ${this.recordConfig.configApiName} before editing here.`;
       }
     } else if (error) {
       this.recordLoaded = false;
@@ -154,11 +207,14 @@ export default class ProductOnboardingConfig extends LightningElement {
   }
 
   get error() {
+    if (!this.recordConfig) {
+      return "Onboarding configuration is only available for Product and Case records.";
+    }
     return (
       this.recordError ||
       this.configError ||
       this.caseInfoError ||
-      this.productInfoError ||
+      this.recordInfoError ||
       this.saveError
     );
   }
@@ -167,18 +223,18 @@ export default class ProductOnboardingConfig extends LightningElement {
     return (
       this.recordId &&
       !this.error &&
-      (!this.recordLoaded || !this.caseInfoLoaded || !this.productInfo)
+      (!this.recordLoaded || !this.caseInfoLoaded || !this.recordInfo)
     );
   }
 
   get showReadOnlyNotice() {
-    return this.productInfo && !this.canUpdate && !this.error;
+    return this.recordInfo && !this.canUpdate && !this.error;
   }
 
   get canUpdate() {
     return Boolean(
-      this.productInfo?.updateable &&
-      this.productInfo.fields[CONFIG_API_NAME]?.updateable
+      this.recordInfo?.updateable &&
+      this.recordInfo.fields[this.recordConfig?.configApiName]?.updateable
     );
   }
 
@@ -431,17 +487,19 @@ export default class ProductOnboardingConfig extends LightningElement {
       });
     }
     const json = JSON.stringify(rows);
-    const maxLength = this.productInfo.fields[CONFIG_API_NAME].length;
+    const configApiName = this.recordConfig.configApiName;
+    const maxLength = this.recordInfo.fields[configApiName].length;
     if (maxLength && json.length > maxLength) {
       this.saveError = `The configuration exceeds the field limit of ${maxLength} characters. Remove fields or shorten override labels.`;
       return;
     }
-    const productId = this.recordId;
+    const recordId = this.recordId;
+    const recordLabel = this.recordConfig.label;
     const recordVersion = this.recordVersion;
     this.isSaving = true;
     try {
       await updateRecord(
-        { fields: { Id: productId, [CONFIG_API_NAME]: json } },
+        { fields: { Id: recordId, [configApiName]: json } },
         { ifUnmodifiedSince: this.editLastModifiedDate }
       );
       if (this.recordVersion !== recordVersion) return;
@@ -459,14 +517,14 @@ export default class ProductOnboardingConfig extends LightningElement {
       if (this.recordVersion === recordVersion) {
         this.saveError =
           error.status === 412
-            ? "This Product was changed by another user. Cancel to view the latest configuration, then edit again."
+            ? `This ${recordLabel} was changed by another user. Cancel to view the latest configuration, then edit again.`
             : `Unable to save the onboarding configuration. ${errorMessage(error)}`;
         if (error.status === 412) {
           try {
-            await notifyRecordUpdateAvailable([{ recordId: productId }]);
+            await notifyRecordUpdateAvailable([{ recordId }]);
           } catch (refreshError) {
             if (this.recordVersion === recordVersion) {
-              this.saveError = `Unable to reload this Product. Cancel and refresh the page before editing again. ${errorMessage(refreshError)}`;
+              this.saveError = `Unable to reload this ${recordLabel}. Cancel and refresh the page before editing again. ${errorMessage(refreshError)}`;
             }
           }
         }

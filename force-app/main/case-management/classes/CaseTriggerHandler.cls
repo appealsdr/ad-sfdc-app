@@ -1,5 +1,31 @@
 public class CaseTriggerHandler {
 
+    public static void copyProductOnboardingConfig(List<Case> caseList) {
+        if (caseList == null || caseList.isEmpty()) return;
+
+        Set<Id> contractLineItemIds = new Set<Id>();
+        for (Case c : caseList) {
+            if (c.Contract_Line_Item__c != null) {
+                contractLineItemIds.add(c.Contract_Line_Item__c);
+            }
+        }
+
+        if (contractLineItemIds.isEmpty()) return;
+
+        Map<Id, ContractLineItem> contractLineItems = new Map<Id, ContractLineItem>([
+            SELECT Id, PricebookEntry.Product2.Onboarding_Config__c
+            FROM ContractLineItem
+            WHERE Id IN :contractLineItemIds
+        ]);
+
+        for (Case c : caseList) {
+            ContractLineItem lineItem = contractLineItems.get(c.Contract_Line_Item__c);
+            if (lineItem != null) {
+                c.Case_Onboarding__c = lineItem.PricebookEntry.Product2.Onboarding_Config__c;
+            }
+        }
+    }
+
     public static void updateTotalCases(List<Case> caseList, Map<Id, Case> oldMap) {
         if (caseList == null || caseList.isEmpty()) return;
 
