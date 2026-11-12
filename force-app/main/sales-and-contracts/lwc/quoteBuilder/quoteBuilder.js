@@ -7,6 +7,7 @@ import getContext from "@salesforce/apex/QuoteBuilderController.getContext";
 import setPricebook from "@salesforce/apex/QuoteBuilderController.setPricebook";
 import saveQuote from "@salesforce/apex/QuoteBuilderController.saveQuote";
 import generatePdf from "@salesforce/apex/QuoteBuilderController.generatePdf";
+import renderEmailDraft from "@salesforce/apex/QuoteBuilderController.renderEmailDraft";
 import sendQuote from "@salesforce/apex/QuoteBuilderController.sendQuote";
 import syncQuoteToOpportunity from "@salesforce/apex/QuoteBuilderController.syncQuoteToOpportunity";
 
@@ -32,7 +33,12 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   sendModalOpen = false;
   sendingQuoteId;
   sendEmail = "";
+  sendCc = "";
+  sendSubject = "";
+  sendHtmlBody = "";
   selectedEmailTemplateId = "";
+  selectedFromAddressId = "";
+  emailDraftLoading = false;
   pendingNewQuote = false;
   selectedPricebookId;
   editingQuoteId;
@@ -216,7 +222,29 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   get sendActionDisabled() {
-    return this.busy || !this.sendEmail.trim();
+    return (
+      this.busy ||
+      this.emailDraftLoading ||
+      !this.sendEmail.trim() ||
+      !this.sendSubject.trim() ||
+      !this.sendHtmlBody.trim()
+    );
+  }
+
+  get fromAddressOptions() {
+    return [
+      { label: "Current user / Salesforce default", value: "" },
+      ...(this.context?.fromAddresses || []).map((address) => ({
+        label: address.label,
+        value: address.id,
+        description: address.address
+      }))
+    ];
+  }
+
+  get sendAttachmentName() {
+    const quote = this.findQuote(this.sendingQuoteId);
+    return `${quote?.quoteNumber || "Quote"}.pdf`;
   }
 
   handleNewQuote() {
@@ -425,20 +453,60 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.pdfError = undefined;
   }
 
-  handleSendQuote(event) {
+  async handleSendQuote(event) {
     const quote = this.findQuote(event.currentTarget.dataset.id);
     this.sendingQuoteId = quote.quoteId;
     this.sendEmail = quote.recipientEmail || "";
+    this.sendCc = "";
     this.selectedEmailTemplateId = "";
+    this.selectedFromAddressId = "";
     this.sendModalOpen = true;
+    await this.loadEmailDraft();
   }
 
   handleSendEmailChange(event) {
     this.sendEmail = event.target.value || "";
   }
 
-  handleEmailTemplateChange(event) {
+  handleSendCcChange(event) {
+    this.sendCc = event.target.value || "";
+  }
+
+  async handleEmailTemplateChange(event) {
     this.selectedEmailTemplateId = event.detail.value || "";
+    await this.loadEmailDraft();
+  }
+
+  handleFromAddressChange(event) {
+    this.selectedFromAddressId = event.detail.value || "";
+  }
+
+  handleSendSubjectChange(event) {
+    this.sendSubject = event.target.value || "";
+  }
+
+  handleSendBodyChange(event) {
+    this.sendHtmlBody = event.detail?.value || event.target.value || "";
+  }
+
+  async loadEmailDraft() {
+    this.emailDraftLoading = true;
+    try {
+      const draft = await renderEmailDraft({
+        quoteId: this.sendingQuoteId,
+        templateId: this.selectedEmailTemplateId || null
+      });
+      this.sendSubject = draft.subject || "";
+      this.sendHtmlBody = draft.htmlBody || "";
+    } catch (error) {
+      this.toast(
+        "error",
+        "Email template could not be loaded",
+        this.message(error)
+      );
+    } finally {
+      this.emailDraftLoading = false;
+    }
   }
 
   handleCloseSend() {
@@ -450,7 +518,12 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.sendModalOpen = false;
     this.sendingQuoteId = undefined;
     this.sendEmail = "";
+    this.sendCc = "";
+    this.sendSubject = "";
+    this.sendHtmlBody = "";
     this.selectedEmailTemplateId = "";
+    this.selectedFromAddressId = "";
+    this.emailDraftLoading = false;
   }
 
   async handleConfirmSend() {
@@ -460,7 +533,11 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       await sendQuote({
         quoteId: quote.quoteId,
         recipientEmail: recipient,
-        templateId: this.selectedEmailTemplateId || null
+        ccEmails: this.sendCc.trim(),
+        templateId: this.selectedEmailTemplateId || null,
+        fromAddressId: this.selectedFromAddressId || null,
+        subject: this.sendSubject.trim(),
+        htmlBody: this.sendHtmlBody
       });
       this.applyContext(await getContext({ opportunityId: this.recordId }));
       this.resetSendModal();

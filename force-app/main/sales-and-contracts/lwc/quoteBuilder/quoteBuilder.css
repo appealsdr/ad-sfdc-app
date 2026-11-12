@@ -84,8 +84,8 @@
   overflow: auto;
 }
 
-.modal_compact {
-  width: min(86vw, 38rem);
+.modal_send {
+  width: min(88vw, 52rem);
 }
 
 .send-form {
@@ -95,15 +95,70 @@
   padding: 1.25rem;
 }
 
-.send-form__notice {
+.send-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem 1rem;
+}
+
+.send-form__body {
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
+  min-height: 12rem;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.send-form__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.send-form__loading {
+  position: relative;
+  min-height: 10rem;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.attachment-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.attachment-card__icon {
+  display: inline-flex;
+  width: 2.4rem;
+  height: 2.4rem;
+  align-items: center;
+  justify-content: center;
+  background: #fff1f0;
+  border-radius: 7px;
+}
+
+.attachment-card__status {
+  margin-left: auto;
+  color: #176b44;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.send-form__notice {
   padding: 0.8rem;
   color: #38506f;
   background: #eef4ff;
   border-radius: 8px;
   line-height: 1.35;
+}
+
+@media (max-width: 48rem) {
+  .send-form__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .send-form__actions {

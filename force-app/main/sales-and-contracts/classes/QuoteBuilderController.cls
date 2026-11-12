@@ -39,6 +39,8 @@ public with sharing class QuoteBuilderController {
     public List<PricebookOption> pricebooks = new List<PricebookOption>();
     @AuraEnabled
     public List<EmailTemplateOption> emailTemplates = new List<EmailTemplateOption>();
+    @AuraEnabled
+    public List<FromAddressOption> fromAddresses = new List<FromAddressOption>();
   }
 
   public class CatalogItem {
@@ -136,6 +138,22 @@ public with sharing class QuoteBuilderController {
     public String folderName;
   }
 
+  public class FromAddressOption {
+    @AuraEnabled
+    public Id id;
+    @AuraEnabled
+    public String label;
+    @AuraEnabled
+    public String address;
+  }
+
+  public class EmailDraft {
+    @AuraEnabled
+    public String subject;
+    @AuraEnabled
+    public String htmlBody;
+  }
+
   public class LineInput {
     @AuraEnabled
     public Id pricebookEntryId { get; set; }
@@ -161,6 +179,7 @@ public with sharing class QuoteBuilderController {
     ctx.canOverrideDiscount = canOverride();
     ctx.pricebooks = pricebookOptions(opp.Pricebook2Id);
     ctx.emailTemplates = activeEmailTemplates();
+    ctx.fromAddresses = availableFromAddresses();
     if (opp.Pricebook2Id != null) {
       ctx.catalog = catalogFor(opp.Pricebook2Id);
     }
@@ -352,11 +371,49 @@ public with sharing class QuoteBuilderController {
     return document.Id;
   }
 
+  @AuraEnabled(cacheable=true)
+  public static EmailDraft renderEmailDraft(Id quoteId, Id templateId) {
+    Quote quoteRecord = loadQuoteForAccess(quoteId);
+    EmailDraft draft = new EmailDraft();
+    if (templateId == null) {
+      draft.subject = quoteRecord.Name;
+      draft.htmlBody =
+        '<p>Hello,</p><p>Please find your quote for <strong>' +
+        quoteRecord.Opportunity.Name.escapeHtml4() +
+        '</strong> attached.</p><p>Thank you,<br/>Appeals Doctor</p>';
+      return draft;
+    }
+    EmailTemplate selectedTemplate = loadEmailTemplate(templateId);
+    Id mergeContactId = resolveMergeContactId(
+      quoteRecord,
+      resolveRecipient(quoteRecord)
+    );
+    if (mergeContactId == null) {
+      throw new AuraHandledException(
+        'Add a Contact to the Opportunity before using an email template.'
+      );
+    }
+    Messaging.SingleEmailMessage rendered = Messaging.renderStoredEmailTemplate(
+      selectedTemplate.Id,
+      mergeContactId,
+      quoteRecord.OpportunityId
+    );
+    draft.subject = rendered.getSubject();
+    draft.htmlBody = String.isNotBlank(rendered.getHtmlBody())
+      ? rendered.getHtmlBody()
+      : plainTextToHtml(rendered.getPlainTextBody());
+    return draft;
+  }
+
   @AuraEnabled
   public static QuoteInfo sendQuote(
     Id quoteId,
     String recipientEmail,
-    Id templateId
+    String ccEmails,
+    Id templateId,
+    Id fromAddressId,
+    String subject,
+    String htmlBody
   ) {
     Quote quoteRecord = loadQuoteForAccess(quoteId);
     String recipient = String.isBlank(recipientEmail)
@@ -367,11 +424,12 @@ public with sharing class QuoteBuilderController {
     }
     EmailTemplate selectedTemplate = loadEmailTemplate(templateId);
     Id mergeContactId = resolveMergeContactId(quoteRecord, recipient);
-    if (selectedTemplate != null && mergeContactId == null) {
-      throw new AuraHandledException(
-        'Add a Contact to the Opportunity before using an email template.'
-      );
-    }
+    List<String> ccRecipients = parseEmailList(ccEmails);
+    if (String.isBlank(subject))
+      throw new AuraHandledException('Enter an email subject.');
+    if (String.isBlank(htmlBody))
+      throw new AuraHandledException('Enter an email body.');
+    OrgWideEmailAddress fromAddress = loadFromAddress(fromAddressId);
     Blob pdf = renderPdf(quoteRecord.Id);
     Messaging.EmailFileAttachment attachment = new Messaging.EmailFileAttachment();
     attachment.setFileName(
@@ -382,19 +440,12 @@ public with sharing class QuoteBuilderController {
     attachment.setBody(pdf);
     Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
     email.setToAddresses(new List<String>{ recipient });
-    if (selectedTemplate == null) {
-      email.setSubject(quoteRecord.Name);
-      email.setPlainTextBody(
-        'Hello,\n\nPlease find your quote for ' +
-          quoteRecord.Opportunity.Name +
-          ' attached.\n\nThank you,\nAppeals Doctor'
-      );
-    } else {
-      email.setTemplateId(selectedTemplate.Id);
-      email.setTargetObjectId(mergeContactId);
-      email.setTreatTargetObjectAsRecipient(false);
-      email.setWhatId(quoteRecord.OpportunityId);
-    }
+    if (!ccRecipients.isEmpty())
+      email.setCcAddresses(ccRecipients);
+    if (fromAddress != null)
+      email.setOrgWideEmailAddressId(fromAddress.Id);
+    email.setSubject(subject.trim().left(255));
+    email.setHtmlBody(htmlBody);
     email.setSaveAsActivity(false);
     email.setFileAttachments(
       new List<Messaging.EmailFileAttachment>{ attachment }
@@ -415,10 +466,7 @@ public with sharing class QuoteBuilderController {
     insert as user new Task(
       WhatId = quoteRecord.OpportunityId,
       WhoId = mergeContactId,
-      Subject = 'Email: ' +
-        (selectedTemplate == null
-          ? quoteRecord.Name
-          : selectedTemplate.Subject),
+      Subject = ('Email: ' + subject.trim()).left(255),
       Status = 'Completed',
       Priority = 'Normal',
       ActivityDate = Date.today(),
@@ -426,6 +474,10 @@ public with sharing class QuoteBuilderController {
         quoteRecord.Name +
         ' sent to ' +
         recipient +
+        (ccRecipients.isEmpty()
+          ? ''
+          : '; CC: ' + String.join(ccRecipients, ', ')) +
+        (fromAddress == null ? '' : '; From: ' + fromAddress.Address) +
         (selectedTemplate == null
           ? ' using the default quote email.'
           : ' using template "' + selectedTemplate.Name + '".')
@@ -807,6 +859,25 @@ public with sharing class QuoteBuilderController {
     return options;
   }
 
+  private static List<FromAddressOption> availableFromAddresses() {
+    List<FromAddressOption> options = new List<FromAddressOption>();
+    for (OrgWideEmailAddress address : [
+      SELECT Id, DisplayName, Address
+      FROM OrgWideEmailAddress
+      WHERE IsAllowAllProfiles = TRUE
+      ORDER BY DisplayName, Address
+    ]) {
+      FromAddressOption option = new FromAddressOption();
+      option.id = address.Id;
+      option.address = address.Address;
+      option.label = String.isBlank(address.DisplayName)
+        ? address.Address
+        : address.DisplayName + ' <' + address.Address + '>';
+      options.add(option);
+    }
+    return options;
+  }
+
   private static EmailTemplate loadEmailTemplate(Id templateId) {
     if (templateId == null)
       return null;
@@ -825,6 +896,54 @@ public with sharing class QuoteBuilderController {
       );
     }
     return templates[0];
+  }
+
+  private static OrgWideEmailAddress loadFromAddress(Id fromAddressId) {
+    if (fromAddressId == null)
+      return null;
+    if (fromAddressId.getSObjectType() != OrgWideEmailAddress.SObjectType) {
+      throw new AuraHandledException('Choose a valid From address.');
+    }
+    List<OrgWideEmailAddress> addresses = [
+      SELECT Id, Address
+      FROM OrgWideEmailAddress
+      WHERE Id = :fromAddressId AND IsAllowAllProfiles = TRUE
+      LIMIT 1
+    ];
+    if (addresses.isEmpty()) {
+      throw new AuraHandledException(
+        'The selected From address is not available to all profiles.'
+      );
+    }
+    return addresses[0];
+  }
+
+  private static List<String> parseEmailList(String values) {
+    List<String> emails = new List<String>();
+    if (String.isBlank(values))
+      return emails;
+    for (String value : values.split('[,;]')) {
+      String email = value.trim();
+      if (String.isBlank(email))
+        continue;
+      if (!isValidEmail(email)) {
+        throw new AuraHandledException('Invalid CC email address: ' + email);
+      }
+      if (!emails.contains(email))
+        emails.add(email);
+    }
+    if (emails.size() > 25) {
+      throw new AuraHandledException('Enter no more than 25 CC recipients.');
+    }
+    return emails;
+  }
+
+  private static String plainTextToHtml(String value) {
+    return String.isBlank(value)
+      ? ''
+      : '<p>' +
+        value.escapeHtml4().replace('\r\n', '<br/>').replace('\n', '<br/>') +
+        '</p>';
   }
 
   private static Id resolveMergeContactId(

@@ -518,7 +518,7 @@
         aria-labelledby="send-modal-title"
       >
         <div class="modal-backdrop"></div>
-        <div class="modal modal_medium modal_compact">
+        <div class="modal modal_medium modal_send">
           <header class="workspace__header modal__header">
             <div>
               <p class="eyebrow">End-user delivery</p>
@@ -535,29 +535,76 @@
             </button>
           </header>
           <div class="modal__body send-form">
+            <div class="send-form__grid">
+              <lightning-input
+                type="email"
+                label="Recipient email"
+                value={sendEmail}
+                required
+                onchange={handleSendEmailChange}
+              ></lightning-input>
+              <lightning-input
+                type="text"
+                label="CC"
+                value={sendCc}
+                placeholder="name@example.com, another@example.com"
+                onchange={handleSendCcChange}
+              ></lightning-input>
+              <lightning-combobox
+                label="Email template"
+                value={selectedEmailTemplateId}
+                options={emailTemplateOptions}
+                onchange={handleEmailTemplateChange}
+              ></lightning-combobox>
+              <lightning-combobox
+                label="From address"
+                value={selectedFromAddressId}
+                options={fromAddressOptions}
+                onchange={handleFromAddressChange}
+              ></lightning-combobox>
+            </div>
             <lightning-input
-              type="email"
-              label="Recipient email"
-              value={sendEmail}
+              type="text"
+              label="Subject"
+              value={sendSubject}
               required
-              onchange={handleSendEmailChange}
+              disabled={emailDraftLoading}
+              onchange={handleSendSubjectChange}
             ></lightning-input>
-            <lightning-combobox
-              label="Email template"
-              value={selectedEmailTemplateId}
-              options={emailTemplateOptions}
-              onchange={handleEmailTemplateChange}
-            ></lightning-combobox>
-            <div class="send-form__notice">
-              <lightning-icon
-                icon-name="utility:attach"
-                size="x-small"
-                alternative-text="PDF attached"
-              ></lightning-icon>
-              <span>
-                The current quote PDF will be attached. A completed email
-                activity will be added to this Opportunity.
+            <div class="send-form__body">
+              <span class="send-form__label">HTML body</span>
+              <template lwc:if={emailDraftLoading}>
+                <div class="send-form__loading">
+                  <lightning-spinner
+                    alternative-text="Loading email template"
+                    size="small"
+                  ></lightning-spinner>
+                </div>
+              </template>
+              <template lwc:else>
+                <lightning-input-rich-text
+                  value={sendHtmlBody}
+                  onchange={handleSendBodyChange}
+                ></lightning-input-rich-text>
+              </template>
+            </div>
+            <div class="attachment-card">
+              <span class="attachment-card__icon">
+                <lightning-icon
+                  icon-name="doctype:pdf"
+                  size="small"
+                  alternative-text="Quote PDF attached"
+                ></lightning-icon>
               </span>
+              <span class="stack">
+                <strong>{sendAttachmentName}</strong>
+                <span class="muted">Current branded quote PDF · Attached</span>
+              </span>
+              <span class="attachment-card__status">Attached</span>
+            </div>
+            <div class="send-form__notice">
+              A completed email activity with recipient, CC, template, and From
+              address details will be added to this Opportunity.
             </div>
             <div class="actions send-form__actions">
               <button

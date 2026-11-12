@@ -264,11 +264,21 @@ private class QuoteBuilderControllerTest {
   static void sendQuoteEmailsPdfAndMarksPresented() {
     QuoteBuilderController.QuoteInfo quote = createQuote();
     Opportunity opp = opportunity('QB With Pricebook');
+    QuoteBuilderController.EmailDraft draft = QuoteBuilderController.renderEmailDraft(
+      quote.quoteId,
+      null
+    );
+    Assert.areEqual('QB With Pricebook – Proposal v1', draft.subject);
+    Assert.isTrue(draft.htmlBody.contains('Appeals Doctor'));
     Test.startTest();
     QuoteBuilderController.QuoteInfo sent = QuoteBuilderController.sendQuote(
       quote.quoteId,
       'end.user@example.com',
-      null
+      'manager@example.com; legal@example.com',
+      null,
+      null,
+      'Custom quote subject',
+      '<p>Custom quote email body.</p>'
     );
     Test.stopTest();
     Assert.areEqual('Presented', sent.status);
@@ -287,6 +297,7 @@ private class QuoteBuilderControllerTest {
     Assert.areEqual('Completed', activity.Status);
     Assert.isTrue(activity.Subject.startsWith('Email:'));
     Assert.isTrue(activity.Description.contains('end.user@example.com'));
+    Assert.isTrue(activity.Description.contains('manager@example.com'));
   }
 
   @IsTest

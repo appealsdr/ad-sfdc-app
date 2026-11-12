@@ -5,6 +5,7 @@ import getContext from "@salesforce/apex/QuoteBuilderController.getContext";
 import setPricebook from "@salesforce/apex/QuoteBuilderController.setPricebook";
 import saveQuote from "@salesforce/apex/QuoteBuilderController.saveQuote";
 import generatePdf from "@salesforce/apex/QuoteBuilderController.generatePdf";
+import renderEmailDraft from "@salesforce/apex/QuoteBuilderController.renderEmailDraft";
 import sendQuote from "@salesforce/apex/QuoteBuilderController.sendQuote";
 import syncQuoteToOpportunity from "@salesforce/apex/QuoteBuilderController.syncQuoteToOpportunity";
 
@@ -30,6 +31,11 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
+  "@salesforce/apex/QuoteBuilderController.renderEmailDraft",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
   "@salesforce/apex/QuoteBuilderController.sendQuote",
   () => ({ default: jest.fn() }),
   { virtual: true }
@@ -46,6 +52,7 @@ const ENTRY_ID = "01u000000000001AAA";
 const PRICEBOOK_ID = "01s000000000001AAA";
 const PDF_ID = "0QD000000000001AAA";
 const TEMPLATE_ID = "00X000000000001AAA";
+const FROM_ADDRESS_ID = "0D2000000000001AAA";
 
 const quoteLine = {
   lineId: "0QL000000000001AAA",
@@ -117,6 +124,13 @@ const context = (overrides = {}) => ({
       folderName: "Sales"
     }
   ],
+  fromAddresses: [
+    {
+      id: FROM_ADDRESS_ID,
+      label: "Appeals Doctor <quotes@example.com>",
+      address: "quotes@example.com"
+    }
+  ],
   ...overrides
 });
 
@@ -124,6 +138,10 @@ const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 async function render(initialContext = context()) {
   getContext.mockResolvedValue(initialContext);
+  renderEmailDraft.mockResolvedValue({
+    subject: "Your Appeals Doctor quote",
+    htmlBody: "<p>Please review your quote.</p>"
+  });
   const element = createElement("c-quote-builder", { is: QuoteBuilder });
   element.recordId = OPPORTUNITY_ID;
   document.body.appendChild(element);
@@ -264,24 +282,59 @@ describe("c-quote-builder quote-first workspace", () => {
     await flushPromises();
     expect(element.shadowRoot.querySelector(".send-modal")).toBeTruthy();
 
-    const emailInput = element.shadowRoot.querySelector(
-      ".send-modal lightning-input"
+    const sendInputs = [
+      ...element.shadowRoot.querySelectorAll(".send-modal lightning-input")
+    ];
+    const emailInput = sendInputs.find(
+      (input) => input.label === "Recipient email"
     );
     emailInput.value = "end.user@example.com";
     emailInput.dispatchEvent(new CustomEvent("change"));
-    const templatePicker = element.shadowRoot.querySelector(
-      ".send-modal lightning-combobox"
+    const ccInput = sendInputs.find((input) => input.label === "CC");
+    ccInput.value = "manager@example.com";
+    ccInput.dispatchEvent(new CustomEvent("change"));
+    const sendPickers = [
+      ...element.shadowRoot.querySelectorAll(".send-modal lightning-combobox")
+    ];
+    const templatePicker = sendPickers.find(
+      (picker) => picker.label === "Email template"
     );
     templatePicker.dispatchEvent(
       new CustomEvent("change", { detail: { value: TEMPLATE_ID } })
     );
+    await flushPromises();
+    const subjectInput = sendInputs.find((input) => input.label === "Subject");
+    subjectInput.value = "Updated quote subject";
+    subjectInput.dispatchEvent(new CustomEvent("change"));
+    const fromPicker = sendPickers.find(
+      (picker) => picker.label === "From address"
+    );
+    fromPicker.dispatchEvent(
+      new CustomEvent("change", { detail: { value: FROM_ADDRESS_ID } })
+    );
+    const bodyEditor = element.shadowRoot.querySelector(
+      ".send-modal lightning-input-rich-text"
+    );
+    bodyEditor.dispatchEvent(
+      new CustomEvent("change", {
+        detail: { value: "<p>Updated HTML quote body.</p>" }
+      })
+    );
     buttonByText(element, "Send email").click();
     await flushPromises();
 
+    expect(renderEmailDraft).toHaveBeenLastCalledWith({
+      quoteId: QUOTE_ID,
+      templateId: TEMPLATE_ID
+    });
     expect(sendQuote).toHaveBeenCalledWith({
       quoteId: QUOTE_ID,
       recipientEmail: "end.user@example.com",
-      templateId: TEMPLATE_ID
+      ccEmails: "manager@example.com",
+      templateId: TEMPLATE_ID,
+      fromAddressId: FROM_ADDRESS_ID,
+      subject: "Updated quote subject",
+      htmlBody: "<p>Updated HTML quote body.</p>"
     });
     expect(element.shadowRoot.querySelector(".send-modal")).toBeFalsy();
   });
