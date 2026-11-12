@@ -43,6 +43,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   selectedEmailTemplateId = "";
   selectedFromAddressId = "";
   emailDraftLoading = false;
+  sendInProgress = false;
   pendingNewQuote = false;
   selectedPricebookId;
   editingQuoteId;
@@ -233,6 +234,20 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       !this.sendSubject.trim() ||
       !this.sendHtmlBody.trim()
     );
+  }
+
+  get showSendLoading() {
+    return this.emailDraftLoading || this.sendInProgress;
+  }
+
+  get sendLoadingLabel() {
+    return this.sendInProgress
+      ? "Sending quote email…"
+      : "Preparing email…";
+  }
+
+  get sendActionLabel() {
+    return this.sendInProgress ? "Sending…" : "Send email";
   }
 
   get recipientPills() {
@@ -665,24 +680,29 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   async handleConfirmSend() {
     const quote = this.findQuote(this.sendingQuoteId);
     const recipients = this.recipientEmailsValue;
-    await this.run(async () => {
-      await sendQuote({
-        quoteId: quote.quoteId,
-        recipientEmail: recipients,
-        ccEmails: this.sendCc.trim(),
-        templateId: this.selectedEmailTemplateId || null,
-        fromAddressId: this.selectedFromAddressId || null,
-        subject: this.sendSubject.trim(),
-        htmlBody: this.sendHtmlBody
+    this.sendInProgress = true;
+    try {
+      await this.run(async () => {
+        await sendQuote({
+          quoteId: quote.quoteId,
+          recipientEmail: recipients,
+          ccEmails: this.sendCc.trim(),
+          templateId: this.selectedEmailTemplateId || null,
+          fromAddressId: this.selectedFromAddressId || null,
+          subject: this.sendSubject.trim(),
+          htmlBody: this.sendHtmlBody
+        });
+        this.applyContext(await getContext({ opportunityId: this.recordId }));
+        this.resetSendModal();
+        this.toast(
+          "success",
+          "Quote sent",
+          `Sent to ${recipients} and logged on the Opportunity.`
+        );
       });
-      this.applyContext(await getContext({ opportunityId: this.recordId }));
-      this.resetSendModal();
-      this.toast(
-        "success",
-        "Quote sent",
-        `Sent to ${recipients} and logged on the Opportunity.`
-      );
-    });
+    } finally {
+      this.sendInProgress = false;
+    }
   }
 
   async handleSyncQuote(event) {

@@ -224,6 +224,24 @@
   border-radius: 6px;
 }
 
+.send-loading {
+  align-items: center;
+  background: #eef4ff;
+  border: 1px solid #c9d9f2;
+  border-radius: 0.5rem;
+  color: #16325c;
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.send-loading__spinner {
+  display: inline-block;
+  height: 1.5rem;
+  position: relative;
+  width: 1.5rem;
+}
+
 .attachment-card {
   display: flex;
   align-items: center;

@@ -281,6 +281,55 @@ describe("c-quote-builder quote-first workspace", () => {
     ).toBe(`/apex/QuoteBuilderPdf?id=${QUOTE_ID}`);
   });
 
+  it("shows loading feedback while preparing the quote email", async () => {
+    let resolveDraft;
+    const element = await render();
+    renderEmailDraft.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDraft = resolve;
+      })
+    );
+
+    buttonByText(element, "Send quote").click();
+    await flushPromises();
+
+    expect(element.shadowRoot.querySelector(".send-loading")).toBeTruthy();
+    expect(element.shadowRoot.textContent).toContain("Preparing email…");
+
+    resolveDraft({
+      subject: "Prepared quote",
+      htmlBody: "<p>Prepared quote body.</p>"
+    });
+    await flushPromises();
+
+    expect(element.shadowRoot.querySelector(".send-loading")).toBeFalsy();
+  });
+
+  it("shows sending feedback until the quote email finishes", async () => {
+    let resolveSend;
+    sendQuote.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSend = resolve;
+      })
+    );
+    getContext.mockResolvedValue(context());
+    const element = await render();
+
+    buttonByText(element, "Send quote").click();
+    await flushPromises();
+    buttonByText(element, "Send email").click();
+    await flushPromises();
+
+    expect(element.shadowRoot.querySelector(".send-loading")).toBeTruthy();
+    expect(element.shadowRoot.textContent).toContain("Sending quote email…");
+    expect(buttonByText(element, "Sending…")).toBeTruthy();
+
+    resolveSend(quote({ status: "Presented", pdfId: PDF_ID }));
+    await flushPromises();
+
+    expect(element.shadowRoot.querySelector(".send-modal")).toBeFalsy();
+  });
+
   it("sends the quote to an edited email with a selected template", async () => {
     sendQuote.mockResolvedValue(quote({ status: "Presented", pdfId: PDF_ID }));
     getContext.mockResolvedValue(context());

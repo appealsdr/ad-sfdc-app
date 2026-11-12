@@ -535,6 +535,17 @@
             </button>
           </header>
           <div class="modal__body send-form">
+            <template lwc:if={showSendLoading}>
+              <div class="send-loading" role="status" aria-live="polite">
+                <span class="send-loading__spinner">
+                  <lightning-spinner
+                    alternative-text={sendLoadingLabel}
+                    size="small"
+                  ></lightning-spinner>
+                </span>
+                <strong>{sendLoadingLabel}</strong>
+              </div>
+            </template>
             <div class="composer-row">
               <span class="composer-row__label">
                 <abbr title="required">*</abbr> From
@@ -717,7 +728,7 @@
                 onclick={handleConfirmSend}
                 disabled={sendActionDisabled}
               >
-                Send email
+                {sendActionLabel}
               </button>
             </div>
           </div>
