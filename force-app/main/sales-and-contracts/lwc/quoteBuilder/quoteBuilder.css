@@ -95,12 +95,6 @@
   padding: 1.25rem;
 }
 
-.send-form__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.8rem 1rem;
-}
-
 .send-form__body {
   display: flex;
   min-height: 12rem;
@@ -111,6 +105,47 @@
 .send-form__label {
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.composer-row {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.composer-row_to {
+  grid-template-columns: 5rem minmax(0, 1fr) auto;
+}
+
+.composer-row__label {
+  color: #2e2e2e;
+  font-size: 0.95rem;
+}
+
+.composer-row__label abbr {
+  color: #ba0517;
+  text-decoration: none;
+}
+
+.composer-row__control {
+  min-width: 0;
+}
+
+.composer-row__toggle {
+  align-self: center;
+  padding: 0.35rem 0.45rem;
+  border: 0;
+  color: #8a4f00;
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.composer-row__toggle:hover,
+.composer-row__toggle:focus {
+  text-decoration: underline;
+  outline: 0;
 }
 
 .recipient-lookup {
@@ -147,7 +182,8 @@
   width: 100%;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.65rem 0.75rem;
+  min-height: 4.4rem;
+  padding: 0.75rem 1rem;
   border: 0;
   border-bottom: 1px solid var(--line);
   color: inherit;
@@ -216,8 +252,15 @@
 }
 
 @media (max-width: 48rem) {
-  .send-form__grid {
+  .composer-row,
+  .composer-row_to {
     grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .composer-row__toggle {
+    position: absolute;
+    right: 1.25rem;
   }
 }
 

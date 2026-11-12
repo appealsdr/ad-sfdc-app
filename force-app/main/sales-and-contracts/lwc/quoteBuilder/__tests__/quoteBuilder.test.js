@@ -298,7 +298,11 @@ describe("c-quote-builder quote-first workspace", () => {
     );
     emailInput.value = "end.user@example.com";
     emailInput.dispatchEvent(new CustomEvent("input"));
-    const ccInput = sendInputs.find((input) => input.label === "CC");
+    buttonByText(element, "Cc").click();
+    await flushPromises();
+    const ccInput = [
+      ...element.shadowRoot.querySelectorAll(".send-modal lightning-input")
+    ].find((input) => input.label === "CC");
     ccInput.value = "manager@example.com";
     ccInput.dispatchEvent(new CustomEvent("change"));
     const sendPickers = [

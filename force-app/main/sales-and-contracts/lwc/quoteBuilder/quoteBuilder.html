@@ -535,11 +535,24 @@
             </button>
           </header>
           <div class="modal__body send-form">
-            <div class="send-form__grid">
-              <div class="recipient-lookup">
-                <span class="send-form__label">
-                  <abbr title="required">*</abbr> Recipient
-                </span>
+            <div class="composer-row">
+              <span class="composer-row__label">
+                <abbr title="required">*</abbr> From
+              </span>
+              <lightning-combobox
+                class="composer-row__control"
+                variant="label-hidden"
+                label="From address"
+                value={selectedFromAddressId}
+                options={fromAddressOptions}
+                onchange={handleFromAddressChange}
+              ></lightning-combobox>
+            </div>
+            <div class="composer-row composer-row_to">
+              <span class="composer-row__label">
+                <abbr title="required">*</abbr> To
+              </span>
+              <div class="recipient-lookup composer-row__control">
                 <template lwc:if={selectedRecipientContactId}>
                   <div class="recipient-lookup__selection">
                     <lightning-pill
@@ -602,34 +615,55 @@
                   </div>
                 </template>
               </div>
-              <lightning-input
-                type="text"
-                label="CC"
-                value={sendCc}
-                placeholder="name@example.com, another@example.com"
-                onchange={handleSendCcChange}
-              ></lightning-input>
+              <button
+                type="button"
+                class="composer-row__toggle"
+                onclick={handleToggleCc}
+                aria-expanded={showCc}
+              >
+                Cc
+              </button>
+            </div>
+            <template lwc:if={showCc}>
+              <div class="composer-row">
+                <span class="composer-row__label">Cc</span>
+                <lightning-input
+                  class="composer-row__control"
+                  type="text"
+                  variant="label-hidden"
+                  label="CC"
+                  value={sendCc}
+                  placeholder="name@example.com, another@example.com"
+                  onchange={handleSendCcChange}
+                ></lightning-input>
+              </div>
+            </template>
+            <div class="composer-row">
+              <span class="composer-row__label">Template</span>
               <lightning-combobox
+                class="composer-row__control"
+                variant="label-hidden"
                 label="Email template"
                 value={selectedEmailTemplateId}
                 options={emailTemplateOptions}
                 onchange={handleEmailTemplateChange}
               ></lightning-combobox>
-              <lightning-combobox
-                label="From address"
-                value={selectedFromAddressId}
-                options={fromAddressOptions}
-                onchange={handleFromAddressChange}
-              ></lightning-combobox>
             </div>
-            <lightning-input
-              type="text"
-              label="Subject"
-              value={sendSubject}
-              required
-              disabled={emailDraftLoading}
-              onchange={handleSendSubjectChange}
-            ></lightning-input>
+            <div class="composer-row">
+              <span class="composer-row__label">
+                <abbr title="required">*</abbr> Subject
+              </span>
+              <lightning-input
+                class="composer-row__control"
+                type="text"
+                variant="label-hidden"
+                label="Subject"
+                value={sendSubject}
+                required
+                disabled={emailDraftLoading}
+                onchange={handleSendSubjectChange}
+              ></lightning-input>
+            </div>
             <div class="send-form__body">
               <span class="send-form__label">HTML body</span>
               <template lwc:if={emailDraftLoading}>

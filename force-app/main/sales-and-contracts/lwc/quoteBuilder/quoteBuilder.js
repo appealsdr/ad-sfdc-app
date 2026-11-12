@@ -36,6 +36,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   recipientSearch = "";
   selectedRecipientContactId = "";
   recipientMenuOpen = false;
+  showCc = false;
   sendCc = "";
   sendSubject = "";
   sendHtmlBody = "";
@@ -502,6 +503,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     );
     this.selectedRecipientContactId = matchingContact?.id || "";
     this.recipientMenuOpen = false;
+    this.showCc = false;
     this.sendCc = "";
     this.selectedEmailTemplateId = "";
     this.selectedFromAddressId = "";
@@ -540,6 +542,11 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   handleSendCcChange(event) {
     this.sendCc = event.target.value || "";
+  }
+
+  handleToggleCc() {
+    this.showCc = !this.showCc;
+    if (!this.showCc) this.sendCc = "";
   }
 
   async handleEmailTemplateChange(event) {
@@ -592,6 +599,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.recipientSearch = "";
     this.selectedRecipientContactId = "";
     this.recipientMenuOpen = false;
+    this.showCc = false;
     this.sendCc = "";
     this.sendSubject = "";
     this.sendHtmlBody = "";
