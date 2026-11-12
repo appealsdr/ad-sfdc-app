@@ -41,6 +41,8 @@ public with sharing class QuoteBuilderController {
     public List<EmailTemplateOption> emailTemplates = new List<EmailTemplateOption>();
     @AuraEnabled
     public List<FromAddressOption> fromAddresses = new List<FromAddressOption>();
+    @AuraEnabled
+    public List<ContactOption> recipientContacts = new List<ContactOption>();
   }
 
   public class CatalogItem {
@@ -147,6 +149,17 @@ public with sharing class QuoteBuilderController {
     public String address;
   }
 
+  public class ContactOption {
+    @AuraEnabled
+    public Id id;
+    @AuraEnabled
+    public String name;
+    @AuraEnabled
+    public String email;
+    @AuraEnabled
+    public String title;
+  }
+
   public class EmailDraft {
     @AuraEnabled
     public String subject;
@@ -180,6 +193,7 @@ public with sharing class QuoteBuilderController {
     ctx.pricebooks = pricebookOptions(opp.Pricebook2Id);
     ctx.emailTemplates = activeEmailTemplates();
     ctx.fromAddresses = availableFromAddresses();
+    ctx.recipientContacts = accountContacts(opp.AccountId);
     if (opp.Pricebook2Id != null) {
       ctx.catalog = catalogFor(opp.Pricebook2Id);
     }
@@ -372,7 +386,11 @@ public with sharing class QuoteBuilderController {
   }
 
   @AuraEnabled(cacheable=true)
-  public static EmailDraft renderEmailDraft(Id quoteId, Id templateId) {
+  public static EmailDraft renderEmailDraft(
+    Id quoteId,
+    Id templateId,
+    String recipientEmail
+  ) {
     Quote quoteRecord = loadQuoteForAccess(quoteId);
     EmailDraft draft = new EmailDraft();
     if (templateId == null) {
@@ -386,7 +404,9 @@ public with sharing class QuoteBuilderController {
     EmailTemplate selectedTemplate = loadEmailTemplate(templateId);
     Id mergeContactId = resolveMergeContactId(
       quoteRecord,
-      resolveRecipient(quoteRecord)
+      String.isBlank(recipientEmail)
+        ? resolveRecipient(quoteRecord)
+        : recipientEmail.trim()
     );
     if (mergeContactId == null) {
       throw new AuraHandledException(
@@ -783,7 +803,8 @@ public with sharing class QuoteBuilderController {
         ContactId,
         Contact.Email,
         OpportunityId,
-        Opportunity.Name
+        Opportunity.Name,
+        Opportunity.AccountId
       FROM Quote
       WHERE Id = :quoteId
       WITH USER_MODE
@@ -838,6 +859,28 @@ public with sharing class QuoteBuilderController {
       return role.Contact.Email;
     }
     return null;
+  }
+
+  private static List<ContactOption> accountContacts(Id accountId) {
+    List<ContactOption> options = new List<ContactOption>();
+    if (accountId == null)
+      return options;
+    for (Contact contact : [
+      SELECT Id, Name, Email, Title
+      FROM Contact
+      WHERE AccountId = :accountId AND Email != NULL
+      WITH USER_MODE
+      ORDER BY Name
+      LIMIT 200
+    ]) {
+      ContactOption option = new ContactOption();
+      option.id = contact.Id;
+      option.name = contact.Name;
+      option.email = contact.Email;
+      option.title = contact.Title;
+      options.add(option);
+    }
+    return options;
   }
 
   private static List<EmailTemplateOption> activeEmailTemplates() {
@@ -965,6 +1008,17 @@ public with sharing class QuoteBuilderController {
     ]) {
       if (role.Contact.Email == recipientEmail)
         return role.ContactId;
+    }
+    for (Contact contact : [
+      SELECT Id
+      FROM Contact
+      WHERE
+        AccountId = :quoteRecord.Opportunity.AccountId
+        AND Email = :recipientEmail
+      WITH USER_MODE
+      LIMIT 1
+    ]) {
+      return contact.Id;
     }
     return primaryContactId(quoteRecord.OpportunityId);
   }

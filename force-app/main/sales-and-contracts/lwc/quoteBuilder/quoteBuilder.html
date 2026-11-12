@@ -536,13 +536,71 @@
           </header>
           <div class="modal__body send-form">
             <div class="send-form__grid">
-              <lightning-input
-                type="email"
-                label="Recipient email"
-                value={sendEmail}
-                required
-                onchange={handleSendEmailChange}
-              ></lightning-input>
+              <div class="recipient-lookup">
+                <span class="send-form__label">
+                  <abbr title="required">*</abbr> Recipient
+                </span>
+                <template lwc:if={selectedRecipientContactId}>
+                  <div class="recipient-lookup__selection">
+                    <lightning-pill
+                      label={selectedRecipientLabel}
+                      onremove={handleRemoveRecipient}
+                    >
+                      <lightning-icon
+                        icon-name="standard:contact"
+                        alternative-text="Contact"
+                      ></lightning-icon>
+                    </lightning-pill>
+                  </div>
+                </template>
+                <template lwc:else>
+                  <lightning-input
+                    type="search"
+                    variant="label-hidden"
+                    label="Recipient email or contact"
+                    value={recipientSearch}
+                    placeholder="Search account contacts or enter an email"
+                    required
+                    onfocus={handleRecipientFocus}
+                    oninput={handleSendEmailChange}
+                  ></lightning-input>
+                </template>
+                <template lwc:if={showRecipientContactMenu}>
+                  <div class="recipient-lookup__menu" role="listbox">
+                    <template lwc:if={hasRecipientContactMatches}>
+                      <template
+                        for:each={recipientContactMatches}
+                        for:item="contact"
+                      >
+                        <button
+                          key={contact.id}
+                          type="button"
+                          class="recipient-lookup__option"
+                          data-id={contact.id}
+                          onclick={handleSelectRecipient}
+                          role="option"
+                        >
+                          <lightning-icon
+                            icon-name="standard:contact"
+                            size="small"
+                            alternative-text="Contact"
+                          ></lightning-icon>
+                          <span class="stack">
+                            <strong>{contact.name}</strong>
+                            <span class="muted">{contact.detail}</span>
+                          </span>
+                        </button>
+                      </template>
+                    </template>
+                    <template lwc:else>
+                      <div class="recipient-lookup__empty">
+                        No email-enabled Contacts found on the related Account.
+                        You can enter an email address manually.
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
               <lightning-input
                 type="text"
                 label="CC"

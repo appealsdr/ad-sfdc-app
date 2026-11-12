@@ -33,6 +33,9 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   sendModalOpen = false;
   sendingQuoteId;
   sendEmail = "";
+  recipientSearch = "";
+  selectedRecipientContactId = "";
+  recipientMenuOpen = false;
   sendCc = "";
   sendSubject = "";
   sendHtmlBody = "";
@@ -229,6 +232,41 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       !this.sendSubject.trim() ||
       !this.sendHtmlBody.trim()
     );
+  }
+
+  get selectedRecipientContact() {
+    return (this.context?.recipientContacts || []).find(
+      (contact) => contact.id === this.selectedRecipientContactId
+    );
+  }
+
+  get selectedRecipientLabel() {
+    const contact = this.selectedRecipientContact;
+    return contact ? `${contact.name} <${contact.email}>` : "";
+  }
+
+  get recipientContactMatches() {
+    const term = (this.recipientSearch || "").trim().toLowerCase();
+    return (this.context?.recipientContacts || [])
+      .filter((contact) => {
+        if (!term) return true;
+        return [contact.name, contact.email, contact.title]
+          .filter(Boolean)
+          .some((value) => value.toLowerCase().includes(term));
+      })
+      .slice(0, 8)
+      .map((contact) => ({
+        ...contact,
+        detail: [contact.title, contact.email].filter(Boolean).join(" · ")
+      }));
+  }
+
+  get showRecipientContactMenu() {
+    return this.recipientMenuOpen && !this.selectedRecipientContactId;
+  }
+
+  get hasRecipientContactMatches() {
+    return this.recipientContactMatches.length > 0;
   }
 
   get fromAddressOptions() {
@@ -457,6 +495,13 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     const quote = this.findQuote(event.currentTarget.dataset.id);
     this.sendingQuoteId = quote.quoteId;
     this.sendEmail = quote.recipientEmail || "";
+    this.recipientSearch = this.sendEmail;
+    const matchingContact = (this.context?.recipientContacts || []).find(
+      (contact) =>
+        (contact.email || "").toLowerCase() === this.sendEmail.toLowerCase()
+    );
+    this.selectedRecipientContactId = matchingContact?.id || "";
+    this.recipientMenuOpen = false;
     this.sendCc = "";
     this.selectedEmailTemplateId = "";
     this.selectedFromAddressId = "";
@@ -466,6 +511,31 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   handleSendEmailChange(event) {
     this.sendEmail = event.target.value || "";
+    this.recipientSearch = this.sendEmail;
+    this.selectedRecipientContactId = "";
+    this.recipientMenuOpen = true;
+  }
+
+  handleRecipientFocus() {
+    this.recipientMenuOpen = true;
+  }
+
+  handleSelectRecipient(event) {
+    const contact = (this.context?.recipientContacts || []).find(
+      (item) => item.id === event.currentTarget.dataset.id
+    );
+    if (!contact) return;
+    this.selectedRecipientContactId = contact.id;
+    this.sendEmail = contact.email;
+    this.recipientSearch = contact.email;
+    this.recipientMenuOpen = false;
+  }
+
+  handleRemoveRecipient() {
+    this.selectedRecipientContactId = "";
+    this.sendEmail = "";
+    this.recipientSearch = "";
+    this.recipientMenuOpen = true;
   }
 
   handleSendCcChange(event) {
@@ -494,7 +564,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     try {
       const draft = await renderEmailDraft({
         quoteId: this.sendingQuoteId,
-        templateId: this.selectedEmailTemplateId || null
+        templateId: this.selectedEmailTemplateId || null,
+        recipientEmail: this.sendEmail.trim() || null
       });
       this.sendSubject = draft.subject || "";
       this.sendHtmlBody = draft.htmlBody || "";
@@ -518,6 +589,9 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.sendModalOpen = false;
     this.sendingQuoteId = undefined;
     this.sendEmail = "";
+    this.recipientSearch = "";
+    this.selectedRecipientContactId = "";
+    this.recipientMenuOpen = false;
     this.sendCc = "";
     this.sendSubject = "";
     this.sendHtmlBody = "";

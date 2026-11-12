@@ -53,7 +53,14 @@ private class QuoteBuilderControllerTest {
       Email = 'quote.recipient@example.com',
       AccountId = account.Id
     );
-    insert contact;
+    Contact accountContact = new Contact(
+      FirstName = 'Account',
+      LastName = 'Buyer',
+      Email = 'account.buyer@example.com',
+      Title = 'Head of Operations',
+      AccountId = account.Id
+    );
+    insert new List<Contact>{ contact, accountContact };
     insert new List<Opportunity>{
       new Opportunity(
         Name = 'QB With Pricebook',
@@ -135,6 +142,14 @@ private class QuoteBuilderControllerTest {
     Opportunity opp = opportunity('QB With Pricebook');
     QuoteBuilderController.Context context = QuoteBuilderController.getContext(
       opp.Id
+    );
+    Assert.areEqual(2, context.recipientContacts.size());
+    Assert.isTrue(
+      new Set<String>{
+          context.recipientContacts[0].email,
+          context.recipientContacts[1].email
+        }
+        .contains('account.buyer@example.com')
     );
     Assert.areEqual('QB Test Services', context.pricebookName);
     Assert.areEqual(2, context.catalog.size());
@@ -266,7 +281,8 @@ private class QuoteBuilderControllerTest {
     Opportunity opp = opportunity('QB With Pricebook');
     QuoteBuilderController.EmailDraft draft = QuoteBuilderController.renderEmailDraft(
       quote.quoteId,
-      null
+      null,
+      'account.buyer@example.com'
     );
     Assert.areEqual('QB With Pricebook – Proposal v1', draft.subject);
     Assert.isTrue(draft.htmlBody.contains('Appeals Doctor'));

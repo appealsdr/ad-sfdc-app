@@ -131,6 +131,14 @@ const context = (overrides = {}) => ({
       address: "quotes@example.com"
     }
   ],
+  recipientContacts: [
+    {
+      id: "003000000000001AAA",
+      name: "Account Buyer",
+      email: "account.buyer@example.com",
+      title: "Head of Operations"
+    }
+  ],
   ...overrides
 });
 
@@ -286,10 +294,10 @@ describe("c-quote-builder quote-first workspace", () => {
       ...element.shadowRoot.querySelectorAll(".send-modal lightning-input")
     ];
     const emailInput = sendInputs.find(
-      (input) => input.label === "Recipient email"
+      (input) => input.label === "Recipient email or contact"
     );
     emailInput.value = "end.user@example.com";
-    emailInput.dispatchEvent(new CustomEvent("change"));
+    emailInput.dispatchEvent(new CustomEvent("input"));
     const ccInput = sendInputs.find((input) => input.label === "CC");
     ccInput.value = "manager@example.com";
     ccInput.dispatchEvent(new CustomEvent("change"));
@@ -325,7 +333,8 @@ describe("c-quote-builder quote-first workspace", () => {
 
     expect(renderEmailDraft).toHaveBeenLastCalledWith({
       quoteId: QUOTE_ID,
-      templateId: TEMPLATE_ID
+      templateId: TEMPLATE_ID,
+      recipientEmail: "end.user@example.com"
     });
     expect(sendQuote).toHaveBeenCalledWith({
       quoteId: QUOTE_ID,
@@ -337,6 +346,32 @@ describe("c-quote-builder quote-first workspace", () => {
       htmlBody: "<p>Updated HTML quote body.</p>"
     });
     expect(element.shadowRoot.querySelector(".send-modal")).toBeFalsy();
+  });
+
+  it("selects an email from a Contact on the related Account", async () => {
+    sendQuote.mockResolvedValue(quote({ status: "Presented", pdfId: PDF_ID }));
+    getContext.mockResolvedValue(context());
+    const element = await render(
+      context({ quotes: [quote({ recipientEmail: "" })] })
+    );
+
+    buttonByText(element, "Send quote").click();
+    await flushPromises();
+    const recipientInput = [
+      ...element.shadowRoot.querySelectorAll(".send-modal lightning-input")
+    ].find((input) => input.label === "Recipient email or contact");
+    recipientInput.dispatchEvent(new CustomEvent("focus"));
+    await flushPromises();
+    element.shadowRoot.querySelector(".recipient-lookup__option").click();
+    await flushPromises();
+    buttonByText(element, "Send email").click();
+    await flushPromises();
+
+    expect(sendQuote).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipientEmail: "account.buyer@example.com"
+      })
+    );
   });
 
   it("syncs only the selected quote to Opportunity products", async () => {
