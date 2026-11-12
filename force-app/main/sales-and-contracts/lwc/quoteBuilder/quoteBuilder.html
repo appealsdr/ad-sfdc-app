@@ -553,16 +553,18 @@
                 <abbr title="required">*</abbr> To
               </span>
               <div class="recipient-lookup composer-row__control">
-                <template lwc:if={selectedRecipientContactId}>
+                <template lwc:if={hasCommittedRecipient}>
                   <div class="recipient-lookup__selection">
                     <lightning-pill
                       label={selectedRecipientLabel}
                       onremove={handleRemoveRecipient}
                     >
-                      <lightning-icon
-                        icon-name="standard:contact"
-                        alternative-text="Contact"
-                      ></lightning-icon>
+                      <template lwc:if={selectedRecipientContactId}>
+                        <lightning-icon
+                          icon-name="standard:contact"
+                          alternative-text="Contact"
+                        ></lightning-icon>
+                      </template>
                     </lightning-pill>
                   </div>
                 </template>
@@ -577,6 +579,7 @@
                     onfocus={handleRecipientFocus}
                     onclick={handleRecipientFocus}
                     oninput={handleSendEmailChange}
+                    onkeydown={handleRecipientKeyDown}
                   ></lightning-input>
                 </template>
                 <template lwc:if={showRecipientContactMenu}>

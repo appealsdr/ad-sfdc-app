@@ -12,6 +12,7 @@ import sendQuote from "@salesforce/apex/QuoteBuilderController.sendQuote";
 import syncQuoteToOpportunity from "@salesforce/apex/QuoteBuilderController.syncQuoteToOpportunity";
 
 const ALL = "__all__";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 let keySequence = 0;
 
 export default class QuoteBuilder extends NavigationMixin(LightningElement) {
@@ -35,6 +36,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   sendEmail = "";
   recipientSearch = "";
   selectedRecipientContactId = "";
+  manualRecipientCommitted = false;
   recipientMenuOpen = false;
   showCc = false;
   sendCc = "";
@@ -243,7 +245,13 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   get selectedRecipientLabel() {
     const contact = this.selectedRecipientContact;
-    return contact ? `${contact.name} <${contact.email}>` : "";
+    return contact ? `${contact.name} <${contact.email}>` : this.sendEmail;
+  }
+
+  get hasCommittedRecipient() {
+    return Boolean(
+      this.selectedRecipientContactId || this.manualRecipientCommitted
+    );
   }
 
   get recipientContactMatches() {
@@ -263,7 +271,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   get showRecipientContactMenu() {
-    return this.recipientMenuOpen && !this.selectedRecipientContactId;
+    return this.recipientMenuOpen && !this.hasCommittedRecipient;
   }
 
   get hasRecipientContactMatches() {
@@ -502,6 +510,9 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
         (contact.email || "").toLowerCase() === this.sendEmail.toLowerCase()
     );
     this.selectedRecipientContactId = matchingContact?.id || "";
+    this.manualRecipientCommitted = Boolean(
+      this.sendEmail && !this.selectedRecipientContactId
+    );
     this.recipientMenuOpen = false;
     this.showCc = false;
     this.sendCc = "";
@@ -515,7 +526,26 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.sendEmail = event.target.value || "";
     this.recipientSearch = this.sendEmail;
     this.selectedRecipientContactId = "";
+    this.manualRecipientCommitted = false;
     this.recipientMenuOpen = true;
+    event.target.setCustomValidity?.("");
+  }
+
+  handleRecipientKeyDown(event) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const email = (event.target.value || this.recipientSearch || "").trim();
+    if (!EMAIL_PATTERN.test(email)) {
+      event.target.setCustomValidity?.("Enter a valid email address.");
+      event.target.reportValidity?.();
+      return;
+    }
+    event.target.setCustomValidity?.("");
+    this.sendEmail = email;
+    this.recipientSearch = "";
+    this.selectedRecipientContactId = "";
+    this.manualRecipientCommitted = true;
+    this.recipientMenuOpen = false;
   }
 
   handleRecipientFocus() {
@@ -528,6 +558,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     );
     if (!contact) return;
     this.selectedRecipientContactId = contact.id;
+    this.manualRecipientCommitted = false;
     this.sendEmail = contact.email;
     this.recipientSearch = contact.email;
     this.recipientMenuOpen = false;
@@ -535,6 +566,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   handleRemoveRecipient() {
     this.selectedRecipientContactId = "";
+    this.manualRecipientCommitted = false;
     this.sendEmail = "";
     this.recipientSearch = "";
     this.recipientMenuOpen = true;
@@ -598,6 +630,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.sendEmail = "";
     this.recipientSearch = "";
     this.selectedRecipientContactId = "";
+    this.manualRecipientCommitted = false;
     this.recipientMenuOpen = false;
     this.showCc = false;
     this.sendCc = "";

@@ -290,6 +290,11 @@ describe("c-quote-builder quote-first workspace", () => {
     await flushPromises();
     expect(element.shadowRoot.querySelector(".send-modal")).toBeTruthy();
 
+    element.shadowRoot
+      .querySelector(".recipient-lookup lightning-pill")
+      .dispatchEvent(new CustomEvent("remove"));
+    await flushPromises();
+
     const sendInputs = [
       ...element.shadowRoot.querySelectorAll(".send-modal lightning-input")
     ];
@@ -376,6 +381,35 @@ describe("c-quote-builder quote-first workspace", () => {
         recipientEmail: "account.buyer@example.com"
       })
     );
+  });
+
+  it("commits a manually entered email as a removable recipient pill", async () => {
+    const element = await render(
+      context({ quotes: [quote({ recipientEmail: "" })] })
+    );
+
+    buttonByText(element, "Send quote").click();
+    await flushPromises();
+    const recipientInput = [
+      ...element.shadowRoot.querySelectorAll(".send-modal lightning-input")
+    ].find((input) => input.label === "Recipient email or contact");
+    recipientInput.value = "manual.recipient@example.com";
+    recipientInput.dispatchEvent(new CustomEvent("input"));
+    recipientInput.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter" })
+    );
+    await flushPromises();
+
+    const recipientPill = element.shadowRoot.querySelector(
+      ".recipient-lookup lightning-pill"
+    );
+    expect(recipientPill).toBeTruthy();
+    expect(recipientPill.label).toBe("manual.recipient@example.com");
+    recipientPill.dispatchEvent(new CustomEvent("remove"));
+    await flushPromises();
+    expect(
+      element.shadowRoot.querySelector(".recipient-lookup lightning-pill")
+    ).toBeFalsy();
   });
 
   it("syncs only the selected quote to Opportunity products", async () => {
