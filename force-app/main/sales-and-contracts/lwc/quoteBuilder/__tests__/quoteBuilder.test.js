@@ -417,6 +417,7 @@ describe("c-quote-builder quote-first workspace", () => {
     expect(recipientPills).toHaveLength(2);
     expect(recipientPills[0].label).toBe("manual.recipient@example.com");
     expect(recipientPills[1].label).toBe("second.recipient@example.com");
+    expect(recipientInput.required).toBeFalsy();
     recipientPills[0].dispatchEvent(
       new CustomEvent("remove", {
         detail: { name: "manual.recipient@example.com" }
