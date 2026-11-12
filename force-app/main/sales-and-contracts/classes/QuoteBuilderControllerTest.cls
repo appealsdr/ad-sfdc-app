@@ -263,9 +263,12 @@ private class QuoteBuilderControllerTest {
   @IsTest
   static void sendQuoteEmailsPdfAndMarksPresented() {
     QuoteBuilderController.QuoteInfo quote = createQuote();
+    Opportunity opp = opportunity('QB With Pricebook');
     Test.startTest();
     QuoteBuilderController.QuoteInfo sent = QuoteBuilderController.sendQuote(
-      quote.quoteId
+      quote.quoteId,
+      'end.user@example.com',
+      null
     );
     Test.stopTest();
     Assert.areEqual('Presented', sent.status);
@@ -274,6 +277,16 @@ private class QuoteBuilderControllerTest {
       1,
       [SELECT COUNT() FROM QuoteDocument WHERE QuoteId = :quote.quoteId]
     );
+    Task activity = [
+      SELECT WhatId, Subject, Description, Status
+      FROM Task
+      WHERE WhatId = :opp.Id
+      LIMIT 1
+    ];
+    Assert.areEqual(opp.Id, activity.WhatId);
+    Assert.areEqual('Completed', activity.Status);
+    Assert.isTrue(activity.Subject.startsWith('Email:'));
+    Assert.isTrue(activity.Description.contains('end.user@example.com'));
   }
 
   @IsTest

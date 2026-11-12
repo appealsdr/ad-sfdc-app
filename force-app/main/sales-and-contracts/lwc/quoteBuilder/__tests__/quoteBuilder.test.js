@@ -45,6 +45,7 @@ const QUOTE_ID = "0Q0000000000001AAA";
 const ENTRY_ID = "01u000000000001AAA";
 const PRICEBOOK_ID = "01s000000000001AAA";
 const PDF_ID = "0QD000000000001AAA";
+const TEMPLATE_ID = "00X000000000001AAA";
 
 const quoteLine = {
   lineId: "0QL000000000001AAA",
@@ -106,6 +107,14 @@ const context = (overrides = {}) => ({
       description: "Core services",
       productCount: 1,
       isCurrent: true
+    }
+  ],
+  emailTemplates: [
+    {
+      id: TEMPLATE_ID,
+      name: "Quote delivery",
+      subject: "Your Appeals Doctor quote",
+      folderName: "Sales"
     }
   ],
   ...overrides
@@ -246,17 +255,35 @@ describe("c-quote-builder quote-first workspace", () => {
     ).toBe(`/apex/QuoteBuilderPdf?id=${QUOTE_ID}`);
   });
 
-  it("confirms and sends the quote to its recipient", async () => {
-    LightningConfirm.open.mockResolvedValue(true);
+  it("sends the quote to an edited email with a selected template", async () => {
     sendQuote.mockResolvedValue(quote({ status: "Presented", pdfId: PDF_ID }));
     getContext.mockResolvedValue(context());
     const element = await render();
 
     buttonByText(element, "Send quote").click();
     await flushPromises();
+    expect(element.shadowRoot.querySelector(".send-modal")).toBeTruthy();
 
-    expect(LightningConfirm.open).toHaveBeenCalled();
-    expect(sendQuote).toHaveBeenCalledWith({ quoteId: QUOTE_ID });
+    const emailInput = element.shadowRoot.querySelector(
+      ".send-modal lightning-input"
+    );
+    emailInput.value = "end.user@example.com";
+    emailInput.dispatchEvent(new CustomEvent("change"));
+    const templatePicker = element.shadowRoot.querySelector(
+      ".send-modal lightning-combobox"
+    );
+    templatePicker.dispatchEvent(
+      new CustomEvent("change", { detail: { value: TEMPLATE_ID } })
+    );
+    buttonByText(element, "Send email").click();
+    await flushPromises();
+
+    expect(sendQuote).toHaveBeenCalledWith({
+      quoteId: QUOTE_ID,
+      recipientEmail: "end.user@example.com",
+      templateId: TEMPLATE_ID
+    });
+    expect(element.shadowRoot.querySelector(".send-modal")).toBeFalsy();
   });
 
   it("syncs only the selected quote to Opportunity products", async () => {

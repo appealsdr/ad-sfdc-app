@@ -37,6 +37,8 @@ public with sharing class QuoteBuilderController {
     public List<QuoteInfo> quotes = new List<QuoteInfo>();
     @AuraEnabled
     public List<PricebookOption> pricebooks = new List<PricebookOption>();
+    @AuraEnabled
+    public List<EmailTemplateOption> emailTemplates = new List<EmailTemplateOption>();
   }
 
   public class CatalogItem {
@@ -123,6 +125,17 @@ public with sharing class QuoteBuilderController {
     public Boolean isCurrent = false;
   }
 
+  public class EmailTemplateOption {
+    @AuraEnabled
+    public Id id;
+    @AuraEnabled
+    public String name;
+    @AuraEnabled
+    public String subject;
+    @AuraEnabled
+    public String folderName;
+  }
+
   public class LineInput {
     @AuraEnabled
     public Id pricebookEntryId { get; set; }
@@ -147,6 +160,7 @@ public with sharing class QuoteBuilderController {
     ctx.syncedQuoteId = opp.SyncedQuoteId;
     ctx.canOverrideDiscount = canOverride();
     ctx.pricebooks = pricebookOptions(opp.Pricebook2Id);
+    ctx.emailTemplates = activeEmailTemplates();
     if (opp.Pricebook2Id != null) {
       ctx.catalog = catalogFor(opp.Pricebook2Id);
     }
@@ -339,12 +353,23 @@ public with sharing class QuoteBuilderController {
   }
 
   @AuraEnabled
-  public static QuoteInfo sendQuote(Id quoteId) {
+  public static QuoteInfo sendQuote(
+    Id quoteId,
+    String recipientEmail,
+    Id templateId
+  ) {
     Quote quoteRecord = loadQuoteForAccess(quoteId);
-    String recipient = resolveRecipient(quoteRecord);
-    if (String.isBlank(recipient)) {
+    String recipient = String.isBlank(recipientEmail)
+      ? resolveRecipient(quoteRecord)
+      : recipientEmail.trim();
+    if (String.isBlank(recipient) || !isValidEmail(recipient)) {
+      throw new AuraHandledException('Enter a valid recipient email address.');
+    }
+    EmailTemplate selectedTemplate = loadEmailTemplate(templateId);
+    Id mergeContactId = resolveMergeContactId(quoteRecord, recipient);
+    if (selectedTemplate != null && mergeContactId == null) {
       throw new AuraHandledException(
-        'Add an email to the Quote, its Contact, or the Opportunity primary contact before sending.'
+        'Add a Contact to the Opportunity before using an email template.'
       );
     }
     Blob pdf = renderPdf(quoteRecord.Id);
@@ -357,12 +382,20 @@ public with sharing class QuoteBuilderController {
     attachment.setBody(pdf);
     Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
     email.setToAddresses(new List<String>{ recipient });
-    email.setSubject(quoteRecord.Name);
-    email.setPlainTextBody(
-      'Hello,\n\nPlease find your quote for ' +
-        quoteRecord.Opportunity.Name +
-        ' attached.\n\nThank you,\nAppeals Doctor'
-    );
+    if (selectedTemplate == null) {
+      email.setSubject(quoteRecord.Name);
+      email.setPlainTextBody(
+        'Hello,\n\nPlease find your quote for ' +
+          quoteRecord.Opportunity.Name +
+          ' attached.\n\nThank you,\nAppeals Doctor'
+      );
+    } else {
+      email.setTemplateId(selectedTemplate.Id);
+      email.setTargetObjectId(mergeContactId);
+      email.setTreatTargetObjectAsRecipient(false);
+      email.setWhatId(quoteRecord.OpportunityId);
+    }
+    email.setSaveAsActivity(false);
     email.setFileAttachments(
       new List<Messaging.EmailFileAttachment>{ attachment }
     );
@@ -379,6 +412,24 @@ public with sharing class QuoteBuilderController {
     }
     insert as user new QuoteDocument(QuoteId = quoteRecord.Id, Document = pdf);
     update as user new Quote(Id = quoteRecord.Id, Status = 'Presented');
+    insert as user new Task(
+      WhatId = quoteRecord.OpportunityId,
+      WhoId = mergeContactId,
+      Subject = 'Email: ' +
+        (selectedTemplate == null
+          ? quoteRecord.Name
+          : selectedTemplate.Subject),
+      Status = 'Completed',
+      Priority = 'Normal',
+      ActivityDate = Date.today(),
+      Description = 'Quote ' +
+        quoteRecord.Name +
+        ' sent to ' +
+        recipient +
+        (selectedTemplate == null
+          ? ' using the default quote email.'
+          : ' using template "' + selectedTemplate.Name + '".')
+    );
     Opportunity opp = [
       SELECT SyncedQuoteId
       FROM Opportunity
@@ -677,6 +728,7 @@ public with sharing class QuoteBuilderController {
         QuoteNumber,
         Status,
         Email,
+        ContactId,
         Contact.Email,
         OpportunityId,
         Opportunity.Name
@@ -734,6 +786,72 @@ public with sharing class QuoteBuilderController {
       return role.Contact.Email;
     }
     return null;
+  }
+
+  private static List<EmailTemplateOption> activeEmailTemplates() {
+    List<EmailTemplateOption> options = new List<EmailTemplateOption>();
+    for (EmailTemplate template : [
+      SELECT Id, Name, Subject, Folder.Name
+      FROM EmailTemplate
+      WHERE IsActive = TRUE
+      ORDER BY Folder.Name, Name
+      LIMIT 200
+    ]) {
+      EmailTemplateOption option = new EmailTemplateOption();
+      option.id = template.Id;
+      option.name = template.Name;
+      option.subject = template.Subject;
+      option.folderName = template.Folder?.Name;
+      options.add(option);
+    }
+    return options;
+  }
+
+  private static EmailTemplate loadEmailTemplate(Id templateId) {
+    if (templateId == null)
+      return null;
+    if (templateId.getSObjectType() != EmailTemplate.SObjectType) {
+      throw new AuraHandledException('Choose a valid email template.');
+    }
+    List<EmailTemplate> templates = [
+      SELECT Id, Name, Subject
+      FROM EmailTemplate
+      WHERE Id = :templateId AND IsActive = TRUE
+      LIMIT 1
+    ];
+    if (templates.isEmpty()) {
+      throw new AuraHandledException(
+        'The selected email template is not active.'
+      );
+    }
+    return templates[0];
+  }
+
+  private static Id resolveMergeContactId(
+    Quote quoteRecord,
+    String recipientEmail
+  ) {
+    if (
+      quoteRecord.ContactId != null &&
+      quoteRecord.Contact?.Email == recipientEmail
+    ) {
+      return quoteRecord.ContactId;
+    }
+    for (OpportunityContactRole role : [
+      SELECT ContactId, Contact.Email
+      FROM OpportunityContactRole
+      WHERE OpportunityId = :quoteRecord.OpportunityId
+      WITH USER_MODE
+      ORDER BY IsPrimary DESC, CreatedDate
+    ]) {
+      if (role.Contact.Email == recipientEmail)
+        return role.ContactId;
+    }
+    return primaryContactId(quoteRecord.OpportunityId);
+  }
+
+  private static Boolean isValidEmail(String value) {
+    return Pattern.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', value);
   }
 
   private static String cleanNotes(String notes) {

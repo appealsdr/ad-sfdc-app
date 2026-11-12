@@ -29,6 +29,10 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   pdfLoading = false;
   pdfUrl;
   pdfError;
+  sendModalOpen = false;
+  sendingQuoteId;
+  sendEmail = "";
+  selectedEmailTemplateId = "";
   pendingNewQuote = false;
   selectedPricebookId;
   editingQuoteId;
@@ -74,7 +78,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
         ? "Synced to Opportunity"
         : "Sync to Opportunity",
       syncDisabled: this.busy || quote.isSynced,
-      sendDisabled: this.busy || !quote.recipientEmail,
+      sendDisabled: this.busy,
       statusClass: `status status_${(quote.status || "draft").toLowerCase().replaceAll(" ", "-")}`
     }));
   }
@@ -196,6 +200,23 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   get saveDisabled() {
     return this.busy || !this.hasLines || this.blockedByApproval;
+  }
+
+  get emailTemplateOptions() {
+    return [
+      { label: "Appeals Doctor quote email (default)", value: "" },
+      ...(this.context?.emailTemplates || []).map((template) => ({
+        label: template.folderName
+          ? `${template.folderName} — ${template.name}`
+          : template.name,
+        value: template.id,
+        description: template.subject
+      }))
+    ];
+  }
+
+  get sendActionDisabled() {
+    return this.busy || !this.sendEmail.trim();
   }
 
   handleNewQuote() {
@@ -404,18 +425,50 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.pdfError = undefined;
   }
 
-  async handleSendQuote(event) {
+  handleSendQuote(event) {
     const quote = this.findQuote(event.currentTarget.dataset.id);
-    const confirmed = await LightningConfirm.open({
-      label: "Send quote",
-      message: `Send ${quote.name} as a PDF to ${quote.recipientEmail}?`,
-      theme: "info"
-    });
-    if (!confirmed) return;
+    this.sendingQuoteId = quote.quoteId;
+    this.sendEmail = quote.recipientEmail || "";
+    this.selectedEmailTemplateId = "";
+    this.sendModalOpen = true;
+  }
+
+  handleSendEmailChange(event) {
+    this.sendEmail = event.target.value || "";
+  }
+
+  handleEmailTemplateChange(event) {
+    this.selectedEmailTemplateId = event.detail.value || "";
+  }
+
+  handleCloseSend() {
+    if (this.busy) return;
+    this.resetSendModal();
+  }
+
+  resetSendModal() {
+    this.sendModalOpen = false;
+    this.sendingQuoteId = undefined;
+    this.sendEmail = "";
+    this.selectedEmailTemplateId = "";
+  }
+
+  async handleConfirmSend() {
+    const quote = this.findQuote(this.sendingQuoteId);
+    const recipient = this.sendEmail.trim();
     await this.run(async () => {
-      await sendQuote({ quoteId: quote.quoteId });
+      await sendQuote({
+        quoteId: quote.quoteId,
+        recipientEmail: recipient,
+        templateId: this.selectedEmailTemplateId || null
+      });
       this.applyContext(await getContext({ opportunityId: this.recordId }));
-      this.toast("success", "Quote sent", `Sent to ${quote.recipientEmail}.`);
+      this.resetSendModal();
+      this.toast(
+        "success",
+        "Quote sent",
+        `Sent to ${recipient} and logged on the Opportunity.`
+      );
     });
   }
 

@@ -510,6 +510,78 @@
       ></lightning-spinner
     ></template>
 
+    <template lwc:if={sendModalOpen}>
+      <section
+        class="modal-layer send-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="send-modal-title"
+      >
+        <div class="modal-backdrop"></div>
+        <div class="modal modal_medium modal_compact">
+          <header class="workspace__header modal__header">
+            <div>
+              <p class="eyebrow">End-user delivery</p>
+              <h2 id="send-modal-title">Send quote by email</h2>
+            </div>
+            <button
+              type="button"
+              class="modal__close"
+              onclick={handleCloseSend}
+              disabled={busy}
+              aria-label="Close email dialog"
+            >
+              ×
+            </button>
+          </header>
+          <div class="modal__body send-form">
+            <lightning-input
+              type="email"
+              label="Recipient email"
+              value={sendEmail}
+              required
+              onchange={handleSendEmailChange}
+            ></lightning-input>
+            <lightning-combobox
+              label="Email template"
+              value={selectedEmailTemplateId}
+              options={emailTemplateOptions}
+              onchange={handleEmailTemplateChange}
+            ></lightning-combobox>
+            <div class="send-form__notice">
+              <lightning-icon
+                icon-name="utility:attach"
+                size="x-small"
+                alternative-text="PDF attached"
+              ></lightning-icon>
+              <span>
+                The current quote PDF will be attached. A completed email
+                activity will be added to this Opportunity.
+              </span>
+            </div>
+            <div class="actions send-form__actions">
+              <button
+                type="button"
+                class="btn"
+                onclick={handleCloseSend}
+                disabled={busy}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="btn btn_primary"
+                onclick={handleConfirmSend}
+                disabled={sendActionDisabled}
+              >
+                Send email
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </template>
+
     <template lwc:if={pdfModalOpen}>
       <section
         class="modal-layer pdf-modal"
