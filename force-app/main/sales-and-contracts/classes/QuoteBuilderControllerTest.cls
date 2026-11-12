@@ -289,7 +289,7 @@ private class QuoteBuilderControllerTest {
     Test.startTest();
     QuoteBuilderController.QuoteInfo sent = QuoteBuilderController.sendQuote(
       quote.quoteId,
-      'end.user@example.com',
+      'end.user@example.com; finance@example.com',
       'manager@example.com; legal@example.com',
       null,
       null,
@@ -313,6 +313,7 @@ private class QuoteBuilderControllerTest {
     Assert.areEqual('Completed', activity.Status);
     Assert.isTrue(activity.Subject.startsWith('Email:'));
     Assert.isTrue(activity.Description.contains('end.user@example.com'));
+    Assert.isTrue(activity.Description.contains('finance@example.com'));
     Assert.isTrue(activity.Description.contains('manager@example.com'));
   }
 

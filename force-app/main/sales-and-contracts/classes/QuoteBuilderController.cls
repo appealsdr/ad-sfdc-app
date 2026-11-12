@@ -436,15 +436,18 @@ public with sharing class QuoteBuilderController {
     String htmlBody
   ) {
     Quote quoteRecord = loadQuoteForAccess(quoteId);
-    String recipient = String.isBlank(recipientEmail)
-      ? resolveRecipient(quoteRecord)
-      : recipientEmail.trim();
-    if (String.isBlank(recipient) || !isValidEmail(recipient)) {
+    List<String> recipients = parseEmailList(recipientEmail, 'To');
+    if (recipients.isEmpty()) {
+      String defaultRecipient = resolveRecipient(quoteRecord);
+      if (String.isNotBlank(defaultRecipient))
+        recipients.add(defaultRecipient);
+    }
+    if (recipients.isEmpty()) {
       throw new AuraHandledException('Enter a valid recipient email address.');
     }
     EmailTemplate selectedTemplate = loadEmailTemplate(templateId);
-    Id mergeContactId = resolveMergeContactId(quoteRecord, recipient);
-    List<String> ccRecipients = parseEmailList(ccEmails);
+    Id mergeContactId = resolveMergeContactId(quoteRecord, recipients[0]);
+    List<String> ccRecipients = parseEmailList(ccEmails, 'CC');
     if (String.isBlank(subject))
       throw new AuraHandledException('Enter an email subject.');
     if (String.isBlank(htmlBody))
@@ -459,7 +462,7 @@ public with sharing class QuoteBuilderController {
     attachment.setContentType('application/pdf');
     attachment.setBody(pdf);
     Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-    email.setToAddresses(new List<String>{ recipient });
+    email.setToAddresses(recipients);
     if (!ccRecipients.isEmpty())
       email.setCcAddresses(ccRecipients);
     if (fromAddress != null)
@@ -493,7 +496,7 @@ public with sharing class QuoteBuilderController {
       Description = 'Quote ' +
         quoteRecord.Name +
         ' sent to ' +
-        recipient +
+        String.join(recipients, ', ') +
         (ccRecipients.isEmpty()
           ? ''
           : '; CC: ' + String.join(ccRecipients, ', ')) +
@@ -961,7 +964,7 @@ public with sharing class QuoteBuilderController {
     return addresses[0];
   }
 
-  private static List<String> parseEmailList(String values) {
+  private static List<String> parseEmailList(String values, String fieldLabel) {
     List<String> emails = new List<String>();
     if (String.isBlank(values))
       return emails;
@@ -970,13 +973,17 @@ public with sharing class QuoteBuilderController {
       if (String.isBlank(email))
         continue;
       if (!isValidEmail(email)) {
-        throw new AuraHandledException('Invalid CC email address: ' + email);
+        throw new AuraHandledException(
+          'Invalid ' + fieldLabel + ' email address: ' + email
+        );
       }
       if (!emails.contains(email))
         emails.add(email);
     }
     if (emails.size() > 25) {
-      throw new AuraHandledException('Enter no more than 25 CC recipients.');
+      throw new AuraHandledException(
+        'Enter no more than 25 ' + fieldLabel + ' recipients.'
+      );
     }
     return emails;
   }

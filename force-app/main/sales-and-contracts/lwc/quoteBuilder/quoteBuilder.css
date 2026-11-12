@@ -157,10 +157,17 @@
   display: flex;
   min-height: 2rem;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
   padding: 0.2rem 0.45rem;
   border: 1px solid #747474;
   border-radius: 4px;
   background: #fff;
+}
+
+.recipient-lookup__input {
+  min-width: 12rem;
+  flex: 1 1 12rem;
 }
 
 .recipient-lookup__menu {

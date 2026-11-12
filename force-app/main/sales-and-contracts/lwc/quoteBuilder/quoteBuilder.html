@@ -553,23 +553,24 @@
                 <abbr title="required">*</abbr> To
               </span>
               <div class="recipient-lookup composer-row__control">
-                <template lwc:if={hasCommittedRecipient}>
-                  <div class="recipient-lookup__selection">
+                <div class="recipient-lookup__selection">
+                  <template for:each={recipientPills} for:item="recipient">
                     <lightning-pill
-                      label={selectedRecipientLabel}
+                      key={recipient.key}
+                      name={recipient.key}
+                      label={recipient.label}
                       onremove={handleRemoveRecipient}
                     >
-                      <template lwc:if={selectedRecipientContactId}>
+                      <template lwc:if={recipient.contactId}>
                         <lightning-icon
                           icon-name="standard:contact"
                           alternative-text="Contact"
                         ></lightning-icon>
                       </template>
                     </lightning-pill>
-                  </div>
-                </template>
-                <template lwc:else>
+                  </template>
                   <lightning-input
+                    class="recipient-lookup__input"
                     type="search"
                     variant="label-hidden"
                     label="Recipient email or contact"
@@ -581,7 +582,7 @@
                     oninput={handleSendEmailChange}
                     onkeydown={handleRecipientKeyDown}
                   ></lightning-input>
-                </template>
+                </div>
                 <template lwc:if={showRecipientContactMenu}>
                   <div class="recipient-lookup__menu" role="listbox">
                     <template lwc:if={hasRecipientContactMatches}>

@@ -33,10 +33,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   pdfError;
   sendModalOpen = false;
   sendingQuoteId;
-  sendEmail = "";
+  sendRecipients = [];
   recipientSearch = "";
-  selectedRecipientContactId = "";
-  manualRecipientCommitted = false;
   recipientMenuOpen = false;
   showCc = false;
   sendCc = "";
@@ -231,32 +229,35 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     return (
       this.busy ||
       this.emailDraftLoading ||
-      !this.sendEmail.trim() ||
+      this.sendRecipients.length === 0 ||
       !this.sendSubject.trim() ||
       !this.sendHtmlBody.trim()
     );
   }
 
-  get selectedRecipientContact() {
-    return (this.context?.recipientContacts || []).find(
-      (contact) => contact.id === this.selectedRecipientContactId
-    );
+  get recipientPills() {
+    return this.sendRecipients.map((recipient) => ({
+      ...recipient,
+      label: recipient.contactId
+        ? `${recipient.name} <${recipient.email}>`
+        : recipient.email
+    }));
   }
 
-  get selectedRecipientLabel() {
-    const contact = this.selectedRecipientContact;
-    return contact ? `${contact.name} <${contact.email}>` : this.sendEmail;
-  }
-
-  get hasCommittedRecipient() {
-    return Boolean(
-      this.selectedRecipientContactId || this.manualRecipientCommitted
-    );
+  get recipientEmailsValue() {
+    return this.sendRecipients.map((recipient) => recipient.email).join("; ");
   }
 
   get recipientContactMatches() {
     const term = (this.recipientSearch || "").trim().toLowerCase();
     return (this.context?.recipientContacts || [])
+      .filter(
+        (contact) =>
+          !this.sendRecipients.some(
+            (recipient) =>
+              recipient.email.toLowerCase() === contact.email.toLowerCase()
+          )
+      )
       .filter((contact) => {
         if (!term) return true;
         return [contact.name, contact.email, contact.title]
@@ -271,7 +272,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   get showRecipientContactMenu() {
-    return this.recipientMenuOpen && !this.hasCommittedRecipient;
+    return this.recipientMenuOpen;
   }
 
   get hasRecipientContactMatches() {
@@ -503,16 +504,20 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   async handleSendQuote(event) {
     const quote = this.findQuote(event.currentTarget.dataset.id);
     this.sendingQuoteId = quote.quoteId;
-    this.sendEmail = quote.recipientEmail || "";
-    this.recipientSearch = this.sendEmail;
+    this.sendRecipients = [];
+    this.recipientSearch = "";
     const matchingContact = (this.context?.recipientContacts || []).find(
       (contact) =>
-        (contact.email || "").toLowerCase() === this.sendEmail.toLowerCase()
+        (contact.email || "").toLowerCase() ===
+        (quote.recipientEmail || "").toLowerCase()
     );
-    this.selectedRecipientContactId = matchingContact?.id || "";
-    this.manualRecipientCommitted = Boolean(
-      this.sendEmail && !this.selectedRecipientContactId
-    );
+    if (quote.recipientEmail) {
+      this.addRecipient(
+        quote.recipientEmail,
+        matchingContact?.name,
+        matchingContact?.id
+      );
+    }
     this.recipientMenuOpen = false;
     this.showCc = false;
     this.sendCc = "";
@@ -523,10 +528,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   handleSendEmailChange(event) {
-    this.sendEmail = event.target.value || "";
-    this.recipientSearch = this.sendEmail;
-    this.selectedRecipientContactId = "";
-    this.manualRecipientCommitted = false;
+    this.recipientSearch = event.target.value || "";
     this.recipientMenuOpen = true;
     event.target.setCustomValidity?.("");
   }
@@ -541,11 +543,14 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       return;
     }
     event.target.setCustomValidity?.("");
-    this.sendEmail = email;
+    this.addRecipient(email);
     this.recipientSearch = "";
-    this.selectedRecipientContactId = "";
-    this.manualRecipientCommitted = true;
+    event.target.value = "";
     this.recipientMenuOpen = false;
+    Promise.resolve().then(() => {
+      const input = this.template.querySelector(".recipient-lookup__input");
+      if (input) input.value = "";
+    });
   }
 
   handleRecipientFocus() {
@@ -557,19 +562,37 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       (item) => item.id === event.currentTarget.dataset.id
     );
     if (!contact) return;
-    this.selectedRecipientContactId = contact.id;
-    this.manualRecipientCommitted = false;
-    this.sendEmail = contact.email;
-    this.recipientSearch = contact.email;
+    this.addRecipient(contact.email, contact.name, contact.id);
+    this.recipientSearch = "";
     this.recipientMenuOpen = false;
   }
 
-  handleRemoveRecipient() {
-    this.selectedRecipientContactId = "";
-    this.manualRecipientCommitted = false;
-    this.sendEmail = "";
-    this.recipientSearch = "";
+  handleRemoveRecipient(event) {
+    const key = event.detail?.name || event.target.name;
+    this.sendRecipients = this.sendRecipients.filter(
+      (recipient) => recipient.key !== key
+    );
     this.recipientMenuOpen = true;
+  }
+
+  addRecipient(email, name, contactId) {
+    const normalized = email.trim().toLowerCase();
+    if (
+      this.sendRecipients.some(
+        (recipient) => recipient.email.toLowerCase() === normalized
+      )
+    ) {
+      return;
+    }
+    this.sendRecipients = [
+      ...this.sendRecipients,
+      {
+        key: contactId || normalized,
+        email: email.trim(),
+        name: name || email.trim(),
+        contactId: contactId || null
+      }
+    ];
   }
 
   handleSendCcChange(event) {
@@ -604,7 +627,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       const draft = await renderEmailDraft({
         quoteId: this.sendingQuoteId,
         templateId: this.selectedEmailTemplateId || null,
-        recipientEmail: this.sendEmail.trim() || null
+        recipientEmail: this.sendRecipients[0]?.email || null
       });
       this.sendSubject = draft.subject || "";
       this.sendHtmlBody = draft.htmlBody || "";
@@ -627,10 +650,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   resetSendModal() {
     this.sendModalOpen = false;
     this.sendingQuoteId = undefined;
-    this.sendEmail = "";
+    this.sendRecipients = [];
     this.recipientSearch = "";
-    this.selectedRecipientContactId = "";
-    this.manualRecipientCommitted = false;
     this.recipientMenuOpen = false;
     this.showCc = false;
     this.sendCc = "";
@@ -643,11 +664,11 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   async handleConfirmSend() {
     const quote = this.findQuote(this.sendingQuoteId);
-    const recipient = this.sendEmail.trim();
+    const recipients = this.recipientEmailsValue;
     await this.run(async () => {
       await sendQuote({
         quoteId: quote.quoteId,
-        recipientEmail: recipient,
+        recipientEmail: recipients,
         ccEmails: this.sendCc.trim(),
         templateId: this.selectedEmailTemplateId || null,
         fromAddressId: this.selectedFromAddressId || null,
@@ -659,7 +680,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       this.toast(
         "success",
         "Quote sent",
-        `Sent to ${recipient} and logged on the Opportunity.`
+        `Sent to ${recipients} and logged on the Opportunity.`
       );
     });
   }

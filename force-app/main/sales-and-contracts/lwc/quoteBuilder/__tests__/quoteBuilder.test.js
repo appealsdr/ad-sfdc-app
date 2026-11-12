@@ -303,6 +303,12 @@ describe("c-quote-builder quote-first workspace", () => {
     );
     emailInput.value = "end.user@example.com";
     emailInput.dispatchEvent(new CustomEvent("input"));
+    emailInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    await flushPromises();
+    emailInput.value = "billing@example.com";
+    emailInput.dispatchEvent(new CustomEvent("input"));
+    emailInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    await flushPromises();
     buttonByText(element, "Cc").click();
     await flushPromises();
     const ccInput = [
@@ -347,7 +353,7 @@ describe("c-quote-builder quote-first workspace", () => {
     });
     expect(sendQuote).toHaveBeenCalledWith({
       quoteId: QUOTE_ID,
-      recipientEmail: "end.user@example.com",
+      recipientEmail: "end.user@example.com; billing@example.com",
       ccEmails: "manager@example.com",
       templateId: TEMPLATE_ID,
       fromAddressId: FROM_ADDRESS_ID,
@@ -398,18 +404,28 @@ describe("c-quote-builder quote-first workspace", () => {
     recipientInput.dispatchEvent(
       new KeyboardEvent("keydown", { key: "Enter" })
     );
+    recipientInput.value = "second.recipient@example.com";
+    recipientInput.dispatchEvent(new CustomEvent("input"));
+    recipientInput.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter" })
+    );
     await flushPromises();
 
-    const recipientPill = element.shadowRoot.querySelector(
-      ".recipient-lookup lightning-pill"
+    const recipientPills = [
+      ...element.shadowRoot.querySelectorAll(".recipient-lookup lightning-pill")
+    ];
+    expect(recipientPills).toHaveLength(2);
+    expect(recipientPills[0].label).toBe("manual.recipient@example.com");
+    expect(recipientPills[1].label).toBe("second.recipient@example.com");
+    recipientPills[0].dispatchEvent(
+      new CustomEvent("remove", {
+        detail: { name: "manual.recipient@example.com" }
+      })
     );
-    expect(recipientPill).toBeTruthy();
-    expect(recipientPill.label).toBe("manual.recipient@example.com");
-    recipientPill.dispatchEvent(new CustomEvent("remove"));
     await flushPromises();
     expect(
-      element.shadowRoot.querySelector(".recipient-lookup lightning-pill")
-    ).toBeFalsy();
+      element.shadowRoot.querySelectorAll(".recipient-lookup lightning-pill")
+    ).toHaveLength(1);
   });
 
   it("syncs only the selected quote to Opportunity products", async () => {
