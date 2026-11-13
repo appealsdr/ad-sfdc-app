@@ -15,8 +15,7 @@
     </pathAssistantSteps>
     <pathAssistantSteps>
         <fieldNames>Amount</fieldNames>
-        <fieldNames>Choose_Service__c</fieldNames>
-        <fieldNames>Service_Details__c</fieldNames>
+        <fieldNames>Description</fieldNames>
         <fieldNames>Proposal_Sent_DateTime__c</fieldNames>
         <fieldNames>NextStep</fieldNames>
         <info>&lt;p&gt;&lt;b&gt;Send a complete proposal and establish follow-up.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Verify the service scope, pricing, and expected deliverables.&lt;/li&gt;&lt;li&gt;Record when the proposal was sent.&lt;/li&gt;&lt;li&gt;Set the next step for client review and follow-up.&lt;/li&gt;&lt;/ul&gt;</info>
@@ -32,10 +31,10 @@
         <picklistValueName>Negotiation</picklistValueName>
     </pathAssistantSteps>
     <pathAssistantSteps>
+        <fieldNames>Opportunity_Opener__c</fieldNames>
+        <fieldNames>Opportunity_Closer__c</fieldNames>
         <fieldNames>Contract_Sent_DateTime__c</fieldNames>
         <fieldNames>Checkout_URL__c</fieldNames>
-        <fieldNames>Amount</fieldNames>
-        <fieldNames>CloseDate</fieldNames>
         <fieldNames>NextStep</fieldNames>
         <info>&lt;p&gt;&lt;b&gt;Drive the contract and payment to completion.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Confirm the contract was sent to the correct signer.&lt;/li&gt;&lt;li&gt;Verify the checkout link, amount, and expected start date.&lt;/li&gt;&lt;li&gt;Track the next follow-up until signature and payment are complete.&lt;/li&gt;&lt;/ul&gt;</info>
         <picklistValueName>Contract Sent</picklistValueName>
@@ -51,11 +50,11 @@
     </pathAssistantSteps>
     <pathAssistantSteps>
         <fieldNames>Loss_Reason__c</fieldNames>
-        <fieldNames>Description</fieldNames>
+        <fieldNames>Loss_Reason_Notes__c</fieldNames>
         <fieldNames>Amount</fieldNames>
         <fieldNames>CloseDate</fieldNames>
         <fieldNames>NextStep</fieldNames>
-        <info>&lt;p&gt;&lt;b&gt;Document why the opportunity was lost.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Select a specific loss reason and add useful context to the description.&lt;/li&gt;&lt;li&gt;Confirm the final amount and date for reporting.&lt;/li&gt;&lt;li&gt;Record a next step only when future re-engagement is appropriate.&lt;/li&gt;&lt;/ul&gt;</info>
+        <info>&lt;p&gt;&lt;b&gt;Document why the opportunity was lost.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Select a Loss Reason and enter specific Loss Reason Notes.&lt;/li&gt;&lt;li&gt;Confirm the final amount and date for reporting.&lt;/li&gt;&lt;li&gt;Record a next step only when future re-engagement is appropriate.&lt;/li&gt;&lt;/ul&gt;</info>
         <picklistValueName>Closed Lost</picklistValueName>
     </pathAssistantSteps>
     <recordTypeName>__MASTER__</recordTypeName>

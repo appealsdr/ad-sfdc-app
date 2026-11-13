@@ -700,6 +700,16 @@
   gap: 0.1rem;
 }
 
+.product__price {
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.product__deposit {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
 .muted {
   color: var(--muted);
   font-size: 0.78rem;
@@ -718,6 +728,65 @@
 
 .line__controls {
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.change-pricebook {
+  margin-left: 0.5rem;
+}
+
+.line__pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.line__unit-price,
+.line__deposit,
+.line__deposit-summary,
+.line__term,
+.line__original,
+.line__total {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.line__unit-price input,
+.line__deposit input,
+.line__term input {
+  width: 6.5rem;
+  min-height: 1.9rem;
+  padding: 0.2rem 0.4rem;
+  text-align: right;
+  border: 1px solid #cbd1da;
+  border-radius: 6px;
+}
+
+.line__deposit {
+  margin-bottom: 0.6rem;
+}
+
+.line__deposit input {
+  width: 9.5rem;
+}
+
+.line__original {
+  font-size: 0.7rem;
+}
+
+.line__total > span {
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.quote-term {
+  max-width: 17rem;
 }
 
 .stepper {

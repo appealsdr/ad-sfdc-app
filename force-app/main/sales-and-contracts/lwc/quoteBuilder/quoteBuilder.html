@@ -24,7 +24,7 @@
         <div class="modal modal_medium">
           <header class="workspace__header modal__header">
             <div>
-              <p class="eyebrow">New quote</p>
+              <p class="eyebrow">{editorTitle}</p>
               <h2 id="pricebook-modal-title">Choose a price book</h2>
             </div>
             <button
@@ -91,7 +91,15 @@
             <div>
               <p class="eyebrow">{context.opportunityName}</p>
               <h2 id="quote-editor-modal-title">{editorTitle}</h2>
-              <span class="chip">{context.pricebookName} price book</span>
+              <span class="chip">{editorPricebookName} price book</span>
+              <button
+                type="button"
+                class="btn btn_small change-pricebook"
+                onclick={handleChangePricebook}
+                disabled={busy}
+              >
+                Change price book
+              </button>
             </div>
             <button
               type="button"
@@ -140,15 +148,28 @@
                       ><span class="muted">{product.familyLabel}</span>
                     </div>
                     <div class="product__right">
-                      <lightning-formatted-number
-                        value={product.listPrice}
-                        format-style="currency"
-                        currency-code="USD"
-                      ></lightning-formatted-number>
+                      <div class="product__price stack">
+                        <lightning-formatted-number
+                          value={product.listPrice}
+                          format-style="currency"
+                          currency-code="USD"
+                        ></lightning-formatted-number>
+                        <template lwc:if={product.hasDeposit}>
+                          <span class="product__deposit">
+                            Deposit
+                            <lightning-formatted-number
+                              value={product.depositAmount}
+                              format-style="currency"
+                              currency-code="USD"
+                            ></lightning-formatted-number>
+                          </span>
+                        </template>
+                      </div>
                       <button
                         type="button"
                         class="btn btn_small"
                         data-id={product.pricebookEntryId}
+                        disabled={product.addDisabled}
                         onclick={handleAdd}
                       >
                         + Add
@@ -163,6 +184,14 @@
             </section>
 
             <section class="quote-editor" aria-label="Quote products">
+              <template lwc:if={pricebookMismatch}>
+                <p class="warning" role="alert">
+                  This quote uses {editorPricebookName}, while the Opportunity
+                  uses {context.pricebookName}. Select Change price book to
+                  choose the correct catalogue before changing or saving
+                  products.
+                </p>
+              </template>
               <div class="editor__options">
                 <lightning-input
                   type="date"
@@ -177,22 +206,27 @@
                   max-length="2000"
                 ></lightning-textarea>
               </div>
+              <template lwc:if={hasRecurringLines}>
+                <lightning-input
+                  class="quote-term"
+                  type="number"
+                  label="Quote recurring term (months)"
+                  value={termMonths}
+                  onchange={handleQuoteTerm}
+                  min="1"
+                  max="1200"
+                  step="1"
+                  required
+                  field-level-help="Default term for recurring products. A product can use a different term below."
+                ></lightning-input>
+              </template>
               <template lwc:if={hasCartLines}>
                 <ul class="lines">
                   <template for:each={cartView} for:item="line">
                     <li key={line.key} class={line.lineClass}>
                       <div class="line__head">
                         <div class="stack">
-                          <strong>{line.name}</strong
-                          ><span class="muted"
-                            >List
-                            <lightning-formatted-number
-                              value={line.listPrice}
-                              format-style="currency"
-                              currency-code="USD"
-                            ></lightning-formatted-number>
-                            each</span
-                          >
+                          <strong>{line.name}</strong>
                         </div>
                         <button
                           type="button"
@@ -216,6 +250,7 @@
                             data-key={line.key}
                             data-step="-1"
                             onclick={handleStep}
+                            aria-label="Decrease quantity"
                           >
                             −
                           </button>
@@ -227,35 +262,99 @@
                             data-key={line.key}
                             onchange={handleQty}
                             aria-label="Quantity"
+                            required
                           />
                           <button
                             type="button"
                             data-key={line.key}
                             data-step="1"
                             onclick={handleStep}
+                            aria-label="Increase quantity"
                           >
                             +
                           </button>
                         </div>
-                        <label class="discount"
+                        <label class="disc"
                           ><span>Discount</span
                           ><input
                             type="number"
                             min="0"
                             max="100"
+                            step="0.01"
                             value={line.discountPct}
                             data-key={line.key}
                             onchange={handleDiscount}
+                            aria-label="Discount percent"
                           /><span>%</span></label
                         >
-                        <strong
-                          ><lightning-formatted-number
-                            value={line.net}
-                            format-style="currency"
-                            currency-code="USD"
-                          ></lightning-formatted-number
-                        ></strong>
+                        <div class="line__pricing">
+                          <label class="line__unit-price">
+                            <span>Unit price</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              required
+                              value={line.unitPrice}
+                              data-key={line.key}
+                              onchange={handleUnitPrice}
+                              aria-label="Unit price"
+                            />
+                          </label>
+                          <span class="line__original muted">
+                            <span>Original list price</span>
+                            <lightning-formatted-number
+                              value={line.listPrice}
+                              format-style="currency"
+                              currency-code="USD"
+                            ></lightning-formatted-number>
+                            <span>each</span>
+                          </span>
+                          <strong class="line__total">
+                            <span>Line total</span>
+                            <lightning-formatted-number
+                              value={line.net}
+                              format-style="currency"
+                              currency-code="USD"
+                            ></lightning-formatted-number>
+                          </strong>
+                        </div>
                       </div>
+                      <label class="line__deposit">
+                        <span>Deposit per unit</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={line.depositAmount}
+                          data-key={line.key}
+                          onchange={handleDeposit}
+                          aria-label="Deposit per unit"
+                          placeholder="Price book default"
+                          title="Leave blank to use the price book deposit; enter 0 for no deposit."
+                        />
+                      </label>
+                      <template lwc:if={line.isRecurring}>
+                        <label class="line__term">
+                          <span>Recurring term (months)</span>
+                          <input
+                            type="number"
+                            min="1"
+                            max="1200"
+                            step="1"
+                            value={line.termMonths}
+                            data-key={line.key}
+                            onchange={handleLineTerm}
+                            placeholder="Use quote term"
+                            aria-label="Product recurring term (months)"
+                          />
+                          <template lwc:if={line.effectiveTermMonths}>
+                            <span class="muted"
+                              >{line.effectiveTermMonths} months</span
+                            >
+                          </template>
+                        </label>
+                      </template>
                       <input
                         class="line__note"
                         type="text"
@@ -263,6 +362,7 @@
                         data-key={line.key}
                         onchange={handleNote}
                         placeholder="Client-facing product note"
+                        aria-label="Client-facing product note"
                         maxlength="255"
                       />
                       <template lwc:if={line.needsApproval}
@@ -401,6 +501,9 @@
                   ></span>
                   <span>{quote.pricebookName}</span
                   ><span>{quote.lineCount} product(s)</span>
+                  <template lwc:if={quote.termMonths}>
+                    <span>Recurring term: {quote.termMonths} months</span>
+                  </template>
                   <template lwc:if={quote.recipientEmail}
                     ><span>{quote.recipientEmail}</span></template
                   >
@@ -464,6 +567,19 @@
                               >{line.description}</span
                             ></template
                           >
+                          <template lwc:if={line.termLabel}>
+                            <span class="muted">{line.termLabel}</span>
+                          </template>
+                          <template lwc:if={line.hasDeposit}>
+                            <span class="muted line__deposit-summary">
+                              <span>Deposit per unit</span>
+                              <lightning-formatted-number
+                                value={line.depositAmount}
+                                format-style="currency"
+                                currency-code="USD"
+                              ></lightning-formatted-number>
+                            </span>
+                          </template>
                         </div>
                         <span>{line.quantity}</span
                         ><span>{line.discountPct}%</span>

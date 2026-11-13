@@ -38,7 +38,7 @@ public with sharing class ContractLineItemPaymentService {
         Map<Id, List<ContractLineItem>> linesByContract = new Map<Id, List<ContractLineItem>>();
         Set<Id> depositContractIds = new Set<Id>();
         for (ContractLineItem line : [
-            SELECT Id, ServiceContractId, Quantity, UnitPrice,
+            SELECT Id, ServiceContractId, Quantity, UnitPrice, Deposit__c,
                    PricebookEntry.Payment_type__c, PricebookEntry.Deposit__c
             FROM ContractLineItem WHERE ServiceContractId IN :contractIds
         ]) {
@@ -72,7 +72,9 @@ public with sharing class ContractLineItemPaymentService {
             for (ContractLineItem line : linesByContract.get(contractId)) {
                 String type = line.PricebookEntry.Payment_type__c;
                 if (type != 'Full Price' && type != 'Deposit') continue;
-                Decimal price = type == 'Deposit' ? line.PricebookEntry.Deposit__c : line.UnitPrice;
+                Decimal price = type == 'Deposit'
+                    ? (line.Deposit__c == null ? line.PricebookEntry.Deposit__c : line.Deposit__c)
+                    : line.UnitPrice;
                 if (price == null || line.Quantity == null) continue;
                 Decimal amount = price * line.Quantity;
                 total += amount;

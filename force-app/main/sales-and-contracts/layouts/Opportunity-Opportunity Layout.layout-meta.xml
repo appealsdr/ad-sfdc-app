@@ -48,6 +48,10 @@
                 <behavior>Edit</behavior>
                 <field>Store__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Opportunity_Opener__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
@@ -70,6 +74,10 @@
                 <behavior>Edit</behavior>
                 <field>Amount</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Opportunity_Closer__c</field>
+            </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
@@ -86,6 +94,14 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Description</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Loss_Reason__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Loss_Reason_Notes__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -276,16 +292,6 @@
         <fields>White_Glove__c</fields>
         <fields>CREATED_DATE</fields>
         <relatedList>Store__c.Opportunity__c</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>NAME</fields>
-        <fields>Status__c</fields>
-        <fields>Contract_Type__c</fields>
-        <fields>Date_Sent__c</fields>
-        <fields>Date_Signed__c</fields>
-        <fields>CREATEDBY_USER</fields>
-        <fields>CREATED_DATE</fields>
-        <relatedList>Contract__c.Opportunity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <excludeButtons>MassChangeOwner</excludeButtons>

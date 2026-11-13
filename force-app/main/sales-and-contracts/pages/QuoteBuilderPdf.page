@@ -45,6 +45,12 @@
         text-align: left;
         padding: 8px;
       }
+      .lines th.number {
+        text-align: right;
+      }
+      .lines tr {
+        page-break-inside: avoid;
+      }
       .lines td {
         border-bottom: 1px solid #d9dee7;
         padding: 8px;
@@ -52,12 +58,29 @@
       }
       .number {
         text-align: right;
+        white-space: nowrap;
       }
-      .total {
+      .original-price,
+      .line-term,
+      .discount-amount {
+        color: #657080;
+        display: block;
+        font-size: 8pt;
+        margin-top: 4px;
+      }
+      table.totals {
+        width: 45%;
+        margin: 18px 0 0 auto;
+        border-collapse: collapse;
+      }
+      .totals td {
+        padding: 5px 0;
+      }
+      .totals .total td {
+        border-top: 1px solid #d9dee7;
         font-size: 14pt;
         font-weight: bold;
-        margin-top: 16px;
-        text-align: right;
+        padding-top: 10px;
       }
       .notes {
         margin-top: 24px;
@@ -98,6 +121,19 @@
           /></apex:outputText>
         </td>
       </tr>
+      <apex:outputPanel
+        rendered="{!BLANKVALUE(Quote.Term_Months__c, 0) > 0}"
+        layout="none"
+      >
+        <tr>
+          <td class="label">Recurring term</td>
+          <td>
+            <apex:outputText value="{0,number,0} months">
+              <apex:param value="{!Quote.Term_Months__c}" />
+            </apex:outputText>
+          </td>
+        </tr>
+      </apex:outputPanel>
     </table>
     <table class="lines">
       <thead>
@@ -105,7 +141,7 @@
           <th>Product</th>
           <th>Details</th>
           <th class="number">Qty</th>
-          <th class="number">Price</th>
+          <th class="number">Unit price</th>
           <th class="number">Discount</th>
           <th class="number">Total</th>
         </tr>
@@ -114,14 +150,41 @@
         <apex:repeat value="{!Quote.QuoteLineItems}" var="line">
           <tr>
             <td>{!line.Product2.Name}</td>
-            <td>{!line.Description}</td>
+            <td>
+              {!line.Description}
+              <apex:outputPanel
+                rendered="{!BLANKVALUE(line.Term_Months__c, 0) > 0}"
+                layout="block"
+                styleClass="line-term"
+              >
+                <apex:outputText value="Term: {0,number,0} months">
+                  <apex:param value="{!line.Term_Months__c}" />
+                </apex:outputText>
+              </apex:outputPanel>
+            </td>
             <td class="number">{!line.Quantity}</td>
             <td class="number">
               <apex:outputText value="{0,number,currency}"
                 ><apex:param value="{!line.UnitPrice}"
               /></apex:outputText>
+              <div class="original-price">
+                <apex:outputText value="Original: {0,number,currency}">
+                  <apex:param value="{!line.ListPrice}" />
+                </apex:outputText>
+              </div>
             </td>
-            <td class="number">{!line.Discount}%</td>
+            <td class="number">
+              <apex:outputText value="{0,number,0.##}%">
+                <apex:param value="{!BLANKVALUE(line.Discount, 0)}" />
+              </apex:outputText>
+              <div class="discount-amount">
+                <apex:outputText value="{0,number,currency}">
+                  <apex:param
+                    value="{!line.UnitPrice * line.Quantity - line.TotalPrice}"
+                  />
+                </apex:outputText>
+              </div>
+            </td>
             <td class="number">
               <apex:outputText value="{0,number,currency}"
                 ><apex:param value="{!line.TotalPrice}"
@@ -131,12 +194,34 @@
         </apex:repeat>
       </tbody>
     </table>
-    <div class="total">
-      Total:
-      <apex:outputText value="{0,number,currency}"
-        ><apex:param value="{!Quote.TotalPrice}"
-      /></apex:outputText>
-    </div>
+    <table class="totals">
+      <tr>
+        <td>Subtotal</td>
+        <td class="number">
+          <apex:outputText value="{0,number,currency}">
+            <apex:param value="{!Quote.Subtotal}" />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <td>Discount</td>
+        <td class="number">
+          <apex:outputText value="{0,number,currency}">
+            <apex:param
+              value="{!BLANKVALUE(Quote.Subtotal, 0) - BLANKVALUE(Quote.TotalPrice, 0)}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr class="total">
+        <td>Total</td>
+        <td class="number">
+          <apex:outputText value="{0,number,currency}">
+            <apex:param value="{!Quote.TotalPrice}" />
+          </apex:outputText>
+        </td>
+      </tr>
+    </table>
     <apex:outputPanel
       rendered="{!NOT(ISBLANK(Quote.Description))}"
       layout="block"

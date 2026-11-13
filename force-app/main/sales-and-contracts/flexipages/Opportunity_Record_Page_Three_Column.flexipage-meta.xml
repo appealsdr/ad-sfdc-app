@@ -51,6 +51,20 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
+                    <name>hideUpdateButton</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>variant</name>
+                    <value>linear</value>
+                </componentInstanceProperties>
+                <componentName>runtime_sales_pathassistant:pathAssistant</componentName>
+                <identifier>runtime_sales_pathassistant_pathAssistant</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
                     <name>hideHeader</name>
                     <value>true</value>
                 </componentInstanceProperties>
@@ -104,70 +118,8 @@
         </itemInstances>
         <itemInstances>
             <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.End_Date__c</fieldItem>
-                <identifier>RecordStart_Date_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Checkout_URL__c</fieldItem>
-                <identifier>RecordCheckout_URL_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.CSM_Call__c</fieldItem>
-                <identifier>RecordCSM_Call__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Case__c</fieldItem>
-                <identifier>RecordCase__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Store__c</fieldItem>
-                <identifier>RecordStore__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Choose_Service__c</fieldItem>
-                <identifier>RecordChoose_Service__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
                 <fieldItem>Record.Amount</fieldItem>
                 <identifier>RecordAmountField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.NextStep</fieldItem>
-                <identifier>RecordNextStepField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Proposal_Sent_DateTime__c</fieldItem>
-                <identifier>RecordProposal_Sent_DateTime__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Contract_Sent_DateTime__c</fieldItem>
-                <identifier>RecordContract_Sent_DateTime__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-bda0868e-f60d-43d1-bc15-da4b2cf8d682</name>
@@ -198,36 +150,6 @@
             <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Store_Address__c</fieldItem>
-                <identifier>RecordStore_Address__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Store_Phone__c</fieldItem>
-                <identifier>RecordStore_Phone__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Store_Email__c</fieldItem>
-                <identifier>RecordStore_Email__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
                 <fieldItem>Record.StageName</fieldItem>
@@ -236,49 +158,8 @@
         </itemInstances>
         <itemInstances>
             <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.Service_Details__c</fieldItem>
-                <identifier>RecordService_Details_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Seller_ID__c</fieldItem>
-                <identifier>RecordSeller_ID__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.SPN_Access__c</fieldItem>
-                <identifier>RecordSPN_Access__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Discovery_Completed__c</fieldItem>
-                <identifier>RecordDiscovery_Completed__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Budget_Confirmed__c</fieldItem>
-                <identifier>RecordBudget_Confirmed__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldItem>Record.Loss_Reason__c</fieldItem>
-                <identifier>RecordLoss_Reason__cField</identifier>
-                <visibilityRule>
-                    <criteria>
-                        <leftValue>{!Record.StageName}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>Closed Lost</rightValue>
-                    </criteria>
-                </visibilityRule>
+                <fieldItem>Record.NextStep</fieldItem>
+                <identifier>RecordNextStepField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-f31cfb4a-cff9-4183-ab78-8e77ec6894f0</name>
@@ -311,12 +192,42 @@
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>required</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.ForecastCategoryName</fieldItem>
-                <identifier>RecordForecastCategoryNameField</identifier>
+                <fieldItem>Record.Opportunity_Opener__c</fieldItem>
+                <identifier>RecordOpportunity_Opener__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Opportunity_Closer__c</fieldItem>
+                <identifier>RecordOpportunity_Closer__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Technical_expert__c</fieldItem>
+                <identifier>RecordTechnical_expert__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Meeting_Completed_DateTime__c</fieldItem>
+                <identifier>RecordMeeting_Completed_DateTime__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-006ba1ec-4a66-44a5-91a2-c49383e4529d</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Discovery_Completed__c</fieldItem>
+                <identifier>RecordDiscovery_Completed__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Budget_Confirmed__c</fieldItem>
+                <identifier>RecordBudget_Confirmed__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -325,14 +236,10 @@
                     <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.CloseDate</fieldItem>
-                <identifier>RecordCloseDateField2</identifier>
+                <fieldItem>Record.ForecastCategoryName</fieldItem>
+                <identifier>RecordForecastCategoryNameField</identifier>
             </fieldInstance>
         </itemInstances>
-        <name>Facet-006ba1ec-4a66-44a5-91a2-c49383e4529d</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
                 <fieldInstanceProperties>
@@ -381,6 +288,28 @@
                 <identifier>RecordDescriptionField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Proposal_Sent_DateTime__c</fieldItem>
+                <identifier>RecordProposal_Sent_DateTime__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Contract_Sent_DateTime__c</fieldItem>
+                <identifier>RecordContract_Sent_DateTime__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Checkout_URL__c</fieldItem>
+                <identifier>RecordCheckout_URL_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-9fdfc475-5cc2-403d-977a-1f39bfaf91cc</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -401,12 +330,30 @@
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
+                <fieldItem>Record.Store__c</fieldItem>
+                <identifier>RecordStore__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.CSM_Call__c</fieldItem>
+                <identifier>RecordCSM_Call__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Case__c</fieldItem>
+                <identifier>RecordCase__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
                 <fieldInstanceProperties>
                     <name>uiBehavior</name>
-                    <value>readonly</value>
+                    <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.CreatedById</fieldItem>
-                <identifier>RecordCreatedByIdField</identifier>
+                <fieldItem>Record.End_Date__c</fieldItem>
+                <identifier>RecordStart_Date_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-3166f656-c33e-4d6a-92c0-a2be76b1f002</name>
@@ -415,12 +362,40 @@
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.LastModifiedById</fieldItem>
-                <identifier>RecordLastModifiedByIdField</identifier>
+                <fieldItem>Record.Seller_ID__c</fieldItem>
+                <identifier>RecordSeller_ID__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.SPN_Access__c</fieldItem>
+                <identifier>RecordSPN_Access__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Loss_Reason__c</fieldItem>
+                <identifier>RecordLoss_Reason__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.StageName}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Closed Lost</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Loss_Reason_Notes__c</fieldItem>
+                <identifier>RecordLoss_Reason_Notes__cField</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.StageName}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Closed Lost</rightValue>
+                    </criteria>
+                </visibilityRule>
             </fieldInstance>
         </itemInstances>
         <name>Facet-99325bda-8a12-4e6b-a87c-4ae6a42240dc</name>
@@ -463,7 +438,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
-                    <value>Deal &amp; Contact</value>
+                    <value>Opportunity Details</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection6</identifier>
@@ -481,7 +456,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
-                    <value>Stage, Forecast &amp; Discovery</value>
+                    <value>Qualification &amp; Discovery</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection</identifier>
@@ -499,7 +474,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
-                    <value>Discovery Notes</value>
+                    <value>Proposal, Negotiation &amp; Contract</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection3</identifier>
@@ -517,7 +492,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
-                    <value>System Information</value>
+                    <value>Closed &amp; Handoff</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection5</identifier>
@@ -562,20 +537,6 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
-                    <name>hideUpdateButton</name>
-                    <value>false</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>variant</name>
-                    <value>linear</value>
-                </componentInstanceProperties>
-                <componentName>runtime_sales_pathassistant:pathAssistant</componentName>
-                <identifier>runtime_sales_pathassistant_pathAssistant</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
                     <name>cardTitle</name>
                     <value>Quotes</value>
                 </componentInstanceProperties>
@@ -606,17 +567,6 @@
                 <componentInstanceProperties><name>showActionBar</name><value>false</value></componentInstanceProperties>
                 <componentName>force:relatedListSingleContainer</componentName>
                 <identifier>force_relatedListServiceContracts</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties><name>parentFieldApiName</name><value>Opportunity.Id</value></componentInstanceProperties>
-                <componentInstanceProperties><name>relatedListApiName</name><value>Contracts__r</value></componentInstanceProperties>
-                <componentInstanceProperties><name>relatedListComponentOverride</name><value>NONE</value></componentInstanceProperties>
-                <componentInstanceProperties><name>rowsToDisplay</name><value>5</value></componentInstanceProperties>
-                <componentInstanceProperties><name>showActionBar</name><value>false</value></componentInstanceProperties>
-                <componentName>force:relatedListSingleContainer</componentName>
-                <identifier>force_relatedListContracts</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

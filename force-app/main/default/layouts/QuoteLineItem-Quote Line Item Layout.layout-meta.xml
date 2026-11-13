@@ -41,6 +41,14 @@
                 <field>Discount</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Deposit__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Term_Months__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>TotalPrice</field>
             </layoutItems>
@@ -86,6 +94,8 @@
     <multilineLayoutFields>Quantity</multilineLayoutFields>
     <multilineLayoutFields>Subtotal</multilineLayoutFields>
     <multilineLayoutFields>Discount</multilineLayoutFields>
+    <multilineLayoutFields>Deposit__c</multilineLayoutFields>
+    <multilineLayoutFields>Term_Months__c</multilineLayoutFields>
     <multilineLayoutFields>TotalPrice</multilineLayoutFields>
     <multilineLayoutFields>QuoteId</multilineLayoutFields>
     <showEmailCheckbox>false</showEmailCheckbox>

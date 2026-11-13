@@ -60,6 +60,10 @@ public with sharing class QuoteBuilderController {
     public String description;
     @AuraEnabled
     public Decimal listPrice;
+    @AuraEnabled
+    public Decimal depositAmount;
+    @AuraEnabled
+    public Boolean isRecurring = false;
   }
 
   public class Line {
@@ -73,6 +77,16 @@ public with sharing class QuoteBuilderController {
     public String family;
     @AuraEnabled
     public Decimal listPrice;
+    @AuraEnabled
+    public Decimal unitPrice;
+    @AuraEnabled
+    public Decimal depositAmount;
+    @AuraEnabled
+    public Boolean isRecurring = false;
+    @AuraEnabled
+    public Integer termMonths;
+    @AuraEnabled
+    public Boolean inheritsQuoteTerm = false;
     @AuraEnabled
     public Decimal quantity;
     @AuraEnabled
@@ -98,6 +112,8 @@ public with sharing class QuoteBuilderController {
     public Decimal totalPrice;
     @AuraEnabled
     public String notes;
+    @AuraEnabled
+    public Integer termMonths;
     @AuraEnabled
     public Id pricebookId;
     @AuraEnabled
@@ -175,6 +191,12 @@ public with sharing class QuoteBuilderController {
     @AuraEnabled
     public Decimal discountPct { get; set; }
     @AuraEnabled
+    public Decimal unitPrice { get; set; }
+    @AuraEnabled
+    public Decimal depositAmount { get; set; }
+    @AuraEnabled
+    public Integer termMonths { get; set; }
+    @AuraEnabled
     public String description { get; set; }
   }
 
@@ -206,6 +228,7 @@ public with sharing class QuoteBuilderController {
         ExpirationDate,
         TotalPrice,
         Description,
+        Term_Months__c,
         Pricebook2Id,
         Pricebook2.Name,
         Email,
@@ -219,6 +242,10 @@ public with sharing class QuoteBuilderController {
             PricebookEntryId,
             Product2.Name,
             Product2.Family,
+            PricebookEntry.Payment_type__c,
+            Term_Months__c,
+            Use_Quote_Term__c,
+            Deposit__c,
             ListPrice,
             UnitPrice,
             Quantity,
@@ -240,27 +267,65 @@ public with sharing class QuoteBuilderController {
   }
 
   @AuraEnabled
-  public static Context setPricebook(Id opportunityId, Id pricebookId) {
+  public static Context setPricebook(
+    Id opportunityId,
+    Id pricebookId,
+    Boolean confirmProductRemoval
+  ) {
     Opportunity opp = loadOpportunity(opportunityId);
     if (opp.Pricebook2Id == pricebookId) {
       return getContext(opportunityId);
     }
-    Integer lineCount = [
-      SELECT COUNT()
+    // Reject invalid targets before changing synchronization or existing products.
+    validatePricebook(pricebookId);
+    opp = [
+      SELECT Id, Pricebook2Id, SyncedQuoteId
+      FROM Opportunity
+      WHERE Id = :opportunityId
+      WITH USER_MODE
+      FOR UPDATE
+    ];
+    if (opp.Pricebook2Id == pricebookId) {
+      return getContext(opportunityId);
+    }
+    List<OpportunityLineItem> products = [
+      SELECT Id
       FROM OpportunityLineItem
       WHERE OpportunityId = :opp.Id
       WITH USER_MODE
     ];
-    if (lineCount > 0) {
-      throw new AuraHandledException(
-        'Opportunity products already use the ' +
-          opp.Pricebook2?.Name +
-          ' price book. Remove or sync them before changing price books.'
+    if (
+      confirmProductRemoval != true &&
+      (opp.SyncedQuoteId != null || !products.isEmpty())
+    ) {
+      AuraHandledException confirmationRequired = new AuraHandledException(
+        'Confirm the price book change to stop quote synchronization and remove the current Opportunity products. Saved quotes will be kept.'
       );
+      confirmationRequired.setMessage(
+        'Confirm the price book change to stop quote synchronization and remove the current Opportunity products. Saved quotes will be kept.'
+      );
+      throw confirmationRequired;
     }
-    validatePricebook(pricebookId);
-    update as user new Opportunity(Id = opp.Id, Pricebook2Id = pricebookId);
-    return getContext(opportunityId);
+    Savepoint sp = Database.setSavepoint();
+    try {
+      // Stop native sync first so removing Opportunity products cannot remove
+      // products from the previously synchronized saved quote.
+      if (opp.SyncedQuoteId != null) {
+        update as user new Opportunity(Id = opp.Id, SyncedQuoteId = null);
+      }
+      if (!products.isEmpty()) {
+        delete as user products;
+      }
+      update as user new Opportunity(Id = opp.Id, Pricebook2Id = pricebookId);
+      return getContext(opportunityId);
+    } catch (Exception error) {
+      Database.rollback(sp);
+      throw handled('Could not change the price book', error);
+    }
+  }
+
+  public static Context setPricebook(Id opportunityId, Id pricebookId) {
+    return setPricebook(opportunityId, pricebookId, false);
   }
 
   @AuraEnabled
@@ -269,7 +334,8 @@ public with sharing class QuoteBuilderController {
     Id quoteId,
     Date expirationDate,
     String notes,
-    List<LineInput> lines
+    List<LineInput> lines,
+    Integer termMonths
   ) {
     Opportunity opp = loadOpportunity(opportunityId);
     if (opp.Pricebook2Id == null) {
@@ -278,6 +344,7 @@ public with sharing class QuoteBuilderController {
       );
     }
     Map<Id, PricebookEntry> entries = validateLines(opp.Pricebook2Id, lines);
+    validateTerms(lines, entries, termMonths);
     Id contactId = primaryContactId(opp.Id);
     Quote quoteRecord;
     Savepoint sp = Database.setSavepoint();
@@ -299,11 +366,20 @@ public with sharing class QuoteBuilderController {
             ? Date.today().addDays(14)
             : expirationDate,
           Description = cleanNotes(notes),
+          Term_Months__c = termMonths,
           Status = 'Draft'
         );
         insert as user quoteRecord;
       } else {
         quoteRecord = loadQuoteForUpdate(quoteId, opp.Id);
+        if (
+          quoteRecord.Pricebook2Id != opp.Pricebook2Id &&
+          opp.SyncedQuoteId == quoteId
+        ) {
+          throw new AuraHandledException(
+            'Stop quote synchronization before changing its price book.'
+          );
+        }
         List<QuoteLineItem> existing = [
           SELECT Id
           FROM QuoteLineItem
@@ -315,6 +391,8 @@ public with sharing class QuoteBuilderController {
         }
         quoteRecord.ExpirationDate = expirationDate;
         quoteRecord.Description = cleanNotes(notes);
+        quoteRecord.Term_Months__c = termMonths;
+        quoteRecord.Pricebook2Id = opp.Pricebook2Id;
         if (quoteRecord.ContactId == null) {
           quoteRecord.ContactId = contactId;
         }
@@ -331,8 +409,18 @@ public with sharing class QuoteBuilderController {
             QuoteId = quoteRecord.Id,
             PricebookEntryId = entry.Id,
             Quantity = input.quantity,
-            UnitPrice = entry.UnitPrice,
+            UnitPrice = input.unitPrice == null
+              ? entry.UnitPrice
+              : input.unitPrice.setScale(2),
             Discount = discount == 0 ? null : discount,
+            Deposit__c = input.depositAmount == null
+              ? entry.Deposit__c
+              : input.depositAmount.setScale(2),
+            Term_Months__c = entry.Payment_type__c == 'Recurring'
+              ? (input.termMonths == null ? termMonths : input.termMonths)
+              : null,
+            Use_Quote_Term__c = entry.Payment_type__c == 'Recurring' &&
+              input.termMonths == null,
             Description = input.description == null
               ? null
               : input.description.trim().left(255)
@@ -340,11 +428,32 @@ public with sharing class QuoteBuilderController {
         );
       }
       insert as user quoteLines;
+      if (opp.SyncedQuoteId == quoteRecord.Id) {
+        syncLineDetails(quoteRecord.Id);
+      }
     } catch (Exception error) {
       Database.rollback(sp);
       throw handled('Could not save the quote', error);
     }
     return queryQuoteInfo(quoteRecord.Id, opp.SyncedQuoteId);
+  }
+
+  // Preserve the existing Apex entry point for callers without recurring terms.
+  public static QuoteInfo saveQuote(
+    Id opportunityId,
+    Id quoteId,
+    Date expirationDate,
+    String notes,
+    List<LineInput> lines
+  ) {
+    return saveQuote(
+      opportunityId,
+      quoteId,
+      expirationDate,
+      notes,
+      lines,
+      null
+    );
   }
 
   @AuraEnabled
@@ -362,12 +471,16 @@ public with sharing class QuoteBuilderController {
         'Add at least one product before syncing this quote.'
       );
     }
+    Savepoint sp = Database.setSavepoint();
     try {
       update as user new Opportunity(
         Id = opp.Id,
-        SyncedQuoteId = quoteRecord.Id
+        SyncedQuoteId = quoteRecord.Id,
+        Description = buildServiceSummary(quoteRecord.Id)
       );
+      syncLineDetails(quoteRecord.Id);
     } catch (Exception error) {
+      Database.rollback(sp);
       throw handled('Could not sync the quote to the Opportunity', error);
     }
     return getContext(opportunityId);
@@ -486,6 +599,11 @@ public with sharing class QuoteBuilderController {
     }
     insert as user new QuoteDocument(QuoteId = quoteRecord.Id, Document = pdf);
     update as user new Quote(Id = quoteRecord.Id, Status = 'Presented');
+    update as user new Opportunity(
+      Id = quoteRecord.OpportunityId,
+      Proposal_Sent_DateTime__c = System.now(),
+      Description = buildServiceSummary(quoteRecord.Id)
+    );
     insert as user new Task(
       WhatId = quoteRecord.OpportunityId,
       WhoId = mergeContactId,
@@ -512,6 +630,22 @@ public with sharing class QuoteBuilderController {
       WITH USER_MODE
     ];
     return queryQuoteInfo(quoteRecord.Id, opp.SyncedQuoteId);
+  }
+
+  private static String buildServiceSummary(Id quoteId) {
+    List<String> services = new List<String>();
+    for (QuoteLineItem line : [
+      SELECT Quantity, Product2.Name
+      FROM QuoteLineItem
+      WHERE QuoteId = :quoteId
+      WITH USER_MODE
+      ORDER BY CreatedDate, Id
+    ]) {
+      services.add(
+        line.Product2.Name + ' — Qty ' + String.valueOf(line.Quantity)
+      );
+    }
+    return ('Selected services:\n' + String.join(services, '\n')).left(32000);
   }
 
   @TestVisible
@@ -546,7 +680,7 @@ public with sharing class QuoteBuilderController {
     }
     Map<Id, PricebookEntry> entries = new Map<Id, PricebookEntry>(
       [
-        SELECT Id, UnitPrice, Product2.Name
+        SELECT Id, UnitPrice, Product2.Name, Payment_type__c, Deposit__c
         FROM PricebookEntry
         WHERE
           Id IN :entryIds
@@ -566,6 +700,24 @@ public with sharing class QuoteBuilderController {
       PricebookEntry entry = entries.get(input.pricebookEntryId);
       Decimal quantity = input.quantity == null ? 0 : input.quantity;
       Decimal discount = input.discountPct == null ? 0 : input.discountPct;
+      Decimal unitPrice = input.unitPrice == null
+        ? entry.UnitPrice
+        : input.unitPrice.setScale(2);
+      if (unitPrice < 0) {
+        throw new AuraHandledException(
+          'Sales price for "' +
+            entry.Product2.Name +
+            '" must be zero or greater.'
+        );
+      }
+      Decimal deposit = input.depositAmount == null
+        ? entry.Deposit__c
+        : input.depositAmount;
+      if (deposit != null && deposit < 0) {
+        throw new AuraHandledException(
+          'Deposit for "' + entry.Product2.Name + '" must be zero or greater.'
+        );
+      }
       if (quantity <= 0 || quantity > 9999) {
         throw new AuraHandledException(
           'Quantity for "' +
@@ -593,6 +745,65 @@ public with sharing class QuoteBuilderController {
     return entries;
   }
 
+  private static void validateTerms(
+    List<LineInput> lines,
+    Map<Id, PricebookEntry> entries,
+    Integer termMonths
+  ) {
+    if (termMonths != null && (termMonths < 1 || termMonths > 1200)) {
+      throw new AuraHandledException(
+        'Quote term must be between 1 and 1200 months.'
+      );
+    }
+    for (LineInput input : lines) {
+      if (entries.get(input.pricebookEntryId).Payment_type__c != 'Recurring') {
+        if (input.termMonths != null) {
+          throw new AuraHandledException(
+            'Only recurring products can have a recurring term.'
+          );
+        }
+        continue;
+      }
+      if (termMonths == null) {
+        throw new AuraHandledException(
+          'Set a quote term in months for recurring products.'
+        );
+      }
+      if (
+        input.termMonths != null &&
+        (input.termMonths < 1 ||
+        input.termMonths > 1200)
+      ) {
+        throw new AuraHandledException(
+          'Recurring product terms must be between 1 and 1200 months.'
+        );
+      }
+    }
+  }
+
+  private static void syncLineDetails(Id quoteId) {
+    List<OpportunityLineItem> updates = new List<OpportunityLineItem>();
+    for (QuoteLineItem line : [
+      SELECT OpportunityLineItemId, Term_Months__c, Deposit__c
+      FROM QuoteLineItem
+      WHERE QuoteId = :quoteId
+      WITH USER_MODE
+    ]) {
+      if (line.OpportunityLineItemId != null) {
+        updates.add(
+          new OpportunityLineItem(
+            Id = line.OpportunityLineItemId,
+            Term_Months__c = line.Term_Months__c,
+            Deposit__c = line.Deposit__c
+          )
+        );
+      }
+    }
+    if (!updates.isEmpty()) {
+      update as user updates;
+    }
+  }
+
   private static List<CatalogItem> catalogFor(Id pricebookId) {
     List<CatalogItem> result = new List<CatalogItem>();
     for (PricebookEntry entry : [
@@ -603,7 +814,9 @@ public with sharing class QuoteBuilderController {
         Product2.Name,
         Product2.ProductCode,
         Product2.Family,
-        Product2.Description
+        Product2.Description,
+        Payment_type__c,
+        Deposit__c
       FROM PricebookEntry
       WHERE
         Pricebook2Id = :pricebookId
@@ -621,6 +834,8 @@ public with sharing class QuoteBuilderController {
       item.family = entry.Product2.Family;
       item.description = entry.Product2.Description;
       item.listPrice = entry.UnitPrice;
+      item.depositAmount = entry.Deposit__c;
+      item.isRecurring = entry.Payment_type__c == 'Recurring';
       result.add(item);
     }
     return result;
@@ -676,6 +891,7 @@ public with sharing class QuoteBuilderController {
         ExpirationDate,
         TotalPrice,
         Description,
+        Term_Months__c,
         Pricebook2Id,
         Pricebook2.Name,
         Email,
@@ -689,6 +905,10 @@ public with sharing class QuoteBuilderController {
             PricebookEntryId,
             Product2.Name,
             Product2.Family,
+            PricebookEntry.Payment_type__c,
+            Term_Months__c,
+            Use_Quote_Term__c,
+            Deposit__c,
             ListPrice,
             UnitPrice,
             Quantity,
@@ -714,6 +934,9 @@ public with sharing class QuoteBuilderController {
     info.expirationDate = quoteRecord.ExpirationDate;
     info.totalPrice = quoteRecord.TotalPrice;
     info.notes = quoteRecord.Description;
+    info.termMonths = quoteRecord.Term_Months__c == null
+      ? null
+      : quoteRecord.Term_Months__c.intValue();
     info.pricebookId = quoteRecord.Pricebook2Id;
     info.pricebookName = quoteRecord.Pricebook2?.Name;
     info.recipientEmail = String.isNotBlank(quoteRecord.Email)
@@ -739,6 +962,14 @@ public with sharing class QuoteBuilderController {
           ? quoteLine.UnitPrice
           : quoteLine.ListPrice;
         line.quantity = quoteLine.Quantity;
+        line.unitPrice = quoteLine.UnitPrice;
+        line.depositAmount = quoteLine.Deposit__c;
+        line.isRecurring =
+          quoteLine.PricebookEntry.Payment_type__c == 'Recurring';
+        line.termMonths = quoteLine.Term_Months__c == null
+          ? null
+          : quoteLine.Term_Months__c.intValue();
+        line.inheritsQuoteTerm = quoteLine.Use_Quote_Term__c;
         line.discountPct = quoteLine.Discount == null ? 0 : quoteLine.Discount;
         line.description = quoteLine.Description;
         line.totalPrice = quoteLine.TotalPrice;

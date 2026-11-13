@@ -13,6 +13,8 @@ import syncQuoteToOpportunity from "@salesforce/apex/QuoteBuilderController.sync
 
 const ALL = "__all__";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const roundCurrency = (value) =>
+  Math.round((value + Number.EPSILON) * 100) / 100;
 let keySequence = 0;
 
 export default class QuoteBuilder extends NavigationMixin(LightningElement) {
@@ -48,8 +50,11 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   selectedPricebookId;
   editingQuoteId;
   editorTitle = "New quote";
+  editorPricebookId;
+  editorPricebookName;
   expirationDate;
   notes = "";
+  termMonths;
   cart = [];
   search = "";
   family = ALL;
@@ -90,6 +95,14 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
         : "Sync to Opportunity",
       syncDisabled: this.busy || quote.isSynced,
       sendDisabled: this.busy,
+      lines: (quote.lines || []).map((line) => ({
+        ...line,
+        hasDeposit: line.depositAmount != null,
+        termLabel:
+          line.isRecurring && line.termMonths
+            ? `Recurring · ${line.termMonths} months`
+            : ""
+      })),
       statusClass: `status status_${(quote.status || "draft").toLowerCase().replaceAll(" ", "-")}`
     }));
   }
@@ -153,9 +166,11 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
       .map((item) => ({
         ...item,
         familyLabel: item.family || "Other",
+        hasDeposit: Number(item.depositAmount) > 0,
         rowClass: quantities.has(item.pricebookEntryId)
           ? "product product_selected"
-          : "product"
+          : "product",
+        addDisabled: this.pricebookMismatch
       }));
   }
 
@@ -165,13 +180,14 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   get cartView() {
     return this.cart.map((line) => {
-      const gross = line.listPrice * line.quantity;
-      const net = gross * (1 - line.discountPct / 100);
+      const gross = roundCurrency(line.unitPrice * line.quantity);
+      const net = roundCurrency(gross * (1 - line.discountPct / 100));
       const overLimit = line.discountPct > this.maxDiscount;
       return {
         ...line,
         gross,
         net,
+        effectiveTermMonths: line.termMonths || this.termMonths,
         overLimit,
         needsApproval: overLimit && !this.context?.canOverrideDiscount,
         lineClass: overLimit ? "line line_warn" : "line"
@@ -183,11 +199,60 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     return this.cart.length > 0;
   }
 
+  get hasRecurringLines() {
+    return this.cart.some((line) => line.isRecurring);
+  }
+
+  get invalidTerms() {
+    const validTerm = (value) =>
+      Number.isInteger(Number(value)) &&
+      Number(value) >= 1 &&
+      Number(value) <= 1200;
+    return (
+      this.hasRecurringLines &&
+      (!validTerm(this.termMonths) ||
+        this.cart.some(
+          (line) =>
+            line.isRecurring &&
+            line.termMonths != null &&
+            !validTerm(line.termMonths)
+        ))
+    );
+  }
+
+  get invalidPrices() {
+    return this.cart.some(
+      (line) => !Number.isFinite(line.unitPrice) || line.unitPrice < 0
+    );
+  }
+
+  get invalidDeposits() {
+    return this.cart.some(
+      (line) =>
+        line.depositAmount != null &&
+        (!Number.isFinite(line.depositAmount) || line.depositAmount < 0)
+    );
+  }
+
+  get pricebookMismatch() {
+    return (
+      this.editorPricebookId &&
+      this.editorPricebookId !== this.context?.pricebookId
+    );
+  }
+
   get totals() {
     const lines = this.cartView;
-    const subtotal = lines.reduce((sum, line) => sum + line.gross, 0);
-    const total = lines.reduce((sum, line) => sum + line.net, 0);
-    return { subtotal, discount: subtotal - total, total, count: lines.length };
+    const subtotal = roundCurrency(
+      lines.reduce((sum, line) => sum + line.gross, 0)
+    );
+    const total = roundCurrency(lines.reduce((sum, line) => sum + line.net, 0));
+    return {
+      subtotal,
+      discount: roundCurrency(subtotal - total),
+      total,
+      count: lines.length
+    };
   }
 
   get maxDiscount() {
@@ -202,15 +267,16 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     return this.cart.length > 0;
   }
 
-  get totals() {
-    const lines = this.cartView;
-    const subtotal = lines.reduce((sum, line) => sum + line.gross, 0);
-    const total = lines.reduce((sum, line) => sum + line.net, 0);
-    return { subtotal, discount: subtotal - total, total };
-  }
-
   get saveDisabled() {
-    return this.busy || !this.hasLines || this.blockedByApproval;
+    return (
+      this.busy ||
+      !this.hasLines ||
+      this.blockedByApproval ||
+      this.invalidTerms ||
+      this.invalidPrices ||
+      this.invalidDeposits ||
+      this.pricebookMismatch
+    );
   }
 
   get emailTemplateOptions() {
@@ -241,9 +307,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   get sendLoadingLabel() {
-    return this.sendInProgress
-      ? "Sending quote email…"
-      : "Preparing email…";
+    return this.sendInProgress ? "Sending quote email…" : "Preparing email…";
   }
 
   get sendActionLabel() {
@@ -327,14 +391,23 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   openEditor(quote) {
     this.editingQuoteId = quote?.quoteId;
     this.editorTitle = quote ? `Edit ${quote.name}` : "New quote";
+    this.editorPricebookId = quote?.pricebookId || this.context?.pricebookId;
+    this.editorPricebookName =
+      quote?.pricebookName || this.context?.pricebookName;
     this.expirationDate = quote?.expirationDate || this.defaultExpirationDate();
     this.notes = quote?.notes || "";
+    this.termMonths = quote?.termMonths || null;
     this.cart = (quote?.lines || []).map((line) => ({
       key: `line-${++keySequence}`,
       pricebookEntryId: line.pricebookEntryId,
       name: line.name,
       family: line.family,
       listPrice: Number(line.listPrice) || 0,
+      unitPrice: Number(line.unitPrice ?? line.listPrice) || 0,
+      depositAmount:
+        line.depositAmount == null ? null : Number(line.depositAmount),
+      isRecurring: Boolean(line.isRecurring),
+      termMonths: line.inheritsQuoteTerm ? null : line.termMonths || null,
       quantity: Number(line.quantity) || 1,
       discountPct: Number(line.discountPct) || 0,
       description: line.description || ""
@@ -359,6 +432,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   handleAdd(event) {
+    if (this.pricebookMismatch) return;
     const id = event.currentTarget.dataset.id;
     const existing = this.cart.find((line) => line.pricebookEntryId === id);
     if (existing) {
@@ -378,6 +452,11 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
         name: item.name,
         family: item.family,
         listPrice: Number(item.listPrice) || 0,
+        unitPrice: Number(item.listPrice) || 0,
+        depositAmount:
+          item.depositAmount == null ? null : Number(item.depositAmount),
+        isRecurring: Boolean(item.isRecurring),
+        termMonths: null,
         quantity: 1,
         discountPct: 0,
         description: ""
@@ -415,6 +494,31 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.updateLine(event.target.dataset.key, { discountPct });
   }
 
+  handleUnitPrice(event) {
+    const value = event.target.value;
+    this.updateLine(event.target.dataset.key, {
+      unitPrice: value === "" ? NaN : Number(value)
+    });
+  }
+
+  handleQuoteTerm(event) {
+    this.termMonths =
+      event.target.value === "" ? null : Number(event.target.value);
+  }
+
+  handleDeposit(event) {
+    this.updateLine(event.target.dataset.key, {
+      depositAmount:
+        event.target.value === "" ? null : Number(event.target.value)
+    });
+  }
+
+  handleLineTerm(event) {
+    this.updateLine(event.target.dataset.key, {
+      termMonths: event.target.value === "" ? null : Number(event.target.value)
+    });
+  }
+
   handleNote(event) {
     this.updateLine(event.target.dataset.key, {
       description: event.target.value || ""
@@ -435,40 +539,85 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   handlePricebookPick(event) {
-    if (event.currentTarget.dataset.disabled === "true") return;
+    if (this.busy || event.currentTarget.dataset.disabled === "true") return;
     this.selectedPricebookId = event.currentTarget.dataset.id;
   }
 
+  handleChangePricebook() {
+    this.selectedPricebookId = this.context.pricebookId;
+    this.choosingPricebook = true;
+  }
+
   handleCancelPricebook() {
+    if (this.busy) return;
     this.choosingPricebook = false;
     this.pendingNewQuote = false;
     this.selectedPricebookId = undefined;
   }
 
   async handleSetPricebook() {
-    if (!this.selectedPricebookId) return;
+    if (!this.selectedPricebookId || this.busy) return;
+    const pricebookId = this.selectedPricebookId;
+    const changingOpportunityBook = pricebookId !== this.context?.pricebookId;
+    const changingEditorBook =
+      this.editorOpen && pricebookId !== this.editorPricebookId;
+    const changingBook = changingOpportunityBook || changingEditorBook;
+    const needsConfirmation =
+      (Boolean(this.context?.pricebookId) && changingOpportunityBook) ||
+      changingEditorBook;
     await this.run(async () => {
+      if (needsConfirmation) {
+        const confirmed = await LightningConfirm.open({
+          label: "Change price book",
+          message: changingOpportunityBook
+            ? "Changing the price book removes the current Opportunity products and the products in this quote draft, and stops any quote synchronization. Saved quotes will remain. Your quote notes, expiration date, and recurring term will be kept. Continue?"
+            : "Using the Opportunity's current price book removes the products in this quote draft. Existing Opportunity products and saved quotes will remain. Your quote notes, expiration date, and recurring term will be kept. Continue?",
+          theme: "warning"
+        });
+        if (!confirmed) return;
+      }
       this.applyContext(
         await setPricebook({
           opportunityId: this.recordId,
-          pricebookId: this.selectedPricebookId
+          pricebookId,
+          confirmProductRemoval: changingOpportunityBook && needsConfirmation
         })
       );
+      await notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
       this.choosingPricebook = false;
       this.selectedPricebookId = undefined;
       const shouldOpen = this.pendingNewQuote;
       this.pendingNewQuote = false;
+      if (changingBook && this.editorOpen) {
+        this.cart = [];
+        this.search = "";
+        this.family = ALL;
+      }
+      if (this.editorOpen) {
+        this.editorPricebookId = this.context.pricebookId;
+        this.editorPricebookName = this.context.pricebookName;
+      }
       if (shouldOpen) this.openEditor();
       this.toast("success", "Price book selected", this.context.pricebookName);
     });
   }
 
   async handleSaveQuote() {
+    if (this.saveDisabled) return;
+    const inputs = [
+      ...this.template.querySelectorAll(
+        ".quote-editor input, .quote-editor lightning-input"
+      )
+    ];
+    if (!inputs.every((input) => input.reportValidity?.() !== false)) return;
     await this.run(async () => {
       const lines = this.cart.map((line) => ({
         pricebookEntryId: line.pricebookEntryId,
         quantity: line.quantity,
         discountPct: line.discountPct,
+        unitPrice: line.unitPrice,
+        depositAmount: line.depositAmount,
+        termMonths: line.isRecurring ? line.termMonths : null,
         description: line.description
       }));
       const quote = await saveQuote({
@@ -476,6 +625,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
         quoteId: this.editingQuoteId,
         expirationDate: this.expirationDate,
         notes: this.notes,
+        termMonths: this.hasRecurringLines ? this.termMonths : null,
         lines
       });
       this.applyContext(await getContext({ opportunityId: this.recordId }));
