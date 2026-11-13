@@ -22,6 +22,18 @@
                 <behavior>Required</behavior>
                 <field>Quantity</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Discount</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Deposit__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Term_Months__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
@@ -88,6 +100,9 @@
     <multilineLayoutFields>Product2Id</multilineLayoutFields>
     <multilineLayoutFields>Quantity</multilineLayoutFields>
     <multilineLayoutFields>UnitPrice</multilineLayoutFields>
+    <multilineLayoutFields>Discount</multilineLayoutFields>
+    <multilineLayoutFields>Deposit__c</multilineLayoutFields>
+    <multilineLayoutFields>Term_Months__c</multilineLayoutFields>
     <multilineLayoutFields>ServiceDate</multilineLayoutFields>
     <multilineLayoutFields>Description</multilineLayoutFields>
     <multilineLayoutFields>OpportunityId</multilineLayoutFields>

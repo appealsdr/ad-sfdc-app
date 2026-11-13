@@ -29,6 +29,10 @@
                 <field>ExpirationDate</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Term_Months__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>IsSyncing</field>
             </layoutItems>

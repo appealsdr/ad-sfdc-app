@@ -1832,6 +1832,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Opportunity.Loss_Reason_Notes__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Opportunity.Marketplaces__c</field>
         <readable>true</readable>
     </fieldPermissions>

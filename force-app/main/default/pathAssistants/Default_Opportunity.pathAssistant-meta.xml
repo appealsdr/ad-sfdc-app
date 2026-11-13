@@ -4,5 +4,58 @@
     <entityName>Opportunity</entityName>
     <fieldName>StageName</fieldName>
     <masterLabel>Default</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>Meeting_Completed_DateTime__c</fieldNames>
+        <fieldNames>Opportunity_Opener__c</fieldNames>
+        <fieldNames>Opportunity_Closer__c</fieldNames>
+        <fieldNames>Technical_expert__c</fieldNames>
+        <fieldNames>NextStep</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Qualify the opportunity and assign the deal team.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Record the first completed meeting date and time.&lt;/li&gt;&lt;li&gt;Assign the Opportunity Opener who sourced or qualified the deal.&lt;/li&gt;&lt;li&gt;Assign the Opportunity Closer responsible for advancing the sale.&lt;/li&gt;&lt;li&gt;Add a Technical expert when solution or implementation expertise is needed.&lt;/li&gt;&lt;li&gt;Agree on a clear next step before advancing.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Meeting Booked</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Amount</fieldNames>
+        <fieldNames>Description</fieldNames>
+        <fieldNames>Proposal_Sent_DateTime__c</fieldNames>
+        <fieldNames>NextStep</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Send a complete proposal and establish follow-up.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Verify the service scope, pricing, and expected deliverables.&lt;/li&gt;&lt;li&gt;Record when the proposal was sent.&lt;/li&gt;&lt;li&gt;Set the next step for client review and follow-up.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Proposal Sent</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Amount</fieldNames>
+        <fieldNames>Budget_Confirmed__c</fieldNames>
+        <fieldNames>Discovery_Completed__c</fieldNames>
+        <fieldNames>CloseDate</fieldNames>
+        <fieldNames>NextStep</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Resolve objections and confirm the path to signature.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Confirm discovery is complete and budget is approved.&lt;/li&gt;&lt;li&gt;Keep pricing and the expected start date current.&lt;/li&gt;&lt;li&gt;Document the next decision or action required from the client.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Negotiation</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Opportunity_Opener__c</fieldNames>
+        <fieldNames>Opportunity_Closer__c</fieldNames>
+        <fieldNames>Contract_Sent_DateTime__c</fieldNames>
+        <fieldNames>Checkout_URL__c</fieldNames>
+        <fieldNames>NextStep</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Drive the contract and payment to completion.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Confirm the contract was sent to the correct signer.&lt;/li&gt;&lt;li&gt;Verify the checkout link, amount, and expected start date.&lt;/li&gt;&lt;li&gt;Track the next follow-up until signature and payment are complete.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Contract Sent</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Store__c</fieldNames>
+        <fieldNames>CSM_Call__c</fieldNames>
+        <fieldNames>Seller_ID__c</fieldNames>
+        <fieldNames>SPN_Access__c</fieldNames>
+        <fieldNames>End_Date__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Complete the handoff to onboarding and delivery.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Confirm payment and contract completion before closing the deal.&lt;/li&gt;&lt;li&gt;Link the Store and CSM Call, and verify Seller ID and SPN access.&lt;/li&gt;&lt;li&gt;Ensure onboarding ownership and the expected end date are recorded.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Closed Won</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Loss_Reason__c</fieldNames>
+        <fieldNames>Loss_Reason_Notes__c</fieldNames>
+        <fieldNames>Amount</fieldNames>
+        <fieldNames>CloseDate</fieldNames>
+        <fieldNames>NextStep</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Document why the opportunity was lost.&lt;/b&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Select a Loss Reason and enter specific Loss Reason Notes.&lt;/li&gt;&lt;li&gt;Confirm the final amount and date for reporting.&lt;/li&gt;&lt;li&gt;Record a next step only when future re-engagement is appropriate.&lt;/li&gt;&lt;/ul&gt;</info>
+        <picklistValueName>Closed Lost</picklistValueName>
+    </pathAssistantSteps>
     <recordTypeName>__MASTER__</recordTypeName>
 </PathAssistant>

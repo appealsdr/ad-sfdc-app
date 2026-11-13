@@ -1,0 +1,233 @@
+<apex:page
+  standardController="Quote"
+  renderAs="pdf"
+  applyBodyTag="false"
+  showHeader="false"
+>
+  <head>
+    <style type="text/css">
+      @page {
+        size: letter;
+        margin: 0.55in;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        color: #14213d;
+        font-size: 10pt;
+      }
+      .brand-logo {
+        width: 210px;
+        height: auto;
+      }
+      .title {
+        font-size: 18pt;
+        margin-top: 24px;
+      }
+      .meta {
+        width: 100%;
+        margin: 18px 0;
+      }
+      .meta td {
+        padding: 3px 0;
+      }
+      .label {
+        color: #657080;
+        width: 120px;
+      }
+      table.lines {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      .lines th {
+        background: #0b2b55;
+        color: white;
+        text-align: left;
+        padding: 8px;
+      }
+      .lines th.number {
+        text-align: right;
+      }
+      .lines tr {
+        page-break-inside: avoid;
+      }
+      .lines td {
+        border-bottom: 1px solid #d9dee7;
+        padding: 8px;
+        vertical-align: top;
+      }
+      .number {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .original-price,
+      .line-term,
+      .discount-amount {
+        color: #657080;
+        display: block;
+        font-size: 8pt;
+        margin-top: 4px;
+      }
+      table.totals {
+        width: 45%;
+        margin: 18px 0 0 auto;
+        border-collapse: collapse;
+      }
+      .totals td {
+        padding: 5px 0;
+      }
+      .totals .total td {
+        border-top: 1px solid #d9dee7;
+        font-size: 14pt;
+        font-weight: bold;
+        padding-top: 10px;
+      }
+      .notes {
+        margin-top: 24px;
+        padding: 12px;
+        background: #f5f7fa;
+      }
+    </style>
+  </head>
+  <body>
+    <apex:image
+      url="{!$Resource.AppealDoctorLogo}"
+      styleClass="brand-logo"
+      alt="Appeals Doctor"
+    />
+    <div class="title">{!Quote.Name}</div>
+    <table class="meta">
+      <tr>
+        <td class="label">Quote number</td>
+        <td>{!Quote.QuoteNumber}</td>
+      </tr>
+      <tr>
+        <td class="label">Opportunity</td>
+        <td>{!Quote.Opportunity.Name}</td>
+      </tr>
+      <tr>
+        <td class="label">Account</td>
+        <td>{!Quote.Opportunity.Account.Name}</td>
+      </tr>
+      <tr>
+        <td class="label">Status</td>
+        <td>{!Quote.Status}</td>
+      </tr>
+      <tr>
+        <td class="label">Expiration</td>
+        <td>
+          <apex:outputText value="{0,date,MMMM d, yyyy}"
+            ><apex:param value="{!Quote.ExpirationDate}"
+          /></apex:outputText>
+        </td>
+      </tr>
+      <apex:outputPanel
+        rendered="{!BLANKVALUE(Quote.Term_Months__c, 0) > 0}"
+        layout="none"
+      >
+        <tr>
+          <td class="label">Recurring term</td>
+          <td>
+            <apex:outputText value="{0,number,0} months">
+              <apex:param value="{!Quote.Term_Months__c}" />
+            </apex:outputText>
+          </td>
+        </tr>
+      </apex:outputPanel>
+    </table>
+    <table class="lines">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Details</th>
+          <th class="number">Qty</th>
+          <th class="number">Unit price</th>
+          <th class="number">Discount</th>
+          <th class="number">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <apex:repeat value="{!Quote.QuoteLineItems}" var="line">
+          <tr>
+            <td>{!line.Product2.Name}</td>
+            <td>
+              {!line.Description}
+              <apex:outputPanel
+                rendered="{!BLANKVALUE(line.Term_Months__c, 0) > 0}"
+                layout="block"
+                styleClass="line-term"
+              >
+                <apex:outputText value="Term: {0,number,0} months">
+                  <apex:param value="{!line.Term_Months__c}" />
+                </apex:outputText>
+              </apex:outputPanel>
+            </td>
+            <td class="number">{!line.Quantity}</td>
+            <td class="number">
+              <apex:outputText value="{0,number,currency}"
+                ><apex:param value="{!line.UnitPrice}"
+              /></apex:outputText>
+              <div class="original-price">
+                <apex:outputText value="Original: {0,number,currency}">
+                  <apex:param value="{!line.ListPrice}" />
+                </apex:outputText>
+              </div>
+            </td>
+            <td class="number">
+              <apex:outputText value="{0,number,0.##}%">
+                <apex:param value="{!BLANKVALUE(line.Discount, 0)}" />
+              </apex:outputText>
+              <div class="discount-amount">
+                <apex:outputText value="{0,number,currency}">
+                  <apex:param
+                    value="{!line.UnitPrice * line.Quantity - line.TotalPrice}"
+                  />
+                </apex:outputText>
+              </div>
+            </td>
+            <td class="number">
+              <apex:outputText value="{0,number,currency}"
+                ><apex:param value="{!line.TotalPrice}"
+              /></apex:outputText>
+            </td>
+          </tr>
+        </apex:repeat>
+      </tbody>
+    </table>
+    <table class="totals">
+      <tr>
+        <td>Subtotal</td>
+        <td class="number">
+          <apex:outputText value="{0,number,currency}">
+            <apex:param value="{!Quote.Subtotal}" />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr>
+        <td>Discount</td>
+        <td class="number">
+          <apex:outputText value="{0,number,currency}">
+            <apex:param
+              value="{!BLANKVALUE(Quote.Subtotal, 0) - BLANKVALUE(Quote.TotalPrice, 0)}"
+            />
+          </apex:outputText>
+        </td>
+      </tr>
+      <tr class="total">
+        <td>Total</td>
+        <td class="number">
+          <apex:outputText value="{0,number,currency}">
+            <apex:param value="{!Quote.TotalPrice}" />
+          </apex:outputText>
+        </td>
+      </tr>
+    </table>
+    <apex:outputPanel
+      rendered="{!NOT(ISBLANK(Quote.Description))}"
+      layout="block"
+      styleClass="notes"
+    >
+      <strong>Notes</strong><br />{!Quote.Description}
+    </apex:outputPanel>
+  </body>
+</apex:page>

@@ -66,4 +66,57 @@ private class ContractLineItemPaymentServiceTest {
             Quantity = 1, UnitPrice = 100);
         System.assertEquals(0, [SELECT COUNT() FROM Payment__c WHERE Service_Contract__c = :contract.Id]);
     }
+
+    @isTest
+    static void usesStoredDepositsAndPreservesLegacyFallbackAndExplicitZero() {
+        Account account = new Account(Name = 'Agreed deposit account');
+        insert account;
+        Id pricebookId = Test.getStandardPricebookId();
+        List<Product2> products = new List<Product2>{
+            new Product2(Name = 'Stored deposit', IsActive = true),
+            new Product2(Name = 'Legacy deposit', IsActive = true),
+            new Product2(Name = 'Waived deposit', IsActive = true)
+        };
+        insert products;
+        List<PricebookEntry> entries = new List<PricebookEntry>{
+            new PricebookEntry(Pricebook2Id = pricebookId, Product2Id = products[0].Id,
+                UnitPrice = 100, IsActive = true, Payment_type__c = 'Deposit', Deposit__c = 100),
+            new PricebookEntry(Pricebook2Id = pricebookId, Product2Id = products[1].Id,
+                UnitPrice = 100, IsActive = true, Payment_type__c = 'Deposit', Deposit__c = 50),
+            new PricebookEntry(Pricebook2Id = pricebookId, Product2Id = products[2].Id,
+                UnitPrice = 100, IsActive = true, Payment_type__c = 'Deposit', Deposit__c = 75)
+        };
+        insert entries;
+        ServiceContract contract = new ServiceContract(Name = 'Agreed deposit contract',
+            AccountId = account.Id, Pricebook2Id = pricebookId, StartDate = Date.today());
+        insert contract;
+        List<ContractLineItem> lines = new List<ContractLineItem>{
+            new ContractLineItem(ServiceContractId = contract.Id, PricebookEntryId = entries[0].Id,
+                Quantity = 2, UnitPrice = 100, Deposit__c = 25),
+            new ContractLineItem(ServiceContractId = contract.Id, PricebookEntryId = entries[1].Id,
+                Quantity = 3, UnitPrice = 100),
+            new ContractLineItem(ServiceContractId = contract.Id, PricebookEntryId = entries[2].Id,
+                Quantity = 4, UnitPrice = 100, Deposit__c = 0)
+        };
+        Test.startTest();
+        insert lines;
+        Test.stopTest();
+        Map<Id, Decimal> amountByLine = new Map<Id, Decimal>();
+        Decimal total;
+        for (Payment__c payment : [
+            SELECT Amount__c, Contract_Line_Item__c, Payment_Type__c
+            FROM Payment__c WHERE Service_Contract__c = :contract.Id
+        ]) {
+            if (payment.Contract_Line_Item__c != null) {
+                amountByLine.put(payment.Contract_Line_Item__c, payment.Amount__c);
+            } else if (payment.Payment_Type__c == 'First Payment') {
+                total = payment.Amount__c;
+            }
+        }
+        System.assertEquals(3, amountByLine.size());
+        System.assertEquals(50, amountByLine.get(lines[0].Id), 'Use the stored per-unit deposit instead of the catalogue deposit');
+        System.assertEquals(150, amountByLine.get(lines[1].Id), 'Legacy null deposits still use the catalogue amount');
+        System.assertEquals(0, amountByLine.get(lines[2].Id), 'Explicit zero must not fall back to the catalogue');
+        System.assertEquals(200, total, 'The first payment uses deposit snapshots multiplied by quantity');
+    }
 }

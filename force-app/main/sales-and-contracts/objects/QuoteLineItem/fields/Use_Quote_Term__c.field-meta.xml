@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Use_Quote_Term__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Tracks whether a recurring line inherits the quote term so subsequent quote term changes preserve that inheritance.</description>
+    <label>Use Quote Term</label>
+    <type>Checkbox</type>
+</CustomField>

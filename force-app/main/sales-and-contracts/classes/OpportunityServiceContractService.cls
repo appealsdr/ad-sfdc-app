@@ -51,7 +51,7 @@ public with sharing class OpportunityServiceContractService {
             Map<Id, Opportunity> oppMap = new Map<Id, Opportunity>([
                 SELECT Id, Name, AccountId, Pricebook2Id, CloseDate,
                        (SELECT Id, PricebookEntryId, Product2Id, Quantity, UnitPrice,
-                               Discount, Description, ServiceDate
+                               Discount, Description, ServiceDate, Term_Months__c, Deposit__c
                         FROM OpportunityLineItems)
                 FROM Opportunity
                 WHERE Id IN :opportunityIds
@@ -116,6 +116,8 @@ public with sharing class OpportunityServiceContractService {
                         Quantity = oli.Quantity,
                         UnitPrice = oli.UnitPrice,
                         Discount = oli.Discount,
+                        Deposit__c = oli.Deposit__c,
+                        Term_Months__c = oli.Term_Months__c,
                         Description = oli.Description,
                         StartDate = oli.ServiceDate
                     ));

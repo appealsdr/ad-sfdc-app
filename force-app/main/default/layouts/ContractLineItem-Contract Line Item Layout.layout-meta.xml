@@ -73,6 +73,14 @@
                 <field>Discount</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Deposit__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Term_Months__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>TotalPrice</field>
             </layoutItems>
