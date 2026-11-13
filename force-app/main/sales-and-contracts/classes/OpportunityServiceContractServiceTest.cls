@@ -7,8 +7,19 @@ private class OpportunityServiceContractServiceTest {
     oppList[0].Opportunity_Opener__c = UserInfo.getUserId();
     oppList[0].Opportunity_Closer__c = UserInfo.getUserId();
     update oppList[0];
+    List<Contact> contacts = TestDataFactory.createContacts(accList, 1);
+    insert new OpportunityContactRole(
+      OpportunityId = oppList[0].Id,
+      ContactId = contacts[0].Id,
+      IsPrimary = true
+    );
     PricebookEntry pbe = TestDataFactory.createStandardPricebookEntry(100);
     TestDataFactory.createOpportunityLineItems(oppList[0].Id, pbe, 2);
+    insert new Appeals_Dr_Setting__c(
+      SetupOwnerId = UserInfo.getOrganizationId(),
+      App_Url__c = 'https://app.example.com',
+      Signup_Link_Secret__c = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    );
   }
 
   // Closed Won with line items -> Service Contract + Service Contract Line Items created
@@ -30,6 +41,16 @@ private class OpportunityServiceContractServiceTest {
       1,
       contracts.size(),
       'One Service Contract should be created for the Closed Won Opportunity'
+    );
+
+    Account customer = [
+      SELECT Signup_Link__c
+      FROM Account
+      WHERE Id = :contracts[0].AccountId
+    ];
+    System.assert(
+      customer.Signup_Link__c.startsWith('https://app.example.com/register/link?t='),
+      'The signup link must be stored before the Service Contract is created.'
     );
 
     List<ContractLineItem> scliList = [
@@ -197,6 +218,12 @@ private class OpportunityServiceContractServiceTest {
       CloseDate = Date.today().addDays(15)
     );
     insert oppNoLines;
+    Contact contact = [SELECT Id FROM Contact WHERE AccountId = :acc.Id LIMIT 1];
+    insert new OpportunityContactRole(
+      OpportunityId = oppNoLines.Id,
+      ContactId = contact.Id,
+      IsPrimary = true
+    );
 
     Test.startTest();
     oppNoLines.StageName = 'Closed Won';
@@ -212,6 +239,11 @@ private class OpportunityServiceContractServiceTest {
       0,
       contractCount,
       'No Service Contract should be created when the Opportunity has no line items'
+    );
+    System.assertNotEquals(
+      null,
+      [SELECT Signup_Link__c FROM Account WHERE Id = :acc.Id].Signup_Link__c,
+      'Closed Won must generate a signup link even when no contract is created.'
     );
   }
 }

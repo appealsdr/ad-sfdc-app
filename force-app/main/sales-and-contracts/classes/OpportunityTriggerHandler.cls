@@ -8,6 +8,7 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
   private Map<Id, Opportunity> mapOldOpportunities;
   public static String TRIGGER_HANDLER_NAME = 'OpportunityTriggerHandler';
   public static Boolean skipWebhookFiring = false;
+  private static final String CLOSED_WON_STAGE = 'Closed Won';
 
   public OpportunityTriggerHandler() {
     this.lstNewOpportunities = (Trigger.new != null)
@@ -170,6 +171,7 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
     try {
       List<Opportunity> accountChangedOpps = new List<Opportunity>();
       Set<Id> contractSentOppIds = new Set<Id>();
+      Set<Id> closedWonOppIds = new Set<Id>();
       for (Opportunity opp : opportunities) {
         Opportunity oldOpp = oldMap.get(opp.Id);
         if (oldOpp != null && opp.AccountId != oldOpp.AccountId) {
@@ -181,6 +183,12 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
         ) {
           contractSentOppIds.add(opp.Id);
         }
+        if (
+          opp.StageName == CLOSED_WON_STAGE &&
+          oldOpp.StageName != CLOSED_WON_STAGE
+        ) {
+          closedWonOppIds.add(opp.Id);
+        }
       }
 
       if (!accountChangedOpps.isEmpty()) {
@@ -190,6 +198,10 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
       // Data migrations set skipWebhookFiring to suppress every stage side effect,
       // including ServiceContract creation as well as outbound webhooks.
       if (!skipWebhookFiring) {
+        if (!closedWonOppIds.isEmpty()) {
+          // Generate the customer link before any Service Contract is inserted.
+          SignupLinkService.generateAndStoreForOpportunityIds(closedWonOppIds);
+        }
         Set<Id> contractCreationOppIds = OpportunityServiceContractService.getContractCreationTransitionIds(
           opportunities,
           oldMap
