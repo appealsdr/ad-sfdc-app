@@ -1,0 +1,11 @@
+<design:component label="Product Record — Wide Left, Narrow Right">
+    <design:supportedFormFactors>
+        <design:supportedFormFactor type="Large" />
+        <design:supportedFormFactor type="Small" />
+    </design:supportedFormFactors>
+    <flexipage:template>
+        <flexipage:region name="header" defaultWidth="LARGE" />
+        <flexipage:region name="main" defaultWidth="LARGE" />
+        <flexipage:region name="sidebar" defaultWidth="SMALL" />
+    </flexipage:template>
+</design:component>

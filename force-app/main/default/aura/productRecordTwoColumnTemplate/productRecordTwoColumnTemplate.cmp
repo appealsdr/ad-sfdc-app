@@ -1,0 +1,23 @@
+<aura:component implements="lightning:recordHomeTemplate" access="global">
+  <aura:attribute name="header" type="Aura.Component[]" access="global" />
+  <aura:attribute name="main" type="Aura.Component[]" access="global" />
+  <aura:attribute name="sidebar" type="Aura.Component[]" access="global" />
+
+  <div class="page">
+    <header class="page__header">{!v.header}</header>
+    <div class="slds-grid slds-wrap slds-gutters page__columns">
+      <div
+        role="main"
+        class="slds-col slds-size_1-of-1 slds-large-size_9-of-12"
+      >
+        {!v.main}
+      </div>
+      <div
+        role="complementary"
+        class="slds-col slds-size_1-of-1 slds-large-size_3-of-12"
+      >
+        {!v.sidebar}
+      </div>
+    </div>
+  </div>
+</aura:component>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <description
+  >Responsive Product record template with a wide left workspace and narrow right sidebar.</description>
+</AuraDefinitionBundle>

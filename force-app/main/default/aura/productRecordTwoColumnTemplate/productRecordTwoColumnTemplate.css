@@ -1,0 +1,11 @@
+.THIS.page {
+  min-width: 0;
+}
+
+.THIS .page__header {
+  margin-bottom: 0.75rem;
+}
+
+.THIS .page__columns > .slds-col {
+  min-width: 0;
+}

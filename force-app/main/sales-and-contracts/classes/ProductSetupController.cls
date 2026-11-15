@@ -351,12 +351,17 @@ public with sharing class ProductSetupController {
       row.pricebookId = pricebook.Id;
       row.pricebookName = pricebook.Name;
       row.isStandard = pricebook.IsStandard;
-      row.pricebookEntryId = entry?.Id;
-      row.selected = entry?.IsActive == true;
-      row.unitPrice = entry?.UnitPrice;
-      row.deposit = entry?.Deposit__c;
-      row.paymentType = entry?.Payment_type__c;
-      row.isActive = entry?.IsActive == true;
+      if (entry == null) {
+        row.selected = false;
+        row.isActive = false;
+      } else {
+        row.pricebookEntryId = entry.Id;
+        row.selected = entry.IsActive;
+        row.unitPrice = entry.UnitPrice;
+        row.deposit = entry.Deposit__c;
+        row.paymentType = entry.Payment_type__c;
+        row.isActive = entry.IsActive;
+      }
       rows.add(row);
     }
     return rows;

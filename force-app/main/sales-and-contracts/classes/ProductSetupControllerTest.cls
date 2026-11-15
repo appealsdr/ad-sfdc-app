@@ -67,6 +67,24 @@ private class ProductSetupControllerTest {
   }
 
   @IsTest
+  static void loadsActivePriceBooksWithoutExistingProductPrices() {
+    Product2 product = [SELECT Id FROM Product2 WHERE Name = 'AD-1942 Product'];
+
+    Test.startTest();
+    ProductSetupController.SetupData result = ProductSetupController.getSetup(
+      product.Id
+    );
+    Test.stopTest();
+
+    System.assertEquals(2, result.pricebooks.size());
+    for (ProductSetupController.PricebookRow row : result.pricebooks) {
+      System.assertEquals(false, row.selected);
+      System.assertEquals(false, row.isActive);
+      System.assertEquals(null, row.pricebookEntryId);
+    }
+  }
+
+  @IsTest
   static void requiresStandardPriceBeforeCustomPriceBook() {
     Product2 product = [SELECT Id FROM Product2 WHERE Name = 'AD-1942 Product'];
     Pricebook2 customPricebook = [
