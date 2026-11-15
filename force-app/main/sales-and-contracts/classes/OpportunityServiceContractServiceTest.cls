@@ -33,7 +33,7 @@ private class OpportunityServiceContractServiceTest {
     Test.stopTest();
 
     List<ServiceContract> contracts = [
-      SELECT Id, AccountId, Opportunity__c
+      SELECT Id, AccountId, Opportunity__c, Checkout_URL__c
       FROM ServiceContract
       WHERE Opportunity__c = :opp.Id
     ];
@@ -101,7 +101,7 @@ private class OpportunityServiceContractServiceTest {
     Test.stopTest();
 
     List<ServiceContract> contracts = [
-      SELECT Id, AccountId, Opportunity__c
+      SELECT Id, AccountId, Opportunity__c, Checkout_URL__c
       FROM ServiceContract
       WHERE Opportunity__c = :opp.Id
     ];
@@ -109,6 +109,20 @@ private class OpportunityServiceContractServiceTest {
       1,
       contracts.size(),
       'One Service Contract should be created for the Contract Sent Opportunity'
+    );
+    Opportunity checkoutOpportunity = [
+      SELECT Checkout_URL__c
+      FROM Opportunity
+      WHERE Id = :opp.Id
+    ];
+    System.assert(
+      contracts[0].Checkout_URL__c.startsWith('https://app.example.com/register/link?t='),
+      'An unprovisioned customer must receive a signed checkout/signup URL on the Service Contract.'
+    );
+    System.assertEquals(
+      contracts[0].Checkout_URL__c,
+      checkoutOpportunity.Checkout_URL__c,
+      'Opportunity and Service Contract must expose the same checkout URL.'
     );
 
     List<ContractLineItem> scliList = [
@@ -120,6 +134,52 @@ private class OpportunityServiceContractServiceTest {
       2,
       scliList.size(),
       'Both Opportunity Line Items should be copied to the Service Contract'
+    );
+  }
+
+  @isTest
+  static void contractSentResaveBackfillsMissingSignupAndCheckoutLinks() {
+    Opportunity opp = [SELECT Id, AccountId, StageName FROM Opportunity LIMIT 1];
+    opp.StageName = 'Contract Sent';
+    update opp;
+    ServiceContract contractRecord = [
+      SELECT Id, Checkout_URL__c
+      FROM ServiceContract
+      WHERE Opportunity__c = :opp.Id
+      LIMIT 1
+    ];
+
+    OpportunityTriggerHandler.skipWebhookFiring = true;
+    update new Opportunity(Id = opp.Id, Checkout_URL__c = null);
+    OpportunityTriggerHandler.skipWebhookFiring = false;
+    update new Account(Id = opp.AccountId, Signup_Link__c = null);
+    update new ServiceContract(Id = contractRecord.Id, Checkout_URL__c = null);
+
+    Test.startTest();
+    update new Opportunity(
+      Id = opp.Id,
+      Description = 'Retry missing contract checkout link'
+    );
+    Test.stopTest();
+
+    Opportunity refreshedOpportunity = [
+      SELECT Checkout_URL__c, Account.Signup_Link__c
+      FROM Opportunity
+      WHERE Id = :opp.Id
+    ];
+    ServiceContract refreshedContract = [
+      SELECT Checkout_URL__c
+      FROM ServiceContract
+      WHERE Id = :contractRecord.Id
+    ];
+    System.assertNotEquals(null, refreshedOpportunity.Checkout_URL__c);
+    System.assertEquals(
+      refreshedOpportunity.Checkout_URL__c,
+      refreshedOpportunity.Account.Signup_Link__c
+    );
+    System.assertEquals(
+      refreshedOpportunity.Checkout_URL__c,
+      refreshedContract.Checkout_URL__c
     );
   }
 

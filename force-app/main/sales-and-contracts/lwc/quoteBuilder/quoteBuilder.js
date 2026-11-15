@@ -95,6 +95,10 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
         : "Sync to Opportunity",
       syncDisabled: this.busy || quote.isSynced,
       sendDisabled: this.busy,
+      cardClass:
+        (quote.status || "").toLowerCase() === "presented"
+          ? "quote-card quote-card_sent"
+          : "quote-card",
       lines: (quote.lines || []).map((line) => ({
         ...line,
         hasDeposit: line.depositAmount != null,

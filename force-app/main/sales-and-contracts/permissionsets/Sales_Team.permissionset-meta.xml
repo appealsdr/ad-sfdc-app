@@ -672,6 +672,11 @@
         <field>Product_Document_Requirement__c.Sort_Order__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>ServiceContract.Checkout_URL__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Sales Team</label>
     <pageAccesses>

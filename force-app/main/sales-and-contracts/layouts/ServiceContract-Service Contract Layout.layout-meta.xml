@@ -90,6 +90,10 @@
                 <behavior>Readonly</behavior>
                 <field>LineItemCount</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>Checkout_URL__c</field>
+            </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>

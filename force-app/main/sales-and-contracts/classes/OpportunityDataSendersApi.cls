@@ -567,10 +567,11 @@ public without sharing class OpportunityDataSendersApi {
                 
                 checkoutUrl = (String) resp.get('checkout_url');
                 
-                // Update Opportunity only if valid and present
+                // Provisioned Accounts use the normal checkout URL returned by
+                // the app. Unprovisioned Accounts already have a signed signup
+                // URL with the Service Contract claim and must not be overwritten.
                 if (oppId != null && !String.isBlank(checkoutUrl)) {
-                    update new Opportunity(Id = oppId, Checkout_URL__c = checkoutUrl);
-                    System.debug('Checkout URL updated on Opportunity: ' + checkoutUrl);
+                    storeProvisionedCheckoutUrl(oppId, checkoutUrl);
                 }
             }
             
@@ -589,5 +590,36 @@ public without sharing class OpportunityDataSendersApi {
         } catch (Exception logEx) {
             System.debug('Log Insert Failed: ' + logEx.getMessage());
         }
+    }
+
+    @TestVisible
+    private static void storeProvisionedCheckoutUrl(Id opportunityId, String checkoutUrl) {
+        Opportunity opportunity = [
+            SELECT Id, Account.appealsdoctor_vuid__c
+            FROM Opportunity
+            WHERE Id = :opportunityId
+            LIMIT 1
+        ];
+        if (opportunity.Account == null
+                || String.isBlank(opportunity.Account.appealsdoctor_vuid__c)) {
+            return;
+        }
+
+        update new Opportunity(
+            Id = opportunityId,
+            Checkout_URL__c = checkoutUrl
+        );
+        List<ServiceContract> contractsToUpdate = [
+            SELECT Id, Checkout_URL__c
+            FROM ServiceContract
+            WHERE Opportunity__c = :opportunityId
+        ];
+        for (ServiceContract contractRecord : contractsToUpdate) {
+            contractRecord.Checkout_URL__c = checkoutUrl;
+        }
+        if (!contractsToUpdate.isEmpty()) {
+            update contractsToUpdate;
+        }
+        System.debug('Checkout URL updated on Opportunity and Service Contract: ' + checkoutUrl);
     }
 }

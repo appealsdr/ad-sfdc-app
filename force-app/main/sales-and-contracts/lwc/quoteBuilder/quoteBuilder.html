@@ -455,7 +455,7 @@
           <template for:each={quoteCards} for:item="quote">
             <li key={quote.quoteId} class="timeline__item">
               <span class="timeline__dot" aria-hidden="true"></span>
-              <article class="quote-card">
+              <article class={quote.cardClass}>
                 <header class="quote-card__header">
                   <div class="quote-card__main">
                     <button

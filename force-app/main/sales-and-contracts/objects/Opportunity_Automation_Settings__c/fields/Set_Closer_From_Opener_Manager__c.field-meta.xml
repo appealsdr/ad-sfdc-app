@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Set_Closer_From_Opener_Manager__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>When enabled, Lead conversion assigns the Opportunity Closer to the manager of the Lead owner (the Opportunity Opener).</description>
+    <inlineHelpText>Disable to leave Opportunity Closer unchanged during Lead conversion.</inlineHelpText>
+    <label>Set Closer From Opener Manager</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -183,6 +183,14 @@ describe("c-quote-builder quote-first workspace", () => {
     expect(buttonByText(element, "Sync to Opportunity")).toBeTruthy();
   });
 
+  it("uses a grey card after a proposal is sent", async () => {
+    const element = await render(
+      context({ quotes: [quote({ status: "Presented" })] })
+    );
+
+    expect(element.shadowRoot.querySelector(".quote-card_sent")).toBeTruthy();
+  });
+
   it("creates a quote directly from products in the editor", async () => {
     saveQuote.mockResolvedValue(quote());
     getContext.mockResolvedValue(context());
