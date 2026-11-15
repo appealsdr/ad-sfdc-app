@@ -75,54 +75,59 @@
           Price Book is required before custom price books.
         </p>
         <div class="pricebook-list">
-          <template for:each={pricebooks} for:item="row">
-            <section key={row.pricebookId} class="setup-row pricebook-row">
-              <lightning-input
-                class="pricebook-input"
-                type="checkbox"
-                label={row.pricebookName}
-                checked={row.selected}
-                data-id={row.pricebookId}
-                data-field="selected"
-                onchange={handlePricebookChange}
-              ></lightning-input>
-              <lightning-input
-                class="pricebook-input"
-                type="number"
-                formatter="currency"
-                step="0.01"
-                min="0"
-                label="List Price"
-                value={row.unitPrice}
-                required={row.selected}
-                disabled={row.inputsDisabled}
-                data-id={row.pricebookId}
-                data-field="unitPrice"
-                onchange={handlePricebookChange}
-              ></lightning-input>
-              <lightning-input
-                class="pricebook-input"
-                type="number"
-                formatter="currency"
-                step="0.01"
-                min="0"
-                label="Deposit"
-                value={row.deposit}
-                disabled={row.inputsDisabled}
-                data-id={row.pricebookId}
-                data-field="deposit"
-                onchange={handlePricebookChange}
-              ></lightning-input>
-              <lightning-combobox
-                class="pricebook-input"
-                label="Payment Type"
-                value={row.paymentType}
-                options={paymentTypeOptions}
-                disabled={row.inputsDisabled}
-                data-id={row.pricebookId}
-                data-field="paymentType"
-                onchange={handlePricebookChange}
-              ></lightning-combobox>
+          <template for:each={pricebookGroups} for:item="group">
+            <section key={group.key} class="pricebook-group">
+              <h3 class="pricebook-group__heading">{group.label}</h3>
+              <template for:each={group.rows} for:item="row">
+                <section key={row.pricebookId} class="setup-row pricebook-row">
+                  <lightning-input
+                    class="pricebook-input"
+                    type="checkbox"
+                    label={row.pricebookName}
+                    checked={row.selected}
+                    data-id={row.pricebookId}
+                    data-field="selected"
+                    onchange={handlePricebookChange}
+                  ></lightning-input>
+                  <lightning-input
+                    class="pricebook-input"
+                    type="number"
+                    formatter="currency"
+                    step="0.01"
+                    min="0"
+                    label="List Price"
+                    value={row.unitPrice}
+                    required={row.selected}
+                    disabled={row.inputsDisabled}
+                    data-id={row.pricebookId}
+                    data-field="unitPrice"
+                    onchange={handlePricebookChange}
+                  ></lightning-input>
+                  <lightning-input
+                    class="pricebook-input"
+                    type="number"
+                    formatter="currency"
+                    step="0.01"
+                    min="0"
+                    label="Deposit"
+                    value={row.deposit}
+                    disabled={row.inputsDisabled}
+                    data-id={row.pricebookId}
+                    data-field="deposit"
+                    onchange={handlePricebookChange}
+                  ></lightning-input>
+                  <lightning-combobox
+                    class="pricebook-input"
+                    label="Payment Type"
+                    value={row.paymentType}
+                    options={paymentTypeOptions}
+                    disabled={row.inputsDisabled}
+                    data-id={row.pricebookId}
+                    data-field="paymentType"
+                    onchange={handlePricebookChange}
+                  ></lightning-combobox>
+                </section>
+              </template>
             </section>
           </template>
         </div>

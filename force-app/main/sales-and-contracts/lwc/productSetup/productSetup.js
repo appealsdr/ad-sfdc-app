@@ -63,6 +63,22 @@ export default class ProductSetup extends LightningElement {
     return this.loading || this.savingPricebooks || !this.pricebooks.length;
   }
 
+  get pricebookGroups() {
+    const groups = [
+      {
+        key: "assigned",
+        label: "Assigned price books",
+        rows: this.pricebooks.filter((row) => row.selected)
+      },
+      {
+        key: "available",
+        label: "Available active price books",
+        rows: this.pricebooks.filter((row) => !row.selected)
+      }
+    ];
+    return groups.filter((group) => group.rows.length);
+  }
+
   get requirementSaveDisabled() {
     return this.loading || this.savingRequirements;
   }

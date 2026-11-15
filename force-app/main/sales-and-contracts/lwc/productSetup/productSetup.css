@@ -22,6 +22,19 @@ lightning-card {
   align-items: end;
 }
 
+.pricebook-group + .pricebook-group {
+  border-top: 1px solid #e5e5e5;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.pricebook-group__heading {
+  color: #3e3e3c;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
 .row-heading {
   display: flex;
   align-items: center;

@@ -100,6 +100,17 @@ describe("c-product-setup", () => {
     expect(element.shadowRoot.querySelectorAll(".pricebook-row")).toHaveLength(
       2
     );
+    const groups = [...element.shadowRoot.querySelectorAll(".pricebook-group")];
+    expect(groups.map((group) => group.textContent)).toEqual([
+      expect.stringContaining("Assigned price books"),
+      expect.stringContaining("Available active price books")
+    ]);
+    expect(
+      groups[0].querySelector('lightning-input[data-field="selected"]').label
+    ).toBe("Services");
+    expect(
+      groups[1].querySelector('lightning-input[data-field="selected"]').label
+    ).toBe("Standard Price Book");
     expect(
       element.shadowRoot.querySelector("c-product-onboarding-config").recordId
     ).toBe(PRODUCT_ID);
