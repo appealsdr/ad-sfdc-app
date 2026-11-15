@@ -131,7 +131,7 @@ private class SignupLinkServiceTest {
             account.Id,
             contact.Id,
             contractRecord.Id,
-            'https://app.example.com',
+            'https://qa5xpqdgfx.us-east-2.awsapprunner.com/',
             SECRET
         );
         String token = link.substringAfter('?t=');
@@ -143,6 +143,11 @@ private class SignupLinkServiceTest {
             String.valueOf(contractRecord.Id),
             payload.get('k'),
             'The signed checkout link must identify the generated Service Contract.'
+        );
+        System.assertEquals(11, String.valueOf(payload.get('n')).length());
+        System.assert(
+            link.length() <= 255,
+            'The signed checkout link must fit Salesforce URL fields.'
         );
     }
 

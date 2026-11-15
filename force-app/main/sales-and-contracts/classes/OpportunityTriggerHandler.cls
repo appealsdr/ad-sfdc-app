@@ -179,7 +179,8 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
         }
         if (
           opp.StageName == 'Contract Sent' &&
-          oldOpp.StageName != 'Contract Sent'
+          (oldOpp.StageName != 'Contract Sent' ||
+          String.isBlank(opp.Checkout_URL__c))
         ) {
           contractSentOppIds.add(opp.Id);
         }

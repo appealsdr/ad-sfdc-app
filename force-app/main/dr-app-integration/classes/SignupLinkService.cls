@@ -175,7 +175,11 @@ public with sharing class SignupLinkService {
         Map<String, Object> body = new Map<String, Object>{
             'a' => String.valueOf(accountId),
             'c' => String.valueOf(contactId),
-            'n' => EncodingUtil.convertToHex(Crypto.generateAesKey(128)).substring(0, 16),
+            // Encode the same 64 bits of nonce entropy more compactly than hex
+            // so contract links fit Salesforce's 255-character URL fields.
+            'n' => base64UrlEncode(EncodingUtil.convertFromHex(
+                EncodingUtil.convertToHex(Crypto.generateAesKey(128)).substring(0, 16)
+            )),
             'e' => (DateTime.now().getTime() / 1000) + LINK_LIFETIME_SECONDS
         };
         if (serviceContractId != null) {

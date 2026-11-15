@@ -138,6 +138,52 @@ private class OpportunityServiceContractServiceTest {
   }
 
   @isTest
+  static void contractSentResaveBackfillsMissingSignupAndCheckoutLinks() {
+    Opportunity opp = [SELECT Id, AccountId, StageName FROM Opportunity LIMIT 1];
+    opp.StageName = 'Contract Sent';
+    update opp;
+    ServiceContract contractRecord = [
+      SELECT Id, Checkout_URL__c
+      FROM ServiceContract
+      WHERE Opportunity__c = :opp.Id
+      LIMIT 1
+    ];
+
+    OpportunityTriggerHandler.skipWebhookFiring = true;
+    update new Opportunity(Id = opp.Id, Checkout_URL__c = null);
+    OpportunityTriggerHandler.skipWebhookFiring = false;
+    update new Account(Id = opp.AccountId, Signup_Link__c = null);
+    update new ServiceContract(Id = contractRecord.Id, Checkout_URL__c = null);
+
+    Test.startTest();
+    update new Opportunity(
+      Id = opp.Id,
+      Description = 'Retry missing contract checkout link'
+    );
+    Test.stopTest();
+
+    Opportunity refreshedOpportunity = [
+      SELECT Checkout_URL__c, Account.Signup_Link__c
+      FROM Opportunity
+      WHERE Id = :opp.Id
+    ];
+    ServiceContract refreshedContract = [
+      SELECT Checkout_URL__c
+      FROM ServiceContract
+      WHERE Id = :contractRecord.Id
+    ];
+    System.assertNotEquals(null, refreshedOpportunity.Checkout_URL__c);
+    System.assertEquals(
+      refreshedOpportunity.Checkout_URL__c,
+      refreshedOpportunity.Account.Signup_Link__c
+    );
+    System.assertEquals(
+      refreshedOpportunity.Checkout_URL__c,
+      refreshedContract.Checkout_URL__c
+    );
+  }
+
+  @isTest
   static void contractPreservesNegotiatedPriceDiscountAndRecurringTerm() {
     Opportunity opp = [SELECT Id, StageName FROM Opportunity LIMIT 1];
     OpportunityLineItem sourceLine = [

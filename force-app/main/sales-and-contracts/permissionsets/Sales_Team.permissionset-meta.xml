@@ -618,6 +618,11 @@
         <field>Opportunity.Technical_expert__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>ServiceContract.Checkout_URL__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Sales Team</label>
     <pageAccesses>
