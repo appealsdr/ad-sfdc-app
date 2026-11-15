@@ -69,6 +69,102 @@ public with sharing class SignupLinkService {
         }
     }
 
+    /**
+     * Generates the signed checkout/signup URL for unprovisioned Accounts after
+     * their Service Contract has been created. The contract claim lets the app
+     * resume checkout immediately after registration.
+     */
+    public static void generateAndStoreCheckoutLinksForOpportunityIds(
+            Set<Id> opportunityIds) {
+        if (opportunityIds == null || opportunityIds.isEmpty()) {
+            return;
+        }
+
+        Appeals_Dr_Setting__c settings = Appeals_Dr_Setting__c.getInstance();
+        if (settings == null || String.isBlank(settings.App_Url__c)
+                || String.isBlank(settings.Signup_Link_Secret__c)) {
+            return;
+        }
+
+        List<Opportunity> opportunities = [
+            SELECT Id, AccountId, ContactId, Account.appealsdoctor_vuid__c
+            FROM Opportunity
+            WHERE Id IN :opportunityIds
+        ];
+        Set<Id> contactIds = new Set<Id>();
+        for (Opportunity opportunity : opportunities) {
+            if (opportunity.AccountId != null && opportunity.ContactId != null
+                    && String.isBlank(opportunity.Account.appealsdoctor_vuid__c)) {
+                contactIds.add(opportunity.ContactId);
+            }
+        }
+        if (contactIds.isEmpty()) {
+            return;
+        }
+
+        Map<Id, Contact> contactsById = new Map<Id, Contact>([
+            SELECT Id, AccountId
+            FROM Contact
+            WHERE Id IN :contactIds
+        ]);
+        Map<Id, ServiceContract> contractByOpportunityId =
+            new Map<Id, ServiceContract>();
+        for (ServiceContract contractRecord : [
+            SELECT Id, Opportunity__c
+            FROM ServiceContract
+            WHERE Opportunity__c IN :opportunityIds
+            ORDER BY CreatedDate DESC
+        ]) {
+            if (!contractByOpportunityId.containsKey(contractRecord.Opportunity__c)) {
+                contractByOpportunityId.put(contractRecord.Opportunity__c, contractRecord);
+            }
+        }
+
+        Map<Id, Account> accountsToUpdate = new Map<Id, Account>();
+        List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
+        List<ServiceContract> contractsToUpdate = new List<ServiceContract>();
+        for (Opportunity opportunity : opportunities) {
+            Contact contact = contactsById.get(opportunity.ContactId);
+            ServiceContract contractRecord = contractByOpportunityId.get(opportunity.Id);
+            if (opportunity.AccountId == null || contact == null
+                    || contact.AccountId != opportunity.AccountId
+                    || contractRecord == null
+                    || !String.isBlank(opportunity.Account.appealsdoctor_vuid__c)) {
+                continue;
+            }
+
+            String checkoutUrl = buildSignupLink(
+                opportunity.AccountId,
+                contact.Id,
+                contractRecord.Id,
+                settings.App_Url__c,
+                settings.Signup_Link_Secret__c
+            );
+            accountsToUpdate.put(opportunity.AccountId, new Account(
+                Id = opportunity.AccountId,
+                Signup_Link__c = checkoutUrl
+            ));
+            opportunitiesToUpdate.add(new Opportunity(
+                Id = opportunity.Id,
+                Checkout_URL__c = checkoutUrl
+            ));
+            contractsToUpdate.add(new ServiceContract(
+                Id = contractRecord.Id,
+                Checkout_URL__c = checkoutUrl
+            ));
+        }
+
+        if (!accountsToUpdate.isEmpty()) {
+            update accountsToUpdate.values();
+        }
+        if (!opportunitiesToUpdate.isEmpty()) {
+            update opportunitiesToUpdate;
+        }
+        if (!contractsToUpdate.isEmpty()) {
+            update contractsToUpdate;
+        }
+    }
+
     @TestVisible
     private static String buildSignupLink(
             Id accountId,

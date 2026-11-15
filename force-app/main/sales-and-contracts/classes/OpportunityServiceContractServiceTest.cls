@@ -33,7 +33,7 @@ private class OpportunityServiceContractServiceTest {
     Test.stopTest();
 
     List<ServiceContract> contracts = [
-      SELECT Id, AccountId, Opportunity__c
+      SELECT Id, AccountId, Opportunity__c, Checkout_URL__c
       FROM ServiceContract
       WHERE Opportunity__c = :opp.Id
     ];
@@ -101,7 +101,7 @@ private class OpportunityServiceContractServiceTest {
     Test.stopTest();
 
     List<ServiceContract> contracts = [
-      SELECT Id, AccountId, Opportunity__c
+      SELECT Id, AccountId, Opportunity__c, Checkout_URL__c
       FROM ServiceContract
       WHERE Opportunity__c = :opp.Id
     ];
@@ -109,6 +109,20 @@ private class OpportunityServiceContractServiceTest {
       1,
       contracts.size(),
       'One Service Contract should be created for the Contract Sent Opportunity'
+    );
+    Opportunity checkoutOpportunity = [
+      SELECT Checkout_URL__c
+      FROM Opportunity
+      WHERE Id = :opp.Id
+    ];
+    System.assert(
+      contracts[0].Checkout_URL__c.startsWith('https://app.example.com/register/link?t='),
+      'An unprovisioned customer must receive a signed checkout/signup URL on the Service Contract.'
+    );
+    System.assertEquals(
+      contracts[0].Checkout_URL__c,
+      checkoutOpportunity.Checkout_URL__c,
+      'Opportunity and Service Contract must expose the same checkout URL.'
     );
 
     List<ContractLineItem> scliList = [

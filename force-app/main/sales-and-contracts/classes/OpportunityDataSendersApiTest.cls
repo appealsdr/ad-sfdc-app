@@ -32,7 +32,8 @@ public class OpportunityDataSendersApiTest {
 
         Account acc = new Account(
             Name = 'Test Account',
-            Primary_Email__c = 'test@mail.com'
+            Primary_Email__c = 'test@mail.com',
+            appealsdoctor_vuid__c = 'account-vuid'
         );
         insert acc;
 
@@ -44,6 +45,13 @@ public class OpportunityDataSendersApiTest {
             AccountId = acc.Id
         );
         insert opp;
+
+        insert new ServiceContract(
+            Name = 'Test Service Contract',
+            AccountId = acc.Id,
+            StartDate = Date.today(),
+            Opportunity__c = opp.Id
+        );
 
         Contact con = new Contact(
             FirstName = 'John',
@@ -132,7 +140,19 @@ public class OpportunityDataSendersApiTest {
             WHERE Id = :oppId
         ];
 
-        System.assertNotEquals(null, updatedOpp.Checkout_URL__c);
+        System.assertEquals(
+            'https://payment.com/checkout/123',
+            updatedOpp.Checkout_URL__c
+        );
+        System.assertEquals(
+            'https://payment.com/checkout/123',
+            [
+                SELECT Checkout_URL__c
+                FROM ServiceContract
+                WHERE Opportunity__c = :oppId
+                LIMIT 1
+            ].Checkout_URL__c
+        );
 
         System.assertEquals(1,
             [SELECT COUNT() FROM Application_Log__c]);

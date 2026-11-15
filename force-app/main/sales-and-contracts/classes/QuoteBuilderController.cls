@@ -601,6 +601,7 @@ public with sharing class QuoteBuilderController {
     update as user new Quote(Id = quoteRecord.Id, Status = 'Presented');
     update as user new Opportunity(
       Id = quoteRecord.OpportunityId,
+      StageName = 'Proposal Sent',
       Proposal_Sent_DateTime__c = System.now(),
       Description = buildServiceSummary(quoteRecord.Id)
     );

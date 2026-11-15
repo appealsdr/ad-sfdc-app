@@ -324,10 +324,11 @@ private class QuoteBuilderControllerTest {
     Assert.isTrue(activity.Description.contains('finance@example.com'));
     Assert.isTrue(activity.Description.contains('manager@example.com'));
     Opportunity refreshed = [
-      SELECT Proposal_Sent_DateTime__c, Description
+      SELECT StageName, Proposal_Sent_DateTime__c, Description
       FROM Opportunity
       WHERE Id = :opp.Id
     ];
+    Assert.areEqual('Proposal Sent', refreshed.StageName);
     Assert.isNotNull(refreshed.Proposal_Sent_DateTime__c);
     Assert.isTrue(refreshed.Description.startsWith('Selected services:'));
     Assert.isTrue(refreshed.Description.contains('Listing reinstatement'));

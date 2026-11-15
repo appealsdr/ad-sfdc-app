@@ -212,6 +212,12 @@ public class OpportunityTriggerHandler extends TriggerFrameworkService {
           );
         }
         if (!contractSentOppIds.isEmpty()) {
+          // Unprovisioned customers receive a signed signup link containing the
+          // freshly created Service Contract. Provisioned customers keep using
+          // the normal checkout URL returned by the webhook.
+          SignupLinkService.generateAndStoreCheckoutLinksForOpportunityIds(
+            contractSentOppIds
+          );
           callOpportunityApi(contractSentOppIds);
         }
       }

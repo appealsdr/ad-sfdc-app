@@ -114,6 +114,38 @@ private class SignupLinkServiceTest {
         ].Signup_Link__c);
     }
 
+    @IsTest
+    static void contractCheckoutLinkIncludesServiceContractClaim() {
+        Account account = new Account(Name = 'Contract Signup Account');
+        insert account;
+        Contact contact = new Contact(LastName = 'Contract Contact', AccountId = account.Id);
+        insert contact;
+        ServiceContract contractRecord = new ServiceContract(
+            Name = 'Checkout Contract',
+            AccountId = account.Id,
+            StartDate = Date.today()
+        );
+        insert contractRecord;
+
+        String link = SignupLinkService.buildSignupLink(
+            account.Id,
+            contact.Id,
+            contractRecord.Id,
+            'https://app.example.com',
+            SECRET
+        );
+        String token = link.substringAfter('?t=');
+        Map<String, Object> payload = (Map<String, Object>) JSON.deserializeUntyped(
+            decodeBase64Url(token.split('\\.')[0]).toString()
+        );
+
+        System.assertEquals(
+            String.valueOf(contractRecord.Id),
+            payload.get('k'),
+            'The signed checkout link must identify the generated Service Contract.'
+        );
+    }
+
     private static Blob decodeBase64Url(String value) {
         String base64Value = value.replace('-', '+').replace('_', '/');
         while (Math.mod(base64Value.length(), 4) != 0) {
