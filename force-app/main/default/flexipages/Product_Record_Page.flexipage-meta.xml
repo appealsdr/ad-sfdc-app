@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
     <flexiPageRegions>
         <itemInstances>
@@ -43,8 +43,8 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
-                <componentName>c:productOnboardingConfig</componentName>
-                <identifier>c_productOnboardingConfig</identifier>
+                <componentName>c:productSetup</componentName>
+                <identifier>c_productSetup</identifier>
             </componentInstance>
         </itemInstances>
         <name>detailTabContent</name>
@@ -115,16 +115,6 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>runtime_revenue_products:productTreeContainer</componentName>
-                <identifier>bundles_productTreeContainer</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>Facet-5a1a77dd-9921-47ee-93f5-609293e40126</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
                 <componentInstanceProperties>
                     <name>active</name>
                     <value>true</value>
@@ -139,20 +129,6 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:tab</componentName>
                 <identifier>flexipage_tab</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-5a1a77dd-9921-47ee-93f5-609293e40126</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>title</name>
-                    <value>Standard.Tab.actionConfiguration</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:tab</componentName>
-                <identifier>flexipage_tab2</identifier>
             </componentInstance>
         </itemInstances>
         <name>Facet-ca72761c-4aa6-4095-b507-435cb8eabdf2</name>
