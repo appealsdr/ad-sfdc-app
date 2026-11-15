@@ -243,97 +243,102 @@
                           ></lightning-icon>
                         </button>
                       </div>
-                      <div class="line__controls">
-                        <div class="stepper">
-                          <button
-                            type="button"
-                            data-key={line.key}
-                            data-step="-1"
-                            onclick={handleStep}
-                            aria-label="Decrease quantity"
-                          >
-                            −
-                          </button>
-                          <input
-                            type="number"
-                            min="1"
-                            max="9999"
-                            value={line.quantity}
-                            data-key={line.key}
-                            onchange={handleQty}
-                            aria-label="Quantity"
-                            required
-                          />
-                          <button
-                            type="button"
-                            data-key={line.key}
-                            data-step="1"
-                            onclick={handleStep}
-                            aria-label="Increase quantity"
-                          >
-                            +
-                          </button>
+                      <div class="line__table" role="table">
+                        <div class="line__table-head" role="row">
+                          <span role="columnheader">Quantity</span>
+                          <span role="columnheader">Discount</span>
+                          <span role="columnheader">Unit price</span>
+                          <span role="columnheader">Deposit per unit</span>
+                          <span role="columnheader">Line total</span>
+                          <span role="columnheader">Total deposit</span>
                         </div>
-                        <label class="disc"
-                          ><span>Discount</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            value={line.discountPct}
-                            data-key={line.key}
-                            onchange={handleDiscount}
-                            aria-label="Discount percent"
-                          /><span>%</span></label
-                        >
-                        <div class="line__pricing">
-                          <label class="line__unit-price">
-                            <span>Unit price</span>
+                        <div class="line__table-row" role="row">
+                          <div class="stepper" role="cell">
+                            <button
+                              type="button"
+                              data-key={line.key}
+                              data-step="-1"
+                              onclick={handleStep}
+                              aria-label="Decrease quantity"
+                            >
+                              −
+                            </button>
                             <input
                               type="number"
-                              min="0"
-                              step="0.01"
-                              required
-                              value={line.unitPrice}
+                              min="1"
+                              max="9999"
+                              value={line.quantity}
                               data-key={line.key}
-                              onchange={handleUnitPrice}
-                              aria-label="Unit price"
+                              onchange={handleQty}
+                              aria-label="Quantity"
+                              required
                             />
-                          </label>
-                          <span class="line__original muted">
-                            <span>Original list price</span>
+                            <button
+                              type="button"
+                              data-key={line.key}
+                              data-step="1"
+                              onclick={handleStep}
+                              aria-label="Increase quantity"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <label class="disc" role="cell"
+                            ><input
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="0.01"
+                              value={line.discountPct}
+                              data-key={line.key}
+                              onchange={handleDiscount}
+                              aria-label="Discount percent"
+                            /><span>%</span></label
+                          >
+                          <div class="line__unit-price-value" role="cell">
                             <lightning-formatted-number
-                              value={line.listPrice}
+                              value={line.unitPrice}
                               format-style="currency"
                               currency-code="USD"
                             ></lightning-formatted-number>
-                            <span>each</span>
-                          </span>
-                          <strong class="line__total">
-                            <span>Line total</span>
+                            <span class="line__original muted">
+                              List
+                              <lightning-formatted-number
+                                value={line.listPrice}
+                                format-style="currency"
+                                currency-code="USD"
+                              ></lightning-formatted-number>
+                            </span>
+                          </div>
+                          <div class="line__deposit-value" role="cell">
+                            <template lwc:if={line.hasDeposit}>
+                              <lightning-formatted-number
+                                value={line.depositAmount}
+                                format-style="currency"
+                                currency-code="USD"
+                              ></lightning-formatted-number>
+                            </template>
+                            <template lwc:else>—</template>
+                          </div>
+                          <strong class="line__total" role="cell">
                             <lightning-formatted-number
                               value={line.net}
                               format-style="currency"
                               currency-code="USD"
                             ></lightning-formatted-number>
                           </strong>
+                          <strong class="line__deposit-total" role="cell">
+                            <template lwc:if={line.hasDeposit}>
+                              <lightning-formatted-number
+                                value={line.depositTotal}
+                                format-style="currency"
+                                currency-code="USD"
+                              ></lightning-formatted-number>
+                            </template>
+                            <template lwc:else>—</template>
+                          </strong>
                         </div>
                       </div>
-                      <label class="line__deposit">
-                        <span>Deposit per unit</span>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={line.depositAmount}
-                          data-key={line.key}
-                          onchange={handleDeposit}
-                          aria-label="Deposit per unit"
-                          placeholder="Price book default"
-                          title="Leave blank to use the price book deposit; enter 0 for no deposit."
-                        />
-                      </label>
                       <template lwc:if={line.isRecurring}>
                         <label class="line__term">
                           <span>Recurring term (months)</span>
@@ -355,16 +360,19 @@
                           </template>
                         </label>
                       </template>
-                      <input
-                        class="line__note"
-                        type="text"
-                        value={line.description}
-                        data-key={line.key}
-                        onchange={handleNote}
-                        placeholder="Client-facing product note"
-                        aria-label="Client-facing product note"
-                        maxlength="255"
-                      />
+                      <label class="line__description">
+                        <span>Description</span>
+                        <input
+                          class="line__note"
+                          type="text"
+                          value={line.description}
+                          data-key={line.key}
+                          onchange={handleNote}
+                          placeholder="Client-facing product note"
+                          aria-label="Client-facing product note"
+                          maxlength="255"
+                        />
+                      </label>
                       <template lwc:if={line.needsApproval}
                         ><p class="warning">
                           Discounts above {maxDiscount}% need manager approval.

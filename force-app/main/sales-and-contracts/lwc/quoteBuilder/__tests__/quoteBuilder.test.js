@@ -796,35 +796,49 @@ describe("c-quote-builder quote-first workspace", () => {
     );
   });
 
-  it("calculates and saves an overridden unit price while retaining original list price", async () => {
+  it("renders unit price read-only in the line table and saves it unchanged", async () => {
     saveQuote.mockResolvedValue(quote());
     const element = await render(context({ canOverrideDiscount: false }));
     buttonByText(element, "Edit").click();
     await flushPromises();
-    const priceInput = element.shadowRoot.querySelector(
-      '[aria-label="Unit price"]'
-    );
-    priceInput.value = "450";
-    priceInput.dispatchEvent(new CustomEvent("change"));
-    await flushPromises();
 
     expect(
       element.shadowRoot.querySelector(
-        ".line__original lightning-formatted-number"
+        ".line__unit-price-value > lightning-formatted-number"
       ).value
     ).toBe(500);
+    expect(
+      element.shadowRoot.querySelector('[aria-label="Unit price"]')
+    ).toBeNull();
     expect(
       element.shadowRoot.querySelector(
         ".line__total lightning-formatted-number"
       ).value
-    ).toBe(810);
+    ).toBe(900);
+    expect(
+      [...element.shadowRoot.querySelectorAll(".line__table-head span")].map(
+        (heading) => heading.textContent
+      )
+    ).toEqual([
+      "Quantity",
+      "Discount",
+      "Unit price",
+      "Deposit per unit",
+      "Line total",
+      "Total deposit"
+    ]);
+    expect(
+      element.shadowRoot.querySelector(
+        '.line__description [aria-label="Client-facing product note"]'
+      )
+    ).not.toBeNull();
     buttonByText(element, "Save quote").click();
     await flushPromises();
     expect(saveQuote).toHaveBeenCalledWith(
       expect.objectContaining({
         lines: [
           expect.objectContaining({
-            unitPrice: 450,
+            unitPrice: 500,
             discountPct: 10,
             quantity: 2
           })
@@ -833,22 +847,22 @@ describe("c-quote-builder quote-first workspace", () => {
     );
   });
 
-  it("allows a reduced unit price without an approval warning or save block", async () => {
+  it("retains a previously saved reduced unit price as a read-only value", async () => {
     saveQuote.mockResolvedValue(quote());
     const element = await render(
       context({
-        quotes: [quote({ lines: [{ ...quoteLine, discountPct: 0 }] })]
+        quotes: [
+          quote({ lines: [{ ...quoteLine, unitPrice: 300, discountPct: 0 }] })
+        ]
       })
     );
     buttonByText(element, "Edit").click();
     await flushPromises();
-    const priceInput = element.shadowRoot.querySelector(
-      '[aria-label="Unit price"]'
-    );
-    priceInput.value = "300";
-    priceInput.dispatchEvent(new CustomEvent("change"));
-    await flushPromises();
-
+    expect(
+      element.shadowRoot.querySelector(
+        ".line__unit-price-value > lightning-formatted-number"
+      ).value
+    ).toBe(300);
     expect(buttonByText(element, "Save quote").disabled).toBe(false);
     expect(element.shadowRoot.querySelector(".warning")).toBeNull();
     expect(element.shadowRoot.querySelector(".line_warn")).toBeNull();
@@ -900,21 +914,26 @@ describe("c-quote-builder quote-first workspace", () => {
     element.shadowRoot.querySelector(`button[data-id="${ENTRY_ID}"]`).click();
     await flushPromises();
     const deposit = element.shadowRoot.querySelector(
-      '[aria-label="Deposit per unit"]'
+      ".line__deposit-value lightning-formatted-number"
     );
-    expect(deposit.value).toBe("125");
+    expect(deposit.value).toBe(125);
     const quantity = element.shadowRoot.querySelector(
       '[aria-label="Quantity"]'
     );
     quantity.value = "3";
     quantity.dispatchEvent(new CustomEvent("change"));
     await flushPromises();
-    expect(deposit.value).toBe("125");
+    expect(deposit.value).toBe(125);
     expect(
       element.shadowRoot.querySelector(
         ".line__total lightning-formatted-number"
       ).value
     ).toBe(1500);
+    expect(
+      element.shadowRoot.querySelector(
+        ".line__deposit-total lightning-formatted-number"
+      ).value
+    ).toBe(375);
     buttonByText(element, "Save quote").click();
     await flushPromises();
     expect(saveQuote).toHaveBeenCalledWith(
@@ -961,8 +980,10 @@ describe("c-quote-builder quote-first workspace", () => {
     buttonByText(element, "Edit").click();
     await flushPromises();
     expect(
-      element.shadowRoot.querySelector('[aria-label="Deposit per unit"]').value
-    ).toBe("80");
+      element.shadowRoot.querySelector(
+        ".line__deposit-value lightning-formatted-number"
+      ).value
+    ).toBe(80);
     buttonByText(element, "Save quote").click();
     await flushPromises();
     expect(saveQuote).toHaveBeenCalledWith(
@@ -987,8 +1008,10 @@ describe("c-quote-builder quote-first workspace", () => {
     buttonByText(element, "Edit").click();
     await flushPromises();
     expect(
-      element.shadowRoot.querySelector('[aria-label="Deposit per unit"]').value
-    ).toBe("0");
+      element.shadowRoot.querySelector(
+        ".line__deposit-value lightning-formatted-number"
+      ).value
+    ).toBe(0);
     buttonByText(element, "Save quote").click();
     await flushPromises();
     expect(saveQuote).toHaveBeenCalledWith(
@@ -998,26 +1021,17 @@ describe("c-quote-builder quote-first workspace", () => {
     );
   });
 
-  it("rejects negative deposits and sends blank deposits as a price book default request", async () => {
+  it("renders an unset deposit as read-only and preserves the default request", async () => {
     saveQuote.mockResolvedValue(quote());
     const element = await render();
     buttonByText(element, "Edit").click();
     await flushPromises();
-    const deposit = element.shadowRoot.querySelector(
-      '[aria-label="Deposit per unit"]'
-    );
-    expect(deposit.placeholder).toBe("Price book default");
-    expect(deposit.title).toContain("enter 0 for no deposit");
-    deposit.value = "-1";
-    deposit.dispatchEvent(new CustomEvent("change"));
-    await flushPromises();
-    expect(buttonByText(element, "Save quote").disabled).toBe(true);
-    buttonByText(element, "Save quote").click();
-    await flushPromises();
-    expect(saveQuote).not.toHaveBeenCalled();
-    deposit.value = "";
-    deposit.dispatchEvent(new CustomEvent("change"));
-    await flushPromises();
+    expect(
+      element.shadowRoot.querySelector('[aria-label="Deposit per unit"]')
+    ).toBeNull();
+    expect(
+      element.shadowRoot.querySelector(".line__deposit-value").textContent
+    ).toContain("—");
     expect(buttonByText(element, "Save quote").disabled).toBe(false);
     buttonByText(element, "Save quote").click();
     await flushPromises();
@@ -1146,7 +1160,7 @@ describe("c-quote-builder quote-first workspace", () => {
     expect(buttonByText(element, "+ Add").disabled).toBe(false);
   });
 
-  it("rejects invalid prices and fractional or excessive recurring terms", async () => {
+  it("rejects fractional or excessive recurring terms", async () => {
     const element = await render(
       context({
         quotes: [
@@ -1159,13 +1173,6 @@ describe("c-quote-builder quote-first workspace", () => {
     );
     buttonByText(element, "Edit").click();
     await flushPromises();
-    const price = element.shadowRoot.querySelector('[aria-label="Unit price"]');
-    price.value = "-1";
-    price.dispatchEvent(new CustomEvent("change"));
-    await flushPromises();
-    expect(buttonByText(element, "Save quote").disabled).toBe(true);
-    price.value = "500";
-    price.dispatchEvent(new CustomEvent("change"));
     const quoteTerm = element.shadowRoot.querySelector(".quote-term");
     quoteTerm.value = "1.5";
     quoteTerm.dispatchEvent(new CustomEvent("change"));

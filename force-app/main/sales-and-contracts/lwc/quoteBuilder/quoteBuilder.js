@@ -186,11 +186,17 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     return this.cart.map((line) => {
       const gross = roundCurrency(line.unitPrice * line.quantity);
       const net = roundCurrency(gross * (1 - line.discountPct / 100));
+      const hasDeposit = line.depositAmount != null;
+      const depositTotal = hasDeposit
+        ? roundCurrency(line.depositAmount * line.quantity)
+        : null;
       const overLimit = line.discountPct > this.maxDiscount;
       return {
         ...line,
         gross,
         net,
+        hasDeposit,
+        depositTotal,
         effectiveTermMonths: line.termMonths || this.termMonths,
         overLimit,
         needsApproval: overLimit && !this.context?.canOverrideDiscount,
@@ -498,23 +504,9 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.updateLine(event.target.dataset.key, { discountPct });
   }
 
-  handleUnitPrice(event) {
-    const value = event.target.value;
-    this.updateLine(event.target.dataset.key, {
-      unitPrice: value === "" ? NaN : Number(value)
-    });
-  }
-
   handleQuoteTerm(event) {
     this.termMonths =
       event.target.value === "" ? null : Number(event.target.value);
-  }
-
-  handleDeposit(event) {
-    this.updateLine(event.target.dataset.key, {
-      depositAmount:
-        event.target.value === "" ? null : Number(event.target.value)
-    });
   }
 
   handleLineTerm(event) {

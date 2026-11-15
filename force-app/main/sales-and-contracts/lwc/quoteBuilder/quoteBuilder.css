@@ -344,7 +344,6 @@
 .title-row,
 .quote-card__main,
 .product__right,
-.line__controls,
 .actions {
   display: flex;
   align-items: center;
@@ -710,6 +709,9 @@
 }
 
 .product__deposit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   color: var(--muted);
   font-size: 0.72rem;
 }
@@ -730,39 +732,60 @@
   border-color: #e8bd68;
 }
 
-.line__controls {
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: flex-start;
-}
-
 .change-pricebook {
   margin-left: 0.5rem;
 }
 
-.line__pricing {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.3rem;
-  margin-left: auto;
+.line__table {
+  overflow-x: auto;
+  border: 1px solid #d8dde6;
+  border-radius: 7px;
 }
 
-.line__unit-price,
-.line__deposit,
+.line__table-head,
+.line__table-row {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 1.2fr) minmax(5rem, 0.7fr) repeat(
+      4,
+      minmax(6.5rem, 1fr)
+    );
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 43rem;
+  padding: 0.5rem 0.65rem;
+}
+
+.line__table-head {
+  color: var(--muted);
+  background: #f7f8fa;
+  border-bottom: 1px solid #d8dde6;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.line__table-head span:nth-child(n + 3),
+.line__unit-price-value,
+.line__deposit-value,
+.line__total,
+.line__deposit-total {
+  text-align: right;
+}
+
+.line__unit-price-value {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
 .line__deposit-summary,
-.line__term,
-.line__original,
-.line__total {
+.line__term {
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.35rem;
 }
 
-.line__unit-price input,
-.line__deposit input,
 .line__term input {
   width: 6.5rem;
   min-height: 1.9rem;
@@ -772,21 +795,16 @@
   border-radius: 6px;
 }
 
-.line__deposit {
-  margin-bottom: 0.6rem;
-}
-
-.line__deposit input {
-  width: 9.5rem;
-}
-
 .line__original {
   font-size: 0.7rem;
 }
 
-.line__total > span {
+.line__description {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--muted);
   font-size: 0.75rem;
-  font-weight: 400;
 }
 
 .quote-term {
@@ -832,6 +850,7 @@
 }
 
 .line__note {
+  width: 100%;
   min-height: 2rem;
   padding: 0.35rem 0.55rem;
   border: 1px solid #d5dae2;
