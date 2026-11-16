@@ -163,6 +163,25 @@ const buttonByText = (element, label) =>
     (button) => button.textContent.trim() === label
   );
 
+async function openProductPicker(element) {
+  buttonByText(element, "Add products").click();
+  await flushPromises();
+}
+
+function selectProduct(element, pricebookEntryId) {
+  const checkbox = element.shadowRoot.querySelector(
+    `.product__select[data-id="${pricebookEntryId}"]`
+  );
+  checkbox.checked = true;
+  checkbox.dispatchEvent(new CustomEvent("change"));
+}
+
+async function addSelectedProducts(element) {
+  await flushPromises();
+  element.shadowRoot.querySelector(".product-picker__add").click();
+  await flushPromises();
+}
+
 describe("c-quote-builder quote-first workspace", () => {
   afterEach(() => {
     while (document.body.firstChild)
@@ -204,8 +223,10 @@ describe("c-quote-builder quote-first workspace", () => {
         .querySelector('[role="dialog"]')
         .getAttribute("aria-modal")
     ).toBe("true");
-    element.shadowRoot.querySelector("button[data-id]").click();
-    await flushPromises();
+    expect(element.shadowRoot.querySelector(".catalog")).toBeNull();
+    await openProductPicker(element);
+    selectProduct(element, ENTRY_ID);
+    await addSelectedProducts(element);
     buttonByText(element, "Save quote").click();
     await flushPromises();
 
@@ -226,6 +247,46 @@ describe("c-quote-builder quote-first workspace", () => {
         ]
       })
     );
+  });
+
+  it("adds multiple selected catalogue products in one action", async () => {
+    const secondEntry = "01u000000000002AAA";
+    const element = await render(
+      context({
+        quotes: [],
+        catalog: [
+          ...context().catalog,
+          {
+            pricebookEntryId: secondEntry,
+            productId: "01t000000000002AAA",
+            name: "Account review",
+            family: "Appeals",
+            listPrice: 250,
+            depositAmount: 75
+          }
+        ]
+      })
+    );
+
+    buttonByText(element, "+ New quote").click();
+    await flushPromises();
+    await openProductPicker(element);
+    expect(
+      element.shadowRoot.querySelector(".product-picker-modal")
+    ).toBeTruthy();
+    selectProduct(element, ENTRY_ID);
+    selectProduct(element, secondEntry);
+    await flushPromises();
+    expect(
+      element.shadowRoot.querySelector(".product-picker__add").textContent
+    ).toContain("Add selected (2)");
+    await addSelectedProducts(element);
+
+    expect(
+      element.shadowRoot.querySelector(".product-picker-modal")
+    ).toBeNull();
+    expect(element.shadowRoot.querySelectorAll(".line")).toHaveLength(2);
+    expect(element.shadowRoot.querySelector(".quote-editor")).toBeTruthy();
   });
 
   it("edits the selected quote and its quote lines", async () => {
@@ -911,8 +972,9 @@ describe("c-quote-builder quote-first workspace", () => {
     const element = await render(initial);
     buttonByText(element, "+ New quote").click();
     await flushPromises();
-    element.shadowRoot.querySelector(`button[data-id="${ENTRY_ID}"]`).click();
-    await flushPromises();
+    await openProductPicker(element);
+    selectProduct(element, ENTRY_ID);
+    await addSelectedProducts(element);
     const deposit = element.shadowRoot.querySelector(
       ".line__deposit-value lightning-formatted-number"
     );
@@ -950,6 +1012,7 @@ describe("c-quote-builder quote-first workspace", () => {
     const element = await render(withDeposit);
     buttonByText(element, "+ New quote").click();
     await flushPromises();
+    await openProductPicker(element);
 
     const deposit = element.shadowRoot.querySelector(".product__deposit");
     expect(deposit.textContent).toContain("Deposit");
@@ -960,6 +1023,7 @@ describe("c-quote-builder quote-first workspace", () => {
     const secondElement = await render(withoutDeposit);
     buttonByText(secondElement, "+ New quote").click();
     await flushPromises();
+    await openProductPicker(secondElement);
     expect(
       secondElement.shadowRoot.querySelector(".product__deposit")
     ).toBeNull();
@@ -1065,11 +1129,10 @@ describe("c-quote-builder quote-first workspace", () => {
     const element = await render(initial);
     buttonByText(element, "+ New quote").click();
     await flushPromises();
-    element.shadowRoot.querySelector(`button[data-id="${ENTRY_ID}"]`).click();
-    element.shadowRoot
-      .querySelector(`button[data-id="${recurringEntry}"]`)
-      .click();
-    await flushPromises();
+    await openProductPicker(element);
+    selectProduct(element, ENTRY_ID);
+    selectProduct(element, recurringEntry);
+    await addSelectedProducts(element);
     expect(buttonByText(element, "Save quote").disabled).toBe(true);
 
     const quoteTerm = element.shadowRoot.querySelector(".quote-term");
@@ -1139,7 +1202,7 @@ describe("c-quote-builder quote-first workspace", () => {
     expect(
       element.shadowRoot.querySelector('[role="alert"]').textContent
     ).toContain("Select Change price book");
-    expect(buttonByText(element, "+ Add").disabled).toBe(true);
+    expect(buttonByText(element, "Add products").disabled).toBe(true);
     expect(buttonByText(element, "Save quote").disabled).toBe(true);
 
     setPricebook.mockResolvedValue(context());
@@ -1157,7 +1220,7 @@ describe("c-quote-builder quote-first workspace", () => {
     });
     expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
     expect(element.shadowRoot.querySelectorAll(".line")).toHaveLength(0);
-    expect(buttonByText(element, "+ Add").disabled).toBe(false);
+    expect(buttonByText(element, "Add products").disabled).toBe(false);
   });
 
   it("rejects fractional or excessive recurring terms", async () => {

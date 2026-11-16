@@ -84,6 +84,10 @@
   overflow: auto;
 }
 
+.modal_editor {
+  width: min(94vw, 80rem);
+}
+
 .modal_send {
   width: min(88vw, 52rem);
 }
@@ -618,8 +622,7 @@
 }
 
 .editor {
-  display: grid;
-  grid-template-columns: minmax(17rem, 0.85fr) minmax(22rem, 1.35fr);
+  display: block;
   min-height: 28rem;
 }
 
@@ -634,7 +637,53 @@
 
 .catalog {
   background: var(--soft);
-  border-right: 1px solid var(--line);
+}
+
+.quote-editor {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.product-picker-layer {
+  position: fixed;
+  z-index: 9200;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.product-picker-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(8 20 40 / 34%);
+}
+
+.product-picker-modal {
+  width: min(92vw, 44rem);
+  max-height: 82vh;
+}
+
+.product-picker__body {
+  background: #fff;
+}
+
+.product-picker__body .products {
+  max-height: 26rem;
+}
+
+.product-picker__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.product-picker__footer .actions {
+  justify-content: flex-end;
 }
 
 .editor__options {
@@ -694,6 +743,28 @@
 .product_selected {
   border-color: #7fa1da;
   box-shadow: inset 3px 0 0 var(--blue);
+}
+
+.product_in-cart {
+  background: #f4f6f9;
+  opacity: 0.72;
+}
+
+.product__select {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  accent-color: var(--blue);
+}
+
+.product__details {
+  flex: 1 1 auto;
+}
+
+.product__status {
+  color: #176b44;
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .stack {
@@ -951,17 +1022,13 @@
 }
 
 @media (max-width: 54rem) {
-  .editor {
-    grid-template-columns: 1fr;
-  }
-
-  .catalog {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
   .quote-lines__head,
   .quote-lines__row {
     grid-template-columns: minmax(10rem, 1fr) 3rem 4.5rem 6rem;
+  }
+
+  .product-picker__footer {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

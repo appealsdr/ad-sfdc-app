@@ -100,6 +100,14 @@
               >
                 Change price book
               </button>
+              <button
+                type="button"
+                class="btn btn_small btn_primary add-products"
+                onclick={handleOpenProductPicker}
+                disabled={addProductsDisabled}
+              >
+                Add products
+              </button>
             </div>
             <button
               type="button"
@@ -112,77 +120,6 @@
             </button>
           </header>
           <div class="editor modal__body">
-            <section class="catalog" aria-label="Product catalogue">
-              <h3>Add products</h3>
-              <lightning-input
-                type="search"
-                label="Search products"
-                variant="label-hidden"
-                placeholder="Search products"
-                value={search}
-                onchange={handleSearch}
-              ></lightning-input>
-              <div
-                class="pills"
-                role="group"
-                aria-label="Filter by product family"
-              >
-                <template for:each={familyPills} for:item="pill">
-                  <button
-                    key={pill.value}
-                    type="button"
-                    class={pill.className}
-                    aria-pressed={pill.pressed}
-                    data-family={pill.value}
-                    onclick={handleFamily}
-                  >
-                    {pill.label}
-                  </button>
-                </template>
-              </div>
-              <ul class="products">
-                <template for:each={catalogView} for:item="product">
-                  <li key={product.pricebookEntryId} class={product.rowClass}>
-                    <div class="stack">
-                      <strong>{product.name}</strong
-                      ><span class="muted">{product.familyLabel}</span>
-                    </div>
-                    <div class="product__right">
-                      <div class="product__price stack">
-                        <lightning-formatted-number
-                          value={product.listPrice}
-                          format-style="currency"
-                          currency-code="USD"
-                        ></lightning-formatted-number>
-                        <template lwc:if={product.hasDeposit}>
-                          <span class="product__deposit">
-                            Deposit
-                            <lightning-formatted-number
-                              value={product.depositAmount}
-                              format-style="currency"
-                              currency-code="USD"
-                            ></lightning-formatted-number>
-                          </span>
-                        </template>
-                      </div>
-                      <button
-                        type="button"
-                        class="btn btn_small"
-                        data-id={product.pricebookEntryId}
-                        disabled={product.addDisabled}
-                        onclick={handleAdd}
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  </li>
-                </template>
-              </ul>
-              <template lwc:if={catalogEmpty}
-                ><p class="muted">No matching products.</p></template
-              >
-            </section>
-
             <section class="quote-editor" aria-label="Quote products">
               <template lwc:if={pricebookMismatch}>
                 <p class="warning" role="alert">
@@ -442,6 +379,127 @@
             </section>
           </div>
         </div>
+        <template lwc:if={productPickerOpen}>
+          <section
+            class="product-picker-layer"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="product-picker-title"
+          >
+            <div class="product-picker-backdrop"></div>
+            <div class="modal product-picker-modal">
+              <header class="workspace__header modal__header">
+                <div>
+                  <p class="eyebrow">{editorPricebookName} price book</p>
+                  <h2 id="product-picker-title">Select products</h2>
+                </div>
+                <button
+                  type="button"
+                  class="modal__close"
+                  onclick={handleCloseProductPicker}
+                  aria-label="Close product selection"
+                >
+                  ×
+                </button>
+              </header>
+              <section
+                class="catalog product-picker__body"
+                aria-label="Product catalogue"
+              >
+                <lightning-input
+                  type="search"
+                  label="Search products"
+                  variant="label-hidden"
+                  placeholder="Search products"
+                  value={search}
+                  onchange={handleSearch}
+                ></lightning-input>
+                <div
+                  class="pills"
+                  role="group"
+                  aria-label="Filter by product family"
+                >
+                  <template for:each={familyPills} for:item="pill">
+                    <button
+                      key={pill.value}
+                      type="button"
+                      class={pill.className}
+                      aria-pressed={pill.pressed}
+                      data-family={pill.value}
+                      onclick={handleFamily}
+                    >
+                      {pill.label}
+                    </button>
+                  </template>
+                </div>
+                <ul class="products">
+                  <template for:each={catalogView} for:item="product">
+                    <li key={product.pricebookEntryId} class={product.rowClass}>
+                      <input
+                        class="product__select"
+                        type="checkbox"
+                        checked={product.selectedForAdd}
+                        disabled={product.selectionDisabled}
+                        data-id={product.pricebookEntryId}
+                        aria-label={product.selectionLabel}
+                        onchange={handleProductSelection}
+                      />
+                      <div class="stack product__details">
+                        <strong>{product.name}</strong
+                        ><span class="muted">{product.familyLabel}</span>
+                      </div>
+                      <div class="product__right">
+                        <div class="product__price stack">
+                          <lightning-formatted-number
+                            value={product.listPrice}
+                            format-style="currency"
+                            currency-code="USD"
+                          ></lightning-formatted-number>
+                          <template lwc:if={product.hasDeposit}>
+                            <span class="product__deposit">
+                              Deposit
+                              <lightning-formatted-number
+                                value={product.depositAmount}
+                                format-style="currency"
+                                currency-code="USD"
+                              ></lightning-formatted-number>
+                            </span>
+                          </template>
+                          <template lwc:if={product.inCart}>
+                            <span class="product__status">In quote</span>
+                          </template>
+                        </div>
+                      </div>
+                    </li>
+                  </template>
+                </ul>
+                <template lwc:if={catalogEmpty}
+                  ><p class="muted">No matching products.</p></template
+                >
+                <footer class="product-picker__footer">
+                  <span class="muted">{selectedProductLabel}</span>
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="btn"
+                      onclick={handleCloseProductPicker}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn_primary product-picker__add"
+                      onclick={handleAddSelected}
+                      disabled={addSelectedDisabled}
+                    >
+                      {addSelectedLabel}
+                    </button>
+                  </div>
+                </footer>
+              </section>
+            </div>
+          </section>
+        </template>
       </section>
     </template>
 

@@ -58,6 +58,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   cart = [];
   search = "";
   family = ALL;
+  productPickerOpen = false;
+  selectedProductIds = [];
 
   connectedCallback() {
     this.load();
@@ -152,9 +154,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
 
   get catalogView() {
     const term = this.search.trim().toLowerCase();
-    const quantities = new Map(
-      this.cart.map((line) => [line.pricebookEntryId, line.quantity])
-    );
+    const cartIds = new Set(this.cart.map((line) => line.pricebookEntryId));
+    const selectedIds = new Set(this.selectedProductIds);
     return (this.context?.catalog || [])
       .filter(
         (item) =>
@@ -167,19 +168,49 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
           (item.code || "").toLowerCase().includes(term) ||
           (item.description || "").toLowerCase().includes(term)
       )
-      .map((item) => ({
-        ...item,
-        familyLabel: item.family || "Other",
-        hasDeposit: Number(item.depositAmount) > 0,
-        rowClass: quantities.has(item.pricebookEntryId)
-          ? "product product_selected"
-          : "product",
-        addDisabled: this.pricebookMismatch
-      }));
+      .map((item) => {
+        const inCart = cartIds.has(item.pricebookEntryId);
+        const selectedForAdd = selectedIds.has(item.pricebookEntryId);
+        return {
+          ...item,
+          familyLabel: item.family || "Other",
+          hasDeposit: Number(item.depositAmount) > 0,
+          inCart,
+          selectedForAdd,
+          selectionDisabled: this.pricebookMismatch || inCart,
+          selectionLabel: `Select ${item.name}`,
+          rowClass: inCart
+            ? "product product_in-cart"
+            : selectedForAdd
+              ? "product product_selected"
+              : "product"
+        };
+      });
   }
 
   get catalogEmpty() {
     return this.catalogView.length === 0;
+  }
+
+  get addProductsDisabled() {
+    return this.busy || this.pricebookMismatch;
+  }
+
+  get selectedProductCount() {
+    return this.selectedProductIds.length;
+  }
+
+  get selectedProductLabel() {
+    const count = this.selectedProductCount;
+    return `${count} product${count === 1 ? "" : "s"} selected`;
+  }
+
+  get addSelectedLabel() {
+    return `Add selected (${this.selectedProductCount})`;
+  }
+
+  get addSelectedDisabled() {
+    return this.addProductsDisabled || this.selectedProductCount === 0;
   }
 
   get cartView() {
@@ -424,6 +455,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     }));
     this.search = "";
     this.family = ALL;
+    this.productPickerOpen = false;
+    this.selectedProductIds = [];
     this.editorOpen = true;
   }
 
@@ -431,6 +464,8 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.editorOpen = false;
     this.editingQuoteId = undefined;
     this.cart = [];
+    this.productPickerOpen = false;
+    this.selectedProductIds = [];
   }
 
   handleSearch(event) {
@@ -441,22 +476,38 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
     this.family = event.currentTarget.dataset.family;
   }
 
-  handleAdd(event) {
-    if (this.pricebookMismatch) return;
-    const id = event.currentTarget.dataset.id;
-    const existing = this.cart.find((line) => line.pricebookEntryId === id);
-    if (existing) {
-      this.cart = this.cart.map((line) =>
-        line === existing ? { ...line, quantity: line.quantity + 1 } : line
-      );
-      return;
-    }
-    const item = this.context.catalog.find(
-      (catalogItem) => catalogItem.pricebookEntryId === id
-    );
-    this.cart = [
-      ...this.cart,
-      {
+  handleOpenProductPicker() {
+    if (this.addProductsDisabled) return;
+    this.search = "";
+    this.family = ALL;
+    this.selectedProductIds = [];
+    this.productPickerOpen = true;
+  }
+
+  handleCloseProductPicker() {
+    this.productPickerOpen = false;
+    this.selectedProductIds = [];
+  }
+
+  handleProductSelection(event) {
+    const id = event.target.dataset.id;
+    const selectedIds = new Set(this.selectedProductIds);
+    if (event.target.checked) selectedIds.add(id);
+    else selectedIds.delete(id);
+    this.selectedProductIds = [...selectedIds];
+  }
+
+  handleAddSelected() {
+    if (this.addSelectedDisabled) return;
+    const cartIds = new Set(this.cart.map((line) => line.pricebookEntryId));
+    const selectedIds = new Set(this.selectedProductIds);
+    const newLines = (this.context?.catalog || [])
+      .filter(
+        (item) =>
+          selectedIds.has(item.pricebookEntryId) &&
+          !cartIds.has(item.pricebookEntryId)
+      )
+      .map((item) => ({
         key: `line-${++keySequence}`,
         pricebookEntryId: item.pricebookEntryId,
         name: item.name,
@@ -470,8 +521,9 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
         quantity: 1,
         discountPct: 0,
         description: ""
-      }
-    ];
+      }));
+    this.cart = [...this.cart, ...newLines];
+    this.handleCloseProductPicker();
   }
 
   updateLine(key, patch) {
@@ -540,6 +592,7 @@ export default class QuoteBuilder extends NavigationMixin(LightningElement) {
   }
 
   handleChangePricebook() {
+    this.handleCloseProductPicker();
     this.selectedPricebookId = this.context.pricebookId;
     this.choosingPricebook = true;
   }
