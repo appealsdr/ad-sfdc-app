@@ -231,45 +231,294 @@ private class TimeTrackingControllerTest {
     }
 
     @IsTest
-    static void testGetDataFindsLatestOtherStoreTimer() {
-        Store__c primaryStore = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+    static void testActiveUserKeyUniquenessBlocksSecondActiveTimerForSameUser() {
         Store__c otherStore = [SELECT Id FROM Store__c WHERE Name = 'Secondary Store' LIMIT 1];
-        Case primaryCase = getPrimaryCase();
-        Datetime now = System.now();
-        Time_Tracking__c latestOtherTimer = new Time_Tracking__c(
+        Store__c primaryStore = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        insert new Time_Tracking__c(
             Assignee__c = UserInfo.getUserId(),
             Store__c = otherStore.Id,
-            Start_Time__c = now.addMinutes(-5),
+            Start_Time__c = System.now(),
             Status__c = TimeTrackingController.STATUS_IN_PROGRESS
         );
-        Time_Tracking__c localTimer = new Time_Tracking__c(
-            Assignee__c = UserInfo.getUserId(),
-            Store__c = primaryStore.Id,
-            Start_Time__c = now.addMinutes(-1),
-            Status__c = TimeTrackingController.STATUS_IN_PROGRESS
-        );
-        insert new List<Time_Tracking__c>{
-            latestOtherTimer,
-            localTimer,
-            new Time_Tracking__c(
-                Assignee__c = UserInfo.getUserId(),
-                Case__c = primaryCase.Id,
-                Store__c = primaryStore.Id,
-                Start_Time__c = now.addMinutes(-20),
-                Status__c = TimeTrackingController.STATUS_IN_PROGRESS
-            )
-        };
 
+        Boolean duplicateBlocked = false;
         Test.startTest();
-        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(primaryStore.Id);
+        try {
+            insert new Time_Tracking__c(
+                Assignee__c = UserInfo.getUserId(),
+                Store__c = primaryStore.Id,
+                Start_Time__c = System.now(),
+                Status__c = TimeTrackingController.STATUS_IN_PROGRESS
+            );
+        } catch (DmlException ex) {
+            duplicateBlocked = ex.getMessage().contains('DUPLICATE_VALUE');
+        }
         Test.stopTest();
 
-        System.assertEquals(1, data.records.size(), 'Store records must exclude even a case timer on the same store.');
-        System.assertEquals(localTimer.Id, data.activeTimer.id);
-        System.assertNotEquals(null, data.blockingTimer);
-        System.assertEquals(latestOtherTimer.Id, data.blockingTimer.id, 'The newest timer outside this store must be reported.');
-        System.assertEquals(otherStore.Id, data.blockingTimer.relatedRecordId);
-        System.assertEquals('Secondary Store', data.blockingTimer.relatedRecordName);
+        System.assertEquals(true, duplicateBlocked,
+            'The unique Active_User_Key__c invariant must prevent a second active/paused record for the same user.');
+        System.assertEquals(1, [SELECT COUNT() FROM Time_Tracking__c WHERE Assignee__c = :UserInfo.getUserId()]);
+    }
+
+    @IsTest
+    static void testStartTimerBlocksOnExistingPausedTimerInDifferentContext() {
+        Store__c otherStore = [SELECT Id FROM Store__c WHERE Name = 'Secondary Store' LIMIT 1];
+        Store__c primaryStore = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        Time_Tracking__c existing = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Store__c = otherStore.Id,
+            Start_Time__c = System.now(),
+            Status__c = TimeTrackingConstants.STATUS_PAUSED_OFFLINE,
+            Pause_Started_At__c = System.now()
+        );
+        insert existing;
+
+        Test.startTest();
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(primaryStore.Id, null, null);
+        Test.stopTest();
+
+        System.assertEquals(false, result.success,
+            'A paused timer on another record must block starting a brand new timer rather than being silently replaced.');
+        System.assertNotEquals(null, result.blockingTimer);
+        System.assertEquals(existing.Id, result.blockingTimer.id);
+    }
+
+    @IsTest
+    static void testStartTimerOnAccount() {
+        Account account = [SELECT Id FROM Account LIMIT 1];
+
+        Test.startTest();
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(account.Id, null, 'instance-a');
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(account.Id);
+        Test.stopTest();
+
+        Time_Tracking__c record = [SELECT Account__c, Case__c, Store__c, Type__c FROM Time_Tracking__c WHERE Id = :result.timeTrackingId];
+        System.assertEquals(true, result.success);
+        System.assertEquals(account.Id, record.Account__c);
+        System.assertEquals('Client', record.Type__c);
+        System.assertEquals('Account', data.objectType);
+        System.assertNotEquals(null, data.activeTimer);
+        System.assertEquals(result.timeTrackingId, data.activeTimer.id);
+    }
+
+    @IsTest
+    static void testInternalTimerRequiresValidTypeAndNoContext() {
+        Boolean exceptionThrown = false;
+        Test.startTest();
+        try {
+            TimeTrackingController.startTimer(null, 'Bogus Type', 'instance-a');
+        } catch (AuraHandledException ex) {
+            exceptionThrown = true;
+        }
+        Test.stopTest();
+
+        System.assertEquals(true, exceptionThrown);
+    }
+
+    @IsTest
+    static void testStartInternalMeetingTimerAndFetchUtilityBarData() {
+        Test.startTest();
+        TimeTrackingController.StartTimerResult result =
+            TimeTrackingController.startTimer(null, 'Internal Meeting', 'instance-a');
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(null);
+        Test.stopTest();
+
+        System.assertEquals(true, result.success);
+        Time_Tracking__c record = [SELECT Account__c, Case__c, Store__c, Type__c FROM Time_Tracking__c WHERE Id = :result.timeTrackingId];
+        System.assertEquals('Internal Meeting', record.Type__c);
+        System.assertEquals(null, record.Account__c);
+        System.assertEquals(null, record.Case__c);
+        System.assertEquals(null, record.Store__c);
+        System.assertNotEquals(null, data.activeTimer);
+        System.assertEquals(result.timeTrackingId, data.activeTimer.id);
+    }
+
+    @IsTest
+    static void testClientContextOnDifferentInstanceBlocksRatherThanAttaches() {
+        Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        TimeTrackingController.startTimer(store.Id, null, 'instance-a');
+
+        Test.startTest();
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(store.Id, null, 'instance-b');
+        Test.stopTest();
+
+        System.assertEquals(false, result.success,
+            'A different browser instance must not silently attach to another device\'s running timer, even on the same record.');
+        System.assertNotEquals(null, result.blockingTimer);
+    }
+
+    @IsTest
+    static void testPauseAndResumeExcludePausedTimeFromDuration() {
+        Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        Datetime start = System.now().addMinutes(-30);
+        Time_Tracking__c timer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Store__c = store.Id,
+            Start_Time__c = start,
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
+            Timer_Instance_Id__c = 'instance-a'
+        );
+        insert timer;
+
+        Test.startTest();
+        TimeTrackingController.TimeTrackingWrapper paused =
+            TimeTrackingController.pauseTimer(timer.Id, TimeTrackingConstants.STATUS_PAUSED_LUNCH, 'instance-a');
+        System.assertEquals(TimeTrackingConstants.STATUS_PAUSED_LUNCH, paused.status);
+
+        // Simulate ten minutes on break before resuming.
+        Time_Tracking__c duringPause = [SELECT Pause_Started_At__c FROM Time_Tracking__c WHERE Id = :timer.Id];
+        update new Time_Tracking__c(Id = timer.Id, Pause_Started_At__c = duringPause.Pause_Started_At__c.addMinutes(-10));
+
+        TimeTrackingController.TimeTrackingWrapper resumed =
+            TimeTrackingController.resumeTimer(timer.Id, 'instance-a', false);
+        Test.stopTest();
+
+        System.assertEquals(TimeTrackingController.STATUS_IN_PROGRESS, resumed.status);
+        Time_Tracking__c record = [
+            SELECT Status__c, Pause_Started_At__c, Paused_Duration_Minutes__c, Duration__c
+            FROM Time_Tracking__c
+            WHERE Id = :timer.Id
+        ];
+        System.assertEquals(null, record.Pause_Started_At__c);
+        System.assert(record.Paused_Duration_Minutes__c >= 9.9, 'Resuming must accumulate the pause interval.');
+        System.assert(record.Duration__c < 30, 'Active duration must exclude the paused interval.');
+    }
+
+    @IsTest
+    static void testCompletingWhilePausedExcludesFinalPauseInterval() {
+        Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
+        Datetime start = System.now().addMinutes(-20);
+        Time_Tracking__c timer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Store__c = store.Id,
+            Start_Time__c = start,
+            Status__c = TimeTrackingConstants.STATUS_PAUSED_OFFLINE,
+            Pause_Started_At__c = System.now().addMinutes(-5)
+        );
+        insert timer;
+
+        Test.startTest();
+        TimeTrackingController.completeTimer(timer.Id, 'Done');
+        Test.stopTest();
+
+        Time_Tracking__c record = [
+            SELECT Status__c, Pause_Started_At__c, Paused_Duration_Minutes__c, Duration__c
+            FROM Time_Tracking__c
+            WHERE Id = :timer.Id
+        ];
+        System.assertEquals(TimeTrackingController.STATUS_COMPLETED, record.Status__c);
+        System.assertEquals(null, record.Pause_Started_At__c);
+        System.assert(record.Paused_Duration_Minutes__c >= 4.9);
+        System.assert(record.Duration__c <= 16, 'The final pause interval must be excluded from the logged duration.');
+    }
+
+    @IsTest
+    static void testPauseRejectsNonOwnerAndInvalidStatus() {
+        User adminUser = getAdminUser();
+        Time_Tracking__c timer = new Time_Tracking__c(
+            Assignee__c = adminUser.Id,
+            Start_Time__c = System.now(),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
+            Type__c = 'Internal Task'
+        );
+        insert timer;
+
+        Boolean exceptionThrown = false;
+        Test.startTest();
+        try {
+            TimeTrackingController.pauseTimer(timer.Id, TimeTrackingConstants.STATUS_PAUSED_LUNCH, 'instance-a');
+        } catch (AuraHandledException ex) {
+            exceptionThrown = true;
+        }
+        Test.stopTest();
+
+        System.assertEquals(true, exceptionThrown, 'A user must not be able to pause another user\'s timer.');
+    }
+
+    @IsTest
+    static void testHeartbeatOnlyUpdatesForOwningInstance() {
+        Time_Tracking__c timer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Start_Time__c = System.now(),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
+            Type__c = 'Internal Task',
+            Timer_Instance_Id__c = 'instance-a'
+        );
+        insert timer;
+
+        Test.startTest();
+        TimeTrackingController.heartbeat(timer.Id, 'instance-b');
+        Time_Tracking__c afterWrongInstance = [SELECT Last_Heartbeat__c FROM Time_Tracking__c WHERE Id = :timer.Id];
+        System.assertEquals(null, afterWrongInstance.Last_Heartbeat__c, 'A heartbeat from a non-owning instance must be ignored.');
+
+        TimeTrackingController.heartbeat(timer.Id, 'instance-a');
+        Test.stopTest();
+
+        Time_Tracking__c afterOwningInstance = [SELECT Last_Heartbeat__c FROM Time_Tracking__c WHERE Id = :timer.Id];
+        System.assertNotEquals(null, afterOwningInstance.Last_Heartbeat__c);
+    }
+
+    @IsTest
+    static void testCleanupServicePausesStaleInProgressTimers() {
+        Time_Tracking__c staleTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Start_Time__c = System.now().addMinutes(-20),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
+            Type__c = 'Internal Task',
+            Last_Heartbeat__c = System.now().addMinutes(-10)
+        );
+        insert staleTimer;
+
+        Test.startTest();
+        Integer cleanedUp = TimeTrackingCleanupService.cleanupStaleTimers();
+        Test.stopTest();
+
+        System.assertEquals(1, cleanedUp);
+        Time_Tracking__c record = [SELECT Status__c, Pause_Started_At__c FROM Time_Tracking__c WHERE Id = :staleTimer.Id];
+        System.assertEquals(TimeTrackingConstants.STATUS_PAUSED_OFFLINE, record.Status__c);
+        System.assertNotEquals(null, record.Pause_Started_At__c);
+    }
+
+    @IsTest
+    static void testCleanupServiceLeavesFreshAndHealthyTimersAlone() {
+        Time_Tracking__c freshTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Start_Time__c = System.now().addMinutes(-1),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
+            Type__c = 'Internal Task',
+            Last_Heartbeat__c = System.now()
+        );
+        insert freshTimer;
+
+        Test.startTest();
+        Integer cleanedUp = TimeTrackingCleanupService.cleanupStaleTimers();
+        Test.stopTest();
+
+        System.assertEquals(0, cleanedUp);
+        Time_Tracking__c record = [SELECT Status__c FROM Time_Tracking__c WHERE Id = :freshTimer.Id];
+        System.assertEquals(TimeTrackingController.STATUS_IN_PROGRESS, record.Status__c);
+    }
+
+    @IsTest
+    static void testCleanupSchedulerRunsService() {
+        Time_Tracking__c staleTimer = new Time_Tracking__c(
+            Assignee__c = UserInfo.getUserId(),
+            Start_Time__c = System.now().addMinutes(-20),
+            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
+            Type__c = 'Internal Task',
+            Last_Heartbeat__c = System.now().addMinutes(-10)
+        );
+        insert staleTimer;
+
+        Test.startTest();
+        TimeTrackingCleanupScheduler.scheduleRecurringJob();
+        TimeTrackingCleanupScheduler.scheduleRecurringJob();
+        Test.stopTest();
+
+        System.assertEquals(1, [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :TimeTrackingCleanupScheduler.JOB_NAME],
+            'Scheduling twice must not create a duplicate job.');
+        Time_Tracking__c record = [SELECT Status__c FROM Time_Tracking__c WHERE Id = :staleTimer.Id];
+        System.assertEquals(TimeTrackingConstants.STATUS_PAUSED_OFFLINE, record.Status__c);
     }
 
     @IsTest
@@ -277,9 +526,9 @@ private class TimeTrackingControllerTest {
         Store__c store = [SELECT Id FROM Store__c WHERE Name = 'Primary Store' LIMIT 1];
 
         Test.startTest();
-        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(store.Id);
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(store.Id, null, null);
         TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(store.Id);
-        TimeTrackingController.StartTimerResult resumed = TimeTrackingController.startTimer(store.Id);
+        TimeTrackingController.StartTimerResult resumed = TimeTrackingController.startTimer(store.Id, null, null);
         Test.stopTest();
 
         Time_Tracking__c record = [
@@ -312,7 +561,7 @@ private class TimeTrackingControllerTest {
         insert caseTimer;
 
         Test.startTest();
-        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(testCase.Store__c);
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(testCase.Store__c, null, null);
         Test.stopTest();
 
         System.assertEquals(false, result.success);
@@ -323,17 +572,15 @@ private class TimeTrackingControllerTest {
     }
 
     @IsTest
-    static void testGetTimeTrackingDataNullRecordId() {
-        Boolean exceptionThrown = false;
+    static void testGetTimeTrackingDataNullRecordIdReturnsInternalUtilityBarView() {
         Test.startTest();
-        try {
-            TimeTrackingController.getTimeTrackingData(null);
-        } catch (AuraHandledException ex) {
-            exceptionThrown = true;
-        }
+        TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(null);
         Test.stopTest();
 
-        System.assertEquals(true, exceptionThrown);
+        System.assertEquals(null, data.objectType, 'A null record Id means the context-free utility bar view.');
+        System.assertEquals(0, data.records.size());
+        System.assertEquals(null, data.activeTimer);
+        System.assertEquals(null, data.blockingTimer);
     }
 
     @IsTest
@@ -357,7 +604,7 @@ private class TimeTrackingControllerTest {
         Boolean exceptionThrown = false;
         Test.startTest();
         try {
-            TimeTrackingController.startTimer(null);
+            TimeTrackingController.startTimer(null, null, null);
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
         }
@@ -373,7 +620,7 @@ private class TimeTrackingControllerTest {
         Boolean exceptionThrown = false;
         Test.startTest();
         try {
-            TimeTrackingController.startTimer(opportunity.Id);
+            TimeTrackingController.startTimer(opportunity.Id, null, null);
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
         }
@@ -395,7 +642,7 @@ private class TimeTrackingControllerTest {
         insert existing;
 
         Test.startTest();
-        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(testCase.Id);
+        TimeTrackingController.StartTimerResult result = TimeTrackingController.startTimer(testCase.Id, null, null);
         Test.stopTest();
 
         System.assertEquals(true, result.success);
@@ -407,7 +654,7 @@ private class TimeTrackingControllerTest {
         Boolean exceptionThrown = false;
         Test.startTest();
         try {
-            TimeTrackingController.createManualEntry(null, System.now().addHours(-1), System.now(), 'Entry');
+            TimeTrackingController.createManualEntry(null, null, System.now().addHours(-1), System.now(), 'Entry');
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
         }
@@ -423,7 +670,7 @@ private class TimeTrackingControllerTest {
         Boolean exceptionThrown = false;
         Test.startTest();
         try {
-            TimeTrackingController.createManualEntry(testCase.Id, null, null, 'Entry');
+            TimeTrackingController.createManualEntry(testCase.Id, null, null, null, 'Entry');
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
         }
@@ -443,6 +690,7 @@ private class TimeTrackingControllerTest {
         for (String comments : blankComments) {
             createdIds.add(TimeTrackingController.createManualEntry(
                 testCase.Id,
+                null,
                 endTime.addHours(-1),
                 endTime,
                 comments
@@ -474,6 +722,7 @@ private class TimeTrackingControllerTest {
         try {
             TimeTrackingController.createManualEntry(
                 opportunity.Id,
+                null,
                 System.now().addHours(-1),
                 System.now(),
                 'Entry'
@@ -696,7 +945,7 @@ private class TimeTrackingControllerTest {
 
         Test.startTest();
         TimeTrackingController.StartTimerResult startResult =
-            TimeTrackingController.startTimer(testCase.Id);
+            TimeTrackingController.startTimer(testCase.Id, null, null);
         System.assertEquals(true, startResult.success);
 
         TimeTrackingController.completeTimer(startResult.timeTrackingId, '  Finished task  ');
@@ -728,7 +977,7 @@ private class TimeTrackingControllerTest {
 
         Test.startTest();
         TimeTrackingController.StartTimerResult startResult =
-            TimeTrackingController.startTimer(otherCase.Id);
+            TimeTrackingController.startTimer(otherCase.Id, null, null);
         Test.stopTest();
 
         System.assertEquals(false, startResult.success);
@@ -794,7 +1043,7 @@ private class TimeTrackingControllerTest {
         Datetime endTime = System.now().addHours(-1);
 
         Test.startTest();
-        Id newId = TimeTrackingController.createManualEntry(testCase.Id, startTime, endTime, '  Manual entry  ');
+        Id newId = TimeTrackingController.createManualEntry(testCase.Id, null, startTime, endTime, '  Manual entry  ');
         Test.stopTest();
 
         Time_Tracking__c record = [
@@ -815,7 +1064,7 @@ private class TimeTrackingControllerTest {
         Datetime endTime = System.now();
 
         Test.startTest();
-        Id newId = TimeTrackingController.createManualEntry(store.Id, endTime.addMinutes(-20), endTime, 'Store work');
+        Id newId = TimeTrackingController.createManualEntry(store.Id, null, endTime.addMinutes(-20), endTime, 'Store work');
         TimeTrackingController.TimeTrackingData data = TimeTrackingController.getTimeTrackingData(store.Id);
         Test.stopTest();
 
@@ -843,7 +1092,7 @@ private class TimeTrackingControllerTest {
         Test.startTest();
         for (Integer index = 0; index < durationsInSeconds.size(); index++) {
             Datetime endTime = startTime.addSeconds(durationsInSeconds[index]);
-            Id entryId = TimeTrackingController.createManualEntry(testCase.Id, startTime, endTime, null);
+            Id entryId = TimeTrackingController.createManualEntry(testCase.Id, null, startTime, endTime, null);
             expectedById.put(entryId, expectedMinutes[index]);
             expectedEndTimes.put(entryId, endTime);
         }
@@ -907,7 +1156,7 @@ private class TimeTrackingControllerTest {
     static void testEditingManualEntryRoundsPartialMinuteUp() {
         Case testCase = getPrimaryCase();
         Datetime startTime = Datetime.newInstanceGMT(2026, 1, 15, 10, 0, 0);
-        Id entryId = TimeTrackingController.createManualEntry(testCase.Id, startTime, startTime.addMinutes(1), null);
+        Id entryId = TimeTrackingController.createManualEntry(testCase.Id, null, startTime, startTime.addMinutes(1), null);
         User adminUser = getAdminUser();
         TimeTrackingController.TimeTrackingData data;
 
@@ -940,7 +1189,7 @@ private class TimeTrackingControllerTest {
         Boolean exceptionThrown = false;
         Test.startTest();
         try {
-            TimeTrackingController.createManualEntry(testCase.Id, startTime, endTime, 'Bad entry');
+            TimeTrackingController.createManualEntry(testCase.Id, null, startTime, endTime, 'Bad entry');
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
         }
@@ -958,7 +1207,7 @@ private class TimeTrackingControllerTest {
         Boolean exceptionThrown = false;
         Test.startTest();
         try {
-            TimeTrackingController.createManualEntry(testCase.Id, startTime, endTime, 'Too long entry');
+            TimeTrackingController.createManualEntry(testCase.Id, null, startTime, endTime, 'Too long entry');
         } catch (AuraHandledException ex) {
             exceptionThrown = true;
         }
@@ -1097,7 +1346,7 @@ private class TimeTrackingControllerTest {
         Test.startTest();
         TimeTrackingController.completeTimer(blockingRecord.Id, 'Finished on other case');
         TimeTrackingController.StartTimerResult startResult =
-            TimeTrackingController.startTimer(otherCase.Id);
+            TimeTrackingController.startTimer(otherCase.Id, null, null);
         Test.stopTest();
 
         System.assertEquals(true, startResult.success);

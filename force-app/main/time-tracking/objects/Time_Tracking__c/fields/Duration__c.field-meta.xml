@@ -3,9 +3,23 @@
     <fullName>Duration__c</fullName>
     <externalId>false</externalId>
     <formula>IF(
-    AND(NOT(ISBLANK(Start_Time__c)), NOT(ISBLANK(End_Time__c))),
-    CEILING((End_Time__c - Start_Time__c) * 24 * 60),
-    NULL
+    ISBLANK(Start_Time__c),
+    NULL,
+    MAX(
+        0,
+        CEILING(
+            (
+                CASE(TEXT(Status__c),
+                    &quot;Completed&quot;, IF(ISBLANK(End_Time__c), NOW(), End_Time__c),
+                    &quot;Paused - Lunch/Break&quot;, IF(ISBLANK(Pause_Started_At__c), NOW(), Pause_Started_At__c),
+                    &quot;Paused - Offline&quot;, IF(ISBLANK(Pause_Started_At__c), NOW(), Pause_Started_At__c),
+                    NOW()
+                )
+                - Start_Time__c
+            ) * 24 * 60
+            - Paused_Duration_Minutes__c
+        )
+    )
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Duration</label>

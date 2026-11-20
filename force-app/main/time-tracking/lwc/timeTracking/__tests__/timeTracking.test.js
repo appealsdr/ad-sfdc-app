@@ -3,8 +3,16 @@ import TimeTracking from "c/timeTracking";
 import { refreshApex } from "@salesforce/apex";
 import getTimeTrackingData from "@salesforce/apex/TimeTrackingController.getTimeTrackingData";
 import startTimer from "@salesforce/apex/TimeTrackingController.startTimer";
+import pauseTimer from "@salesforce/apex/TimeTrackingController.pauseTimer";
+import resumeTimer from "@salesforce/apex/TimeTrackingController.resumeTimer";
+import heartbeat from "@salesforce/apex/TimeTrackingController.heartbeat";
 import completeTimer from "@salesforce/apex/TimeTrackingController.completeTimer";
 import createManualEntry from "@salesforce/apex/TimeTrackingController.createManualEntry";
+import { subscribe } from "lightning/empApi";
+
+jest.mock("@salesforce/user/Id", () => ({ default: "005000000000001AAA" }), {
+  virtual: true
+});
 
 jest.mock("@salesforce/apex", () => ({ refreshApex: jest.fn() }), {
   virtual: true
@@ -19,6 +27,21 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/TimeTrackingController.startTimer",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/TimeTrackingController.pauseTimer",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/TimeTrackingController.resumeTimer",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/TimeTrackingController.heartbeat",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -164,8 +187,16 @@ describe("c-time-tracking", () => {
     jest.spyOn(Date, "now").mockReturnValue(NOW);
     refreshApex.mockReset();
     refreshApex.mockResolvedValue();
+    subscribe.mockClear();
+    subscribe.mockResolvedValue({});
     startTimer.mockReset();
     startTimer.mockResolvedValue({ success: true });
+    pauseTimer.mockReset();
+    pauseTimer.mockResolvedValue({ status: "Paused - Lunch/Break" });
+    resumeTimer.mockReset();
+    resumeTimer.mockResolvedValue({ status: "In progress" });
+    heartbeat.mockReset();
+    heartbeat.mockResolvedValue();
     completeTimer.mockReset();
     completeTimer.mockResolvedValue();
     createManualEntry.mockReset();
@@ -378,7 +409,9 @@ describe("c-time-tracking", () => {
   it("does not automatically open logged time when starting or refreshing a timer", async () => {
     const element = await mount();
     await clickIcon(element, "Start timer");
-    expect(startTimer).toHaveBeenCalledWith({ recordId: RECORD_ID });
+    expect(startTimer).toHaveBeenCalledWith(
+      expect.objectContaining({ recordId: RECORD_ID, type: null, instanceId: expect.any(String) })
+    );
     expect(refreshApex).toHaveBeenCalledTimes(1);
     expect(accordion(element).activeSectionName).toEqual([]);
     await clickIcon(element, "Refresh time tracking");
@@ -401,7 +434,7 @@ describe("c-time-tracking", () => {
     });
     const element = await mount(data);
     await clickIcon(element, "Refresh time tracking");
-    expect(headerButtons(element)).toHaveLength(3);
+    expect(headerButtons(element)).toHaveLength(5);
     expect(iconButton(element, "Stop timer").disabled).toBe(true);
     headerButtons(element).forEach((button) =>
       expect(button.disabled).toBe(true)
@@ -659,10 +692,193 @@ describe("c-time-tracking", () => {
       timeTrackingId: BLOCKING_TIMER.id,
       comments: ""
     });
-    expect(startTimer).toHaveBeenCalledWith({ recordId: RECORD_ID });
+    expect(startTimer).toHaveBeenCalledWith(
+      expect.objectContaining({ recordId: RECORD_ID, type: null, instanceId: expect.any(String) })
+    );
     expect(completeTimer.mock.invocationCallOrder[0]).toBeLessThan(
       startTimer.mock.invocationCallOrder[0]
     );
     expect(refreshApex).toHaveBeenCalledTimes(1);
+  });
+
+  it("pauses the running timer for lunch/break and offers resume", async () => {
+    const element = await mount(
+      trackingData({
+        activeTimer: ACTIVE_TIMER,
+        records: [...COMPLETED_RECORDS, ACTIVE_TIMER],
+        totalMinutes: 40
+      })
+    );
+    const pauseButton = iconButton(element, "Pause for lunch or break");
+    expect(pauseButton).toBeDefined();
+    pauseButton.click();
+    await flushPromises();
+    expect(pauseTimer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        timeTrackingId: ACTIVE_TIMER.id,
+        pauseStatus: "Paused - Lunch/Break"
+      })
+    );
+    expect(refreshApex).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows a Resume action for a paused timer and calls resumeTimer", async () => {
+    const pausedTimer = { ...ACTIVE_TIMER, status: "Paused - Offline" };
+    const element = await mount(
+      trackingData({
+        activeTimer: pausedTimer,
+        records: [...COMPLETED_RECORDS, pausedTimer],
+        totalMinutes: 40
+      })
+    );
+    expect(iconButton(element, "Pause for lunch or break")).toBeUndefined();
+    const resumeButton = iconButton(element, "Resume timer");
+    expect(resumeButton).toBeDefined();
+    resumeButton.click();
+    await flushPromises();
+    expect(resumeTimer).toHaveBeenCalledWith(
+      expect.objectContaining({ timeTrackingId: pausedTimer.id, takeOver: true })
+    );
+    expect(refreshApex).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers Resume / Take Over in the blocking modal when the other timer is paused", async () => {
+    const pausedBlocking = { ...BLOCKING_TIMER, status: "Paused - Offline" };
+    const element = await mount(trackingData({ blockingTimer: pausedBlocking }));
+    await clickIcon(element, "Start timer");
+    const takeOverButton = modalButton(element, "Resume / Take Over");
+    expect(takeOverButton).toBeDefined();
+    takeOverButton.click();
+    await flushPromises();
+    expect(resumeTimer).toHaveBeenCalledWith(
+      expect.objectContaining({ timeTrackingId: pausedBlocking.id, takeOver: true })
+    );
+  });
+
+  it("sends a heartbeat on an interval only while this browser instance owns the running timer", async () => {
+    const interval = jest.spyOn(window, "setInterval");
+    const otherInstanceElement = await mount(
+      trackingData({
+        activeTimer: { ...ACTIVE_TIMER, timerInstanceId: "not-this-browser" },
+        records: [...COMPLETED_RECORDS, ACTIVE_TIMER],
+        totalMinutes: 40
+      })
+    );
+    expect(otherInstanceElement).toBeDefined();
+    const heartbeatCallsBefore = interval.mock.calls.length;
+    jest.advanceTimersByTime?.(30000);
+    expect(heartbeat).not.toHaveBeenCalled();
+
+    const thisInstanceId = window.localStorage.getItem("timeTrackingInstanceId");
+    const owningTimer = { ...ACTIVE_TIMER, timerInstanceId: thisInstanceId };
+    await mount(
+      trackingData({
+        activeTimer: owningTimer,
+        records: [...COMPLETED_RECORDS, owningTimer],
+        totalMinutes: 40
+      })
+    );
+    expect(interval.mock.calls.length).toBeGreaterThan(heartbeatCallsBefore);
+    const heartbeatCall = interval.mock.calls.find((call) => call[1] === 30000);
+    expect(heartbeatCall).toBeDefined();
+    heartbeatCall[0]();
+    expect(heartbeat).toHaveBeenCalledWith(
+      expect.objectContaining({ timeTrackingId: owningTimer.id, instanceId: thisInstanceId })
+    );
+  });
+
+  it("starts an internal timer from the utility bar without a related record", async () => {
+    const element = createElement("c-time-tracking", { is: TimeTracking });
+    document.body.appendChild(element);
+    await flushPromises();
+    getTimeTrackingData.emit(trackingData({ objectType: null, records: [], totalMinutes: 0 }));
+    await flushPromises();
+
+    await clickIcon(element, "Start timer");
+    expect(
+      element.shadowRoot.querySelector('[role="dialog"]').textContent
+    ).toContain("Start Internal Time");
+    modalButton(element, "Start").click();
+    await flushPromises();
+
+    expect(startTimer).toHaveBeenCalledWith(
+      expect.objectContaining({ recordId: undefined, type: "Internal Task" })
+    );
+  });
+
+  it("subscribes to the TimeTracking_Update__e platform event for cross-tab/window sync", async () => {
+    const element = await mount();
+    expect(subscribe).toHaveBeenCalledWith(
+      "/event/TimeTracking_Update__e",
+      -1,
+      expect.any(Function)
+    );
+    expect(element).toBeDefined();
+  });
+
+  it("refreshes when another tab/window changes this user's timer", async () => {
+    const element = await mount();
+    refreshApex.mockClear();
+    const handler = subscribe.mock.calls[0][2];
+
+    handler({
+      data: {
+        payload: {
+          Assignee_Id__c: "005000000000001AAA",
+          Timer_Id__c: ACTIVE_TIMER.id,
+          Status__c: "In progress",
+          Originating_Instance_Id__c: "some-other-tab"
+        }
+      }
+    });
+    await flushPromises();
+
+    expect(refreshApex).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores a platform event for a different user", async () => {
+    const element = await mount();
+    refreshApex.mockClear();
+    const handler = subscribe.mock.calls[0][2];
+
+    handler({
+      data: {
+        payload: {
+          Assignee_Id__c: "005000000000999AAA",
+          Timer_Id__c: ACTIVE_TIMER.id,
+          Status__c: "In progress",
+          Originating_Instance_Id__c: "some-other-tab"
+        }
+      }
+    });
+    await flushPromises();
+    expect(refreshApex).not.toHaveBeenCalled();
+    expect(element).toBeDefined();
+  });
+
+  it("still refreshes an event whose Originating_Instance_Id__c matches this tab's instanceId", async () => {
+    // instanceId lives in localStorage, which is shared by every tab/window
+    // of this browser - so a sibling tab's event can carry the same
+    // Originating_Instance_Id__c as this tab's own instanceId. That must
+    // not be treated as "I caused this, skip it", or sibling-tab updates
+    // would be silently dropped.
+    const element = await mount();
+    refreshApex.mockClear();
+    const handler = subscribe.mock.calls[0][2];
+    const thisInstanceId = window.localStorage.getItem("timeTrackingInstanceId");
+
+    handler({
+      data: {
+        payload: {
+          Assignee_Id__c: "005000000000001AAA",
+          Timer_Id__c: ACTIVE_TIMER.id,
+          Status__c: "Paused - Lunch/Break",
+          Originating_Instance_Id__c: thisInstanceId
+        }
+      }
+    });
+    await flushPromises();
+    expect(refreshApex).toHaveBeenCalledTimes(1);
+    expect(element).toBeDefined();
   });
 });

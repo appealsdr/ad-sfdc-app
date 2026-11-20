@@ -3,13 +3,19 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
 import getTimeTrackingData from '@salesforce/apex/TimeTrackingController.getTimeTrackingData';
 import startTimer from '@salesforce/apex/TimeTrackingController.startTimer';
+import pauseTimer from '@salesforce/apex/TimeTrackingController.pauseTimer';
+import resumeTimer from '@salesforce/apex/TimeTrackingController.resumeTimer';
+import heartbeat from '@salesforce/apex/TimeTrackingController.heartbeat';
 import completeTimer from '@salesforce/apex/TimeTrackingController.completeTimer';
 import deleteTimeTracking from '@salesforce/apex/TimeTrackingController.deleteTimeTracking';
 import createManualEntry from '@salesforce/apex/TimeTrackingController.createManualEntry';
 import updateTimeTracking from '@salesforce/apex/TimeTrackingController.updateTimeTracking';
+import { subscribe, unsubscribe } from 'lightning/empApi';
+import CURRENT_USER_ID from '@salesforce/user/Id';
 
 const BASE_COLUMNS = [
     { label: 'Assignee', fieldName: 'assigneeName', type: 'text' },
+    { label: 'Type', fieldName: 'type', type: 'text' },
     { label: 'Start Time', fieldName: 'formattedStartTime', type: 'text' },
     { label: 'End Time', fieldName: 'formattedEndTime', type: 'text' },
     { label: 'Duration', fieldName: 'durationDisplay', type: 'text' },
@@ -27,8 +33,41 @@ const ADMIN_ACTIONS_COLUMN = {
     }
 };
 
+const STATUS_IN_PROGRESS = 'In progress';
+const STATUS_PAUSED_LUNCH = 'Paused - Lunch/Break';
+const STATUS_PAUSED_OFFLINE = 'Paused - Offline';
+const PAUSED_STATUSES = [STATUS_PAUSED_LUNCH, STATUS_PAUSED_OFFLINE];
+
+const TYPE_INTERNAL_MEETING = 'Internal Meeting';
+const TYPE_INTERNAL_TASK = 'Internal Task';
+
+const HEARTBEAT_INTERVAL_MS = 15000;
+const INSTANCE_ID_STORAGE_KEY = 'timeTrackingInstanceId';
+const UPDATE_EVENT_CHANNEL = '/event/TimeTracking_Update__e';
+
+function generateInstanceId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return window.crypto.randomUUID();
+    }
+    return `tt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getOrCreateInstanceId() {
+    try {
+        let instanceId = window.localStorage.getItem(INSTANCE_ID_STORAGE_KEY);
+        if (!instanceId) {
+            instanceId = generateInstanceId();
+            window.localStorage.setItem(INSTANCE_ID_STORAGE_KEY, instanceId);
+        }
+        return instanceId;
+    } catch (error) {
+        // Local storage can be unavailable (private browsing, etc.); fall back to a session-only id.
+        return generateInstanceId();
+    }
+}
+
 export default class TimeTracking extends LightningElement {
-    @api recordId;
+    @api recordId = null;
 
     @track tableData = [];
     @track activeTimer;
@@ -40,6 +79,7 @@ export default class TimeTracking extends LightningElement {
     @track showCommentModal = false;
     @track showBlockingModal = false;
     @track showManualModal = false;
+    @track showInternalTypeModal = false;
     @track modalComments = '';
     @track modalMode = '';
     @track selectedRecordId;
@@ -55,9 +95,19 @@ export default class TimeTracking extends LightningElement {
     @track manualEndTime = '';
     @track manualComments = '';
     @track manualEditId;
+    @track manualType = TYPE_INTERNAL_TASK;
+
+    @track internalType = TYPE_INTERNAL_TASK;
 
     timerInterval;
+    heartbeatInterval;
     wiredDataResult;
+    instanceId = getOrCreateInstanceId();
+
+    internalTypeOptions = [
+        { label: 'Internal Meeting', value: TYPE_INTERNAL_MEETING },
+        { label: 'Internal Task', value: TYPE_INTERNAL_TASK }
+    ];
 
     @wire(getTimeTrackingData, { recordId: '$recordId' })
     wiredTimeTracking(result) {
@@ -78,6 +128,7 @@ export default class TimeTracking extends LightningElement {
                 durationDisplay: this.formatDuration(record.durationMinutes)
             }));
             this.syncTimerDisplay();
+            this.syncHeartbeat();
         } else if (error) {
             this.isLoading = false;
             this.tableData = [];
@@ -85,6 +136,7 @@ export default class TimeTracking extends LightningElement {
             this.blockingTimer = null;
             this.totalMinutes = 0;
             this.syncTimerDisplay();
+            this.syncHeartbeat();
             this.showToast('Error', this.getErrorMessage(error), 'error');
         }
     }
@@ -93,16 +145,91 @@ export default class TimeTracking extends LightningElement {
         this.timerInterval = window.setInterval(() => {
             this.syncTimerDisplay();
         }, 1000);
+        this.boundPageHideHandler = this.handlePageHide.bind(this);
+        window.addEventListener('pagehide', this.boundPageHideHandler);
+        this.subscribeToUpdateEvent();
     }
 
     disconnectedCallback() {
         if (this.timerInterval) {
             window.clearInterval(this.timerInterval);
         }
+        this.stopHeartbeat();
+        if (this.boundPageHideHandler) {
+            window.removeEventListener('pagehide', this.boundPageHideHandler);
+        }
+        this.unsubscribeFromUpdateEvent();
+    }
+
+    subscribeToUpdateEvent() {
+        subscribe(UPDATE_EVENT_CHANNEL, -1, (message) => {
+            const payload = message?.data?.payload;
+            if (!payload || payload.Assignee_Id__c !== CURRENT_USER_ID) {
+                return;
+            }
+            // Note: instanceId is shared across every tab/window of this
+            // browser (it lives in localStorage, by design, so a second
+            // computer can be told apart from a second tab). That means it
+            // cannot be used here to tell "this tab caused it" apart from
+            // "a sibling tab caused it" - so every matching event refreshes,
+            // even the tab that made the change. The extra refresh in that
+            // one tab is harmless; skipping it risked silently dropping
+            // updates for every other open tab/window, which is the whole
+            // point of this subscription.
+            if (this.wiredDataResult) {
+                refreshApex(this.wiredDataResult).catch(() => {
+                    // A transient refresh failure here just means this tab stays
+                    // on slightly stale data until its next successful refresh.
+                });
+            }
+        })
+            .then((subscription) => {
+                this.updateEventSubscription = subscription;
+            })
+            .catch(() => {
+                // Cross-tab sync is a convenience; this component still works
+                // correctly off its own wire data and the heartbeat/cleanup
+                // backstop if the subscription cannot be established.
+            });
+    }
+
+    unsubscribeFromUpdateEvent() {
+        if (this.updateEventSubscription) {
+            unsubscribe(this.updateEventSubscription, () => {});
+            this.updateEventSubscription = null;
+        }
+    }
+
+    handlePageHide() {
+        // Best-effort only: browsers do not guarantee this request completes
+        // once the page is being torn down, so the heartbeat/cleanup job
+        // remains the authoritative backstop for an unresponsive tab.
+        if (!this.isActiveTimerRunning || this.activeTimer.timerInstanceId !== this.instanceId) {
+            return;
+        }
+        pauseTimer({
+            timeTrackingId: this.activeTimer.id,
+            pauseStatus: 'Paused - Offline',
+            instanceId: this.instanceId
+        }).catch(() => {
+            // Nothing to do here; the page is already closing.
+        });
+    }
+
+    get isUtilityBarContext() {
+        return !this.recordId;
     }
 
     get hasActiveTimer() {
         return this.activeTimer != null;
+    }
+
+    get isActiveTimerRunning() {
+        return this.hasActiveTimer && this.activeTimer.status === STATUS_IN_PROGRESS;
+    }
+
+    get isActiveTimerPaused() {
+        return this.hasActiveTimer && PAUSED_STATUSES.includes(this.activeTimer.status);
     }
 
     get showStartButton() {
@@ -125,8 +252,15 @@ export default class TimeTracking extends LightningElement {
         return this.blockingTimer != null;
     }
 
+    get blockingTimerIsPaused() {
+        return this.hasBlockingTimer && PAUSED_STATUSES.includes(this.blockingTimer.status);
+    }
+
     get blockingRecordName() {
-        return this.blockingTimer?.relatedRecordName || 'another record';
+        if (!this.blockingTimer) {
+            return 'another record';
+        }
+        return this.blockingTimer.relatedRecordName || (this.blockingTimer.type !== 'Client' ? 'an internal entry' : 'another record');
     }
 
     get blockingRecordUrl() {
@@ -188,6 +322,9 @@ export default class TimeTracking extends LightningElement {
     }
 
     get blockingMessage() {
+        if (this.blockingTimerIsPaused) {
+            return `You have a paused timer on ${this.blockingRecordName}. Resume or complete it before starting a new timer here.`;
+        }
         return `You have a timer running on ${this.blockingRecordName}. Complete it before starting a new timer here.`;
     }
 
@@ -197,6 +334,24 @@ export default class TimeTracking extends LightningElement {
             return;
         }
 
+        if (this.isUtilityBarContext) {
+            this.showInternalTypeModal = true;
+            return;
+        }
+
+        this.runStartTimer();
+    }
+
+    handleInternalTypeChange(event) {
+        this.internalType = event.target.value;
+    }
+
+    handleInternalTypeCancel() {
+        this.showInternalTypeModal = false;
+    }
+
+    handleInternalTypeConfirm() {
+        this.showInternalTypeModal = false;
         this.runStartTimer();
     }
 
@@ -205,6 +360,45 @@ export default class TimeTracking extends LightningElement {
             return;
         }
         this.openCommentModal('complete', this.activeTimer.id);
+    }
+
+    handlePauseClick(event) {
+        const pauseStatus = event.currentTarget.dataset.status;
+        if (!this.activeTimer || this.actionsDisabled) {
+            return;
+        }
+        this.isProcessing = true;
+        pauseTimer({ timeTrackingId: this.activeTimer.id, pauseStatus, instanceId: this.instanceId })
+            .then(() => {
+                this.showToast('Success', 'Timer paused.', 'success');
+                return refreshApex(this.wiredDataResult);
+            })
+            .catch((error) => {
+                this.showToast('Error', this.getErrorMessage(error), 'error');
+            })
+            .finally(() => {
+                this.isProcessing = false;
+            });
+    }
+
+    handleResumeClick() {
+        const timer = this.activeTimer || this.blockingTimer;
+        if (!timer || this.actionsDisabled) {
+            return;
+        }
+        this.isProcessing = true;
+        resumeTimer({ timeTrackingId: timer.id, instanceId: this.instanceId, takeOver: true })
+            .then(() => {
+                this.showBlockingModal = false;
+                this.showToast('Success', 'Timer resumed.', 'success');
+                return refreshApex(this.wiredDataResult);
+            })
+            .catch((error) => {
+                this.showToast('Error', this.getErrorMessage(error), 'error');
+            })
+            .finally(() => {
+                this.isProcessing = false;
+            });
     }
 
     handleBlockingCompleteClick() {
@@ -286,6 +480,7 @@ export default class TimeTracking extends LightningElement {
 
         this.isProcessing = true;
         const comments = (this.manualComments || '').trim();
+        const type = this.isUtilityBarContext ? this.manualType : null;
         const request = this.manualEditId
             ? updateTimeTracking({
                   timeTrackingId: this.manualEditId,
@@ -295,6 +490,7 @@ export default class TimeTracking extends LightningElement {
               })
             : createManualEntry({
                   recordId: this.recordId,
+                  type,
                   startTime: startTime.toISOString(),
                   endTime: endTime.toISOString(),
                   comments
@@ -347,6 +543,7 @@ export default class TimeTracking extends LightningElement {
             this.manualStartTime = '';
             this.manualEndTime = '';
             this.manualComments = '';
+            this.manualType = TYPE_INTERNAL_TASK;
         }
         this.showManualModal = true;
     }
@@ -362,7 +559,8 @@ export default class TimeTracking extends LightningElement {
 
     runStartTimer() {
         this.isProcessing = true;
-        startTimer({ recordId: this.recordId })
+        const type = this.isUtilityBarContext ? this.internalType : null;
+        startTimer({ recordId: this.recordId, type, instanceId: this.instanceId })
             .then((result) => {
                 if (result.blockingTimer) {
                     this.blockingTimer = result.blockingTimer;
@@ -392,7 +590,8 @@ export default class TimeTracking extends LightningElement {
                 this.blockingTimer = null;
 
                 if (shouldStartAfterComplete) {
-                    return startTimer({ recordId: this.recordId }).then((result) => {
+                    const type = this.isUtilityBarContext ? this.internalType : null;
+                    return startTimer({ recordId: this.recordId, type, instanceId: this.instanceId }).then((result) => {
                         if (result.blockingTimer) {
                             this.blockingTimer = result.blockingTimer;
                             this.openBlockingModal();
@@ -442,6 +641,30 @@ export default class TimeTracking extends LightningElement {
             });
     }
 
+    syncHeartbeat() {
+        const shouldHeartbeat = this.isActiveTimerRunning && this.activeTimer.timerInstanceId === this.instanceId;
+        if (!shouldHeartbeat) {
+            this.stopHeartbeat();
+            return;
+        }
+        if (this.heartbeatInterval) {
+            return;
+        }
+        const timerId = this.activeTimer.id;
+        this.heartbeatInterval = window.setInterval(() => {
+            heartbeat({ timeTrackingId: timerId, instanceId: this.instanceId }).catch(() => {
+                // Heartbeats are best-effort; a transient failure is retried on the next tick.
+            });
+        }, HEARTBEAT_INTERVAL_MS);
+    }
+
+    stopHeartbeat() {
+        if (this.heartbeatInterval) {
+            window.clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+    }
+
     syncTimerDisplay() {
         const blockingElapsedMs = this.blockingTimer?.startTime
             ? Date.now() - new Date(this.blockingTimer.startTime).getTime()
@@ -454,14 +677,14 @@ export default class TimeTracking extends LightningElement {
             : 0;
         this.elapsedDisplay = this.formatElapsed(runningElapsedMs);
 
-        if (!this.activeTimer || !this.activeTimer.startTime) {
-            this.displayTotalMinutes = this.totalMinutes;
+        if (!this.activeTimer || !this.activeTimer.startTime || this.isActiveTimerPaused) {
+            this.displayTotalMinutes = this.totalMinutes + (this.activeTimer ? Number(this.activeTimer.durationMinutes) || 0 : 0);
             return;
         }
 
         const elapsedMs = Math.max(0, Date.now() - new Date(this.activeTimer.startTime).getTime());
-
-        const activeDurationMinutes = Math.ceil(elapsedMs / 60000);
+        const pausedMs = (Number(this.activeTimer.pausedDurationMinutes) || 0) * 60000;
+        const activeDurationMinutes = Math.ceil(Math.max(0, elapsedMs - pausedMs) / 60000);
         const activeRecordId = this.activeTimer.id;
         const completedTotal = (this.tableData || []).reduce((sum, record) => {
             if (record.id === activeRecordId) {

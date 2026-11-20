@@ -20,6 +20,16 @@
                 <default>false</default>
                 <label>Completed</label>
             </value>
+            <value>
+                <fullName>Paused - Lunch/Break</fullName>
+                <default>false</default>
+                <label>Paused - Lunch/Break</label>
+            </value>
+            <value>
+                <fullName>Paused - Offline</fullName>
+                <default>false</default>
+                <label>Paused - Offline</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>
