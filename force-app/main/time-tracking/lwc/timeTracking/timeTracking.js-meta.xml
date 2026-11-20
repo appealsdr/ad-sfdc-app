@@ -5,12 +5,15 @@
     <masterLabel>Time Tracking</masterLabel>
     <targets>
         <target>lightning__RecordPage</target>
+        <target>lightning__UtilityBar</target>
+        <target>lightning__HomePage</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__RecordPage">
             <objects>
                 <object>Case</object>
                 <object>Store__c</object>
+                <object>Account</object>
             </objects>
             <supportedFormFactors>
                 <supportedFormFactor type="Small"/>

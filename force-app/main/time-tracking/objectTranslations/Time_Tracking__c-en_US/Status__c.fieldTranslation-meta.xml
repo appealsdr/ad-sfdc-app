@@ -10,4 +10,12 @@
         <masterLabel>In progress</masterLabel>
         <translation><!-- In progress --></translation>
     </picklistValues>
+    <picklistValues>
+        <masterLabel>Paused - Lunch/Break</masterLabel>
+        <translation><!-- Paused - Lunch/Break --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Paused - Offline</masterLabel>
+        <translation><!-- Paused - Offline --></translation>
+    </picklistValues>
 </CustomFieldTranslation>

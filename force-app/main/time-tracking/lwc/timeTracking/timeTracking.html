@@ -12,7 +12,47 @@
                     disabled={actionsDisabled}>
                 </lightning-button-icon>
             </template>
-            <template if:true={hasActiveTimer}>
+            <template if:true={isActiveTimerRunning}>
+                <lightning-button-icon
+                    icon-name="utility:pause"
+                    alternative-text="Pause for lunch or break"
+                    title="Pause for lunch or break"
+                    aria-label="Pause for lunch or break"
+                    data-status="Paused - Lunch/Break"
+                    onclick={handlePauseClick}
+                    disabled={actionsDisabled}>
+                </lightning-button-icon>
+                <lightning-button-icon
+                    icon-name="utility:offline"
+                    alternative-text="Pause - going offline"
+                    title="Pause - going offline"
+                    aria-label="Pause - going offline"
+                    data-status="Paused - Offline"
+                    onclick={handlePauseClick}
+                    disabled={actionsDisabled}>
+                </lightning-button-icon>
+                <button
+                    type="button"
+                    data-action="stop"
+                    title="Stop timer"
+                    aria-label="Stop timer"
+                    class="slds-button slds-button_icon stop-button"
+                    onclick={handleCompleteClick}
+                    disabled={actionsDisabled}>
+                    <lightning-icon icon-name="utility:stop" variant="inverse" size="x-small"></lightning-icon>
+                    <span class="slds-assistive-text">Stop timer</span>
+                </button>
+            </template>
+            <template if:true={isActiveTimerPaused}>
+                <lightning-button-icon
+                    icon-name="utility:play"
+                    variant="brand"
+                    alternative-text="Resume timer"
+                    title="Resume timer"
+                    aria-label="Resume timer"
+                    onclick={handleResumeClick}
+                    disabled={actionsDisabled}>
+                </lightning-button-icon>
                 <button
                     type="button"
                     data-action="stop"
@@ -58,7 +98,12 @@
                         <div class="timer-section">
                             <template if:true={hasActiveTimer}>
                                 <span class="timer-display">{elapsedDisplay}</span>
-                                <span class="slds-text-body_small slds-text-color_weak">Timer in progress</span>
+                                <template if:true={isActiveTimerRunning}>
+                                    <span class="slds-text-body_small slds-text-color_weak">Timer in progress</span>
+                                </template>
+                                <template if:true={isActiveTimerPaused}>
+                                    <span class="slds-text-body_small slds-text-color_weak">{activeTimer.status}</span>
+                                </template>
                             </template>
                             <template if:true={hasBlockingTimer}>
                                 <span class="blocking-timer-notice" role="status">
@@ -114,6 +159,13 @@
                 </div>
                 <footer class="slds-modal__footer">
                     <lightning-button label="Cancel" onclick={handleBlockingCancelClick}></lightning-button>
+                    <template if:true={blockingTimerIsPaused}>
+                        <lightning-button
+                            label="Resume / Take Over"
+                            class="slds-m-left_small"
+                            onclick={handleResumeClick}>
+                        </lightning-button>
+                    </template>
                     <lightning-button
                         label="Completed"
                         variant="brand"
@@ -156,6 +208,35 @@
         <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
 
+    <template if:true={showInternalTypeModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Start Internal Time</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-radio-group
+                        name="internalType"
+                        label="Type"
+                        options={internalTypeOptions}
+                        value={internalType}
+                        onchange={handleInternalTypeChange}>
+                    </lightning-radio-group>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={handleInternalTypeCancel}></lightning-button>
+                    <lightning-button
+                        label="Start"
+                        variant="brand"
+                        class="slds-m-left_small"
+                        onclick={handleInternalTypeConfirm}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
     <template if:true={showManualModal}>
         <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
             <div class="slds-modal__container">
@@ -164,6 +245,18 @@
                 </header>
                 <div class="slds-modal__content slds-p-around_medium">
                     <div class="slds-grid slds-gutters slds-wrap">
+                        <template if:true={isUtilityBarContext}>
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-radio-group
+                                    name="manualType"
+                                    label="Type"
+                                    options={internalTypeOptions}
+                                    value={manualType}
+                                    data-field="manualType"
+                                    onchange={handleManualFieldChange}>
+                                </lightning-radio-group>
+                            </div>
+                        </template>
                         <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
                             <lightning-input
                                 type="date"
