@@ -639,37 +639,37 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Product_Document_Requirement__c.Accepted_Format__c</field>
+        <field>Required_File__c.Accepted_Format__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Product_Document_Requirement__c.Active__c</field>
+        <field>Required_File__c.Active__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Product_Document_Requirement__c.Document_Template__c</field>
+        <field>Required_File__c.Document_Template__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Product_Document_Requirement__c.Instructions__c</field>
+        <field>Required_File__c.Instructions__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Product_Document_Requirement__c.Product__c</field>
+        <field>Required_File__c.Product__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Product_Document_Requirement__c.Short_Description__c</field>
+        <field>Required_File__c.Short_Description__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Product_Document_Requirement__c.Sort_Order__c</field>
+        <field>Required_File__c.Sort_Order__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -699,7 +699,7 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
-        <object>Product_Document_Requirement__c</object>
+        <object>Required_File__c</object>
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>

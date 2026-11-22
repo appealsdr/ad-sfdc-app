@@ -1,0 +1,244 @@
+<template>
+  <lightning-card>
+    <div slot="title" class="title">
+      <lightning-icon
+        icon-name="standard:pricebook"
+        size="small"
+      ></lightning-icon>
+      <span>Price Book Entries</span>
+      <span class="count">({visibleCount} of {totalCount})</span>
+    </div>
+    <div slot="actions" class="card-actions">
+      <lightning-input
+        type="search"
+        variant="label-hidden"
+        label="Search price book entries"
+        placeholder="Search entries"
+        value={searchTerm}
+        onchange={handleSearch}
+        disabled={isEditing}
+      ></lightning-input>
+      <lightning-button
+        label="Add Products"
+        icon-name="utility:add"
+        onclick={handleOpenAddProducts}
+        disabled={addButtonDisabled}
+      ></lightning-button>
+      <template lwc:if={isEditing}>
+        <lightning-button
+          label="Cancel"
+          onclick={handleCancelEdit}
+          disabled={isSaving}
+        ></lightning-button>
+        <lightning-button
+          label="Save"
+          variant="brand"
+          onclick={handleSaveEntries}
+          disabled={isSaving}
+        ></lightning-button>
+      </template>
+      <template lwc:else>
+        <lightning-button
+          label="Edit"
+          icon-name="utility:edit"
+          onclick={handleEdit}
+          disabled={editButtonDisabled}
+        ></lightning-button>
+      </template>
+    </div>
+    <template lwc:if={warning}>
+      <div class="message warning" role="status">
+        <lightning-icon
+          icon-name="utility:warning"
+          size="x-small"
+        ></lightning-icon>
+        <span>{warning}</span>
+      </div>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="message error" role="alert">
+        <lightning-icon
+          icon-name="utility:error"
+          size="x-small"
+        ></lightning-icon>
+        <span>{errorMessage}</span>
+      </div>
+    </template>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading price book entries"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={isEditing}>
+      <div class="table-wrap">
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered edit-table"
+        >
+          <colgroup>
+            <col class="product-column" />
+            <col class="price-column" />
+            <col class="active-column" />
+            <col class="deposit-column" />
+            <col class="payment-column" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Product</th>
+              <th scope="col">List Price</th>
+              <th scope="col">Active</th>
+              <th scope="col">Deposit</th>
+              <th scope="col">Payment Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={editRows} for:item="row">
+              <tr key={row.Id}>
+                <th scope="row">
+                  <span class="product-name">{row.Product2Id}</span>
+                </th>
+                <td>
+                  <lightning-input
+                    class="edit-input"
+                    type="number"
+                    formatter="currency"
+                    step="0.01"
+                    min="0"
+                    variant="label-hidden"
+                    label="List Price"
+                    value={row.UnitPrice}
+                    required
+                    data-id={row.Id}
+                    data-field="UnitPrice"
+                    onchange={handleEditChange}
+                  ></lightning-input>
+                </td>
+                <td>
+                  <lightning-input
+                    class="edit-input"
+                    type="checkbox"
+                    variant="label-hidden"
+                    label="Active"
+                    checked={row.IsActive}
+                    data-id={row.Id}
+                    data-field="IsActive"
+                    onchange={handleEditChange}
+                  ></lightning-input>
+                </td>
+                <td>
+                  <lightning-input
+                    class="edit-input"
+                    type="number"
+                    formatter="currency"
+                    step="0.01"
+                    min="0"
+                    variant="label-hidden"
+                    label="Deposit"
+                    value={row.Deposit__c}
+                    data-id={row.Id}
+                    data-field="Deposit__c"
+                    onchange={handleEditChange}
+                  ></lightning-input>
+                </td>
+                <td>
+                  <lightning-combobox
+                    class="edit-input"
+                    variant="label-hidden"
+                    label="Payment Type"
+                    value={row.Payment_type__c}
+                    options={paymentTypeOptions}
+                    data-id={row.Id}
+                    data-field="Payment_type__c"
+                    onchange={handleEditChange}
+                  ></lightning-combobox>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template lwc:elseif={hasRows}>
+      <div class="table-wrap">
+        <lightning-datatable
+          key-field="Id"
+          data={filteredRows}
+          columns={columns}
+          hide-checkbox-column
+          onrowaction={handleRowAction}
+        ></lightning-datatable>
+      </div>
+    </template>
+    <template lwc:else>
+      <template lwc:if={isLoaded}>
+        <div class="empty-state">No Price Book Entries match this view.</div>
+      </template>
+    </template>
+  </lightning-card>
+
+  <template lwc:if={isAddOpen}>
+    <section
+      role="dialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="add-heading"
+      class="slds-modal slds-fade-in-open"
+    >
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <button
+            class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+            title="Close"
+            onclick={handleCloseAddProducts}
+          >
+            <lightning-icon
+              icon-name="utility:close"
+              alternative-text="Close"
+              variant="inverse"
+              size="small"
+            ></lightning-icon>
+          </button>
+          <h2 id="add-heading" class="slds-text-heading_medium">
+            Add Products
+          </h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_medium">
+          <template lwc:if={isLoadingProducts}>
+            <lightning-spinner
+              alternative-text="Loading available Products"
+              size="small"
+            ></lightning-spinner>
+          </template>
+          <template lwc:elseif={hasAvailableProducts}>
+            <lightning-datatable
+              key-field="productId"
+              data={availableProducts}
+              columns={availableProductColumns}
+              onrowselection={handleProductSelection}
+            ></lightning-datatable>
+          </template>
+          <template lwc:else>
+            <p class="empty-state">
+              All active Products with Standard Prices are already in this Price
+              Book.
+            </p>
+          </template>
+        </div>
+        <footer class="slds-modal__footer">
+          <lightning-button
+            label="Cancel"
+            onclick={handleCloseAddProducts}
+            disabled={isAddingProducts}
+          ></lightning-button>
+          <lightning-button
+            class="slds-m-left_x-small"
+            variant="brand"
+            label="Add Selected"
+            onclick={handleAddProducts}
+            disabled={addProductsDisabled}
+          ></lightning-button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+  </template>
+</template>

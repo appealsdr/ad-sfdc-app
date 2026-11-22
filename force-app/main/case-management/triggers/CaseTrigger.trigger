@@ -27,7 +27,7 @@ trigger CaseTrigger on Case(
     ---------------------------*/
   if (Trigger.isAfter) {
     if (Trigger.isInsert) {
-      ProductDocumentRequirementService.createForCases(Trigger.new);
+      ProductRequiredFileService.createForCases(Trigger.new);
     }
     if (CaseTriggerControl.isUpdateTotalCaseEnabled()) {
       List<Case> caseList = Trigger.isDelete ? Trigger.old : Trigger.new;

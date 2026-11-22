@@ -150,6 +150,26 @@ describe("c-product-setup", () => {
     });
   });
 
+  it("shows an error toast and does not save invalid price book fields", async () => {
+    const element = await mount();
+    const toastHandler = jest.fn();
+    element.addEventListener("lightning__showtoast", toastHandler);
+    element.shadowRoot.querySelectorAll(".pricebook-input").forEach((input) => {
+      input.reportValidity = jest.fn().mockReturnValue(false);
+    });
+
+    button(element, "Save Price Books").click();
+    await flushPromises();
+
+    expect(savePricebooks).not.toHaveBeenCalled();
+    expect(toastHandler).toHaveBeenCalledTimes(1);
+    expect(toastHandler.mock.calls[0][0].detail).toMatchObject({
+      title: "Complete required information",
+      message: "Review the highlighted price book fields before saving.",
+      variant: "error"
+    });
+  });
+
   it("prefills a required document from a template and saves it", async () => {
     const element = await mount();
     button(element, "Add Document").click();

@@ -153,7 +153,14 @@ export default class ProductSetup extends LightningElement {
   }
 
   async handleSavePricebooks() {
-    if (!this.validate(".pricebook-input")) return;
+    if (!this.validate(".pricebook-input")) {
+      this.toast(
+        "Complete required information",
+        "Review the highlighted price book fields before saving.",
+        "error"
+      );
+      return;
+    }
     this.savingPricebooks = true;
     try {
       const data = await savePricebooks({
@@ -231,7 +238,14 @@ export default class ProductSetup extends LightningElement {
   }
 
   async handleSaveRequirements() {
-    if (!this.validate(".requirement-input")) return;
+    if (!this.validate(".requirement-input")) {
+      this.toast(
+        "Complete required information",
+        "Review the highlighted required document fields before saving.",
+        "error"
+      );
+      return;
+    }
     this.savingRequirements = true;
     try {
       const data = await saveRequirements({
