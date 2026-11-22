@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>68.0</apiVersion>
+  <isExposed>true</isExposed>
+  <masterLabel>Price Book Entry Table</masterLabel>
+  <description
+  >Displays and edits Price Book Entries using an optional field set.</description>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Pricebook2</object>
+      </objects>
+      <property
+        name="fieldSetName"
+        type="String"
+        label="Price Book Entry Field Set API Name"
+        description="Optional PricebookEntry field set used for table columns and popup fields."
+      />
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

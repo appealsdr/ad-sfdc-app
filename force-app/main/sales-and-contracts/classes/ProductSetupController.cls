@@ -242,11 +242,11 @@ public with sharing class ProductSetupController {
       if (row.templateId != null)
         templateIds.add(row.templateId);
     }
-    Map<Id, Product_Document_Requirement__c> existing = new Map<Id, Product_Document_Requirement__c>(
+    Map<Id, Required_File__c> existing = new Map<Id, Required_File__c>(
       [
         SELECT Id, Product__c
-        FROM Product_Document_Requirement__c
-        WHERE Product__c = :productId
+        FROM Required_File__c
+        WHERE Product__c = :productId AND Case__c = NULL
       ]
     );
     for (Id rowId : incomingIds) {
@@ -269,7 +269,7 @@ public with sharing class ProductSetupController {
       ]
     );
 
-    List<Product_Document_Requirement__c> saves = new List<Product_Document_Requirement__c>();
+    List<Required_File__c> saves = new List<Required_File__c>();
     Integer position = 0;
     for (RequirementInput row : rows) {
       if (row == null)
@@ -295,7 +295,7 @@ public with sharing class ProductSetupController {
       if (String.isBlank(name))
         throw handled('Enter a name for every required document.');
 
-      Product_Document_Requirement__c requirement = new Product_Document_Requirement__c(
+      Required_File__c requirement = new Required_File__c(
         Id = row.id,
         Product__c = productId,
         Name = name.trim(),
@@ -320,8 +320,8 @@ public with sharing class ProductSetupController {
     if (!saves.isEmpty())
       upsert saves;
 
-    List<Product_Document_Requirement__c> removals = new List<Product_Document_Requirement__c>();
-    for (Product_Document_Requirement__c requirement : existing.values()) {
+    List<Required_File__c> removals = new List<Required_File__c>();
+    for (Required_File__c requirement : existing.values()) {
       if (!incomingIds.contains(requirement.Id))
         removals.add(requirement);
     }
@@ -395,7 +395,7 @@ public with sharing class ProductSetupController {
 
   private static List<RequirementRow> buildRequirementRows(Id productId) {
     List<RequirementRow> rows = new List<RequirementRow>();
-    for (Product_Document_Requirement__c requirement : [
+    for (Required_File__c requirement : [
       SELECT
         Id,
         Name,
@@ -405,8 +405,8 @@ public with sharing class ProductSetupController {
         Instructions__c,
         Active__c,
         Sort_Order__c
-      FROM Product_Document_Requirement__c
-      WHERE Product__c = :productId
+      FROM Required_File__c
+      WHERE Product__c = :productId AND Case__c = NULL
       ORDER BY Sort_Order__c, CreatedDate
     ]) {
       RequirementRow row = new RequirementRow();

@@ -115,7 +115,7 @@ private class ProductSetupControllerTest {
   }
 
   @IsTest
-  static void savesTemplateRequirementsAndCreatesCaseChecklist() {
+  static void savesTemplateRequirements() {
     Product2 product = [SELECT Id FROM Product2 WHERE Name = 'AD-1942 Product'];
     Document_Template__c template = [
       SELECT Id, Name, Short_Description__c, Accepted_Format__c, Instructions__c
@@ -133,64 +133,33 @@ private class ProductSetupControllerTest {
     System.assertEquals(1, result.requirements.size());
     System.assertEquals(template.Name, result.requirements[0].name);
 
-    Id standardPricebookId = Test.getStandardPricebookId();
-    PricebookEntry entry = new PricebookEntry(
-      Product2Id = product.Id,
-      Pricebook2Id = standardPricebookId,
-      UnitPrice = 500,
-      IsActive = true,
-      Payment_type__c = paymentType()
-    );
-    insert entry;
-    Account account = new Account(Name = 'AD-1942 Account');
-    insert account;
-    ServiceContract contract = new ServiceContract(
-      Name = 'AD-1942 Contract',
-      AccountId = account.Id,
-      Pricebook2Id = standardPricebookId,
-      StartDate = Date.today()
-    );
-    insert contract;
-    ContractLineItem lineItem = new ContractLineItem(
-      ServiceContractId = contract.Id,
-      PricebookEntryId = entry.Id,
-      Quantity = 1,
-      UnitPrice = 500
-    );
-    insert lineItem;
-
-    Case caseRecord = new Case(
-      Subject = 'AD-1942 onboarding',
-      Status = 'New',
-      Origin = 'Phone',
-      Contract_Line_Item__c = lineItem.Id
-    );
-    Test.startTest();
-    insert caseRecord;
-    Test.stopTest();
-
-    Required_File__c requiredFile = [
+    Required_File__c savedRequirement = [
       SELECT
         Name,
-        Case__c,
+        Product__c,
         Document_Template__c,
         Short_Description__c,
         Accepted_Format__c,
         Instructions__c
       FROM Required_File__c
-      WHERE Case__c = :caseRecord.Id
+      WHERE Product__c = :product.Id AND Case__c = NULL
+      LIMIT 1
     ];
-    System.assertEquals(template.Name, requiredFile.Name);
-    System.assertEquals(template.Id, requiredFile.Document_Template__c);
+    System.assertEquals(template.Name, savedRequirement.Name);
+    System.assertEquals(product.Id, savedRequirement.Product__c);
+    System.assertEquals(template.Id, savedRequirement.Document_Template__c);
     System.assertEquals(
       template.Short_Description__c,
-      requiredFile.Short_Description__c
+      savedRequirement.Short_Description__c
     );
     System.assertEquals(
       template.Accepted_Format__c,
-      requiredFile.Accepted_Format__c
+      savedRequirement.Accepted_Format__c
     );
-    System.assertEquals(template.Instructions__c, requiredFile.Instructions__c);
+    System.assertEquals(
+      template.Instructions__c,
+      savedRequirement.Instructions__c
+    );
   }
 
   @IsTest
@@ -220,8 +189,8 @@ private class ProductSetupControllerTest {
       0,
       [
         SELECT COUNT()
-        FROM Product_Document_Requirement__c
-        WHERE Product__c = :product.Id
+        FROM Required_File__c
+        WHERE Product__c = :product.Id AND Case__c = NULL
       ]
     );
   }
