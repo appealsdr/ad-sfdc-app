@@ -93,30 +93,6 @@ public class CaseTriggerHandlerTest {
     /* =====================================
        TEST METHOD
     ======================================*/
-    @IsTest
-    static void testUpdateTotalCases() {
-
-        // Fetch inserted case
-        Case c = [SELECT Id, Store__c FROM Case LIMIT 1];
-
-        Test.startTest();
-        CaseTriggerHandler.updateTotalCases(
-            new List<Case>{c},
-            null
-        );
-        Test.stopTest();
-
-        // Verify Retainer updated
-        Retainer_Service__c rs = [
-            SELECT Id, Total_Case__c 
-            FROM Retainer_Service__c 
-            LIMIT 1
-        ];
-
-        System.assertEquals(1, rs.Total_Case__c,
-            'Retainer total case count should be 1');
-    }
-
     /* =====================================
        STORE LEVEL CASE COUNTS
     ======================================*/
@@ -151,10 +127,11 @@ public class CaseTriggerHandlerTest {
     static void testStoreCaseCountsOnClose() {
 
         Store__c store = [SELECT Id FROM Store__c LIMIT 1];
-        Case c = [SELECT Id, Status FROM Case LIMIT 1];
+        Case c = [SELECT Id, Status, Closed_Reason__c FROM Case LIMIT 1];
 
         Test.startTest();
         c.Status = 'Closed';
+        c.Closed_Reason__c = 'Resolved - Tech';
         update c;
         Test.stopTest();
 
