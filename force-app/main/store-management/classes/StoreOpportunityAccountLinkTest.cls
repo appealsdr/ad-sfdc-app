@@ -135,6 +135,25 @@ private class StoreOpportunityAccountLinkTest {
     }
   }
 
+  @IsTest
+  static void triggerLogsAndRethrowsServiceFailure() {
+    ApplicationErrorLogger.publishedEvents.clear();
+    StoreOpportunityAccountLinkService.forceFailure = true;
+    Boolean failed = false;
+    Test.startTest();
+    try {
+      insert new Store__c(Name = 'Forced failure store');
+    } catch (DmlException ex) {
+      failed = true;
+    } finally {
+      StoreOpportunityAccountLinkService.forceFailure = false;
+    }
+    Test.stopTest();
+
+    Assert.isTrue(failed, 'The original trigger exception must be rethrown');
+    Assert.areEqual(1, ApplicationErrorLogger.publishedEvents.size());
+  }
+
   private static Opportunity opportunity(String name) {
     return [SELECT Id, AccountId FROM Opportunity WHERE Name = :name];
   }
