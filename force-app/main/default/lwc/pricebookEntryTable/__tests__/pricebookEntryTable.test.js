@@ -91,6 +91,7 @@ function emitEntries() {
     rows: [
       {
         id: ENTRY_ID,
+        productId: PRODUCT_ID,
         values: {
           Product2Id: "Appeal Service",
           UnitPrice: 220,
@@ -159,6 +160,7 @@ describe("c-pricebook-entry-table", () => {
     const table = element.shadowRoot.querySelector("lightning-datatable");
     expect(table.data[0]).toMatchObject({
       Id: ENTRY_ID,
+      ProductUrl: `/lightning/r/Product2/${PRODUCT_ID}/view`,
       Product2Id: "Appeal Service",
       UnitPrice: 220,
       Deposit__c: 50,
@@ -172,6 +174,10 @@ describe("c-pricebook-entry-table", () => {
       "Payment Type",
       "Actions"
     ]);
+    expect(table.columns[0]).toMatchObject({
+      fieldName: "ProductUrl",
+      type: "url"
+    });
   });
 
   it("edits and saves the full pricing table", async () => {
@@ -224,6 +230,9 @@ describe("c-pricebook-entry-table", () => {
     const selectionTable = [
       ...element.shadowRoot.querySelectorAll("lightning-datatable")
     ].find((table) => table.keyField === "productId");
+    expect(selectionTable.data[0].productUrl).toBe(
+      `/lightning/r/Product2/${PRODUCT_ID}/view`
+    );
     selectionTable.dispatchEvent(
       new CustomEvent("rowselection", {
         detail: { selectedRows: [{ productId: PRODUCT_ID }] }
@@ -238,6 +247,31 @@ describe("c-pricebook-entry-table", () => {
       productIds: [PRODUCT_ID]
     });
     expect(element.shadowRoot.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  it("requires Payment Type and conditionally requires Deposit", async () => {
+    const element = await mount();
+    button(element, "Edit").click();
+    await flushPromises();
+
+    const paymentType = element.shadowRoot.querySelector(
+      'lightning-combobox[data-field="Payment_type__c"]'
+    );
+    const deposit = element.shadowRoot.querySelector(
+      'lightning-input[data-field="Deposit__c"]'
+    );
+    expect(paymentType.required).toBe(true);
+    expect(deposit.required).toBe(true);
+
+    paymentType.dispatchEvent(
+      new CustomEvent("change", { detail: { value: "Full Price" } })
+    );
+    await flushPromises();
+    expect(
+      element.shadowRoot.querySelector(
+        'lightning-input[data-field="Deposit__c"]'
+      ).required
+    ).toBe(false);
   });
 
   it("confirms before deleting a Price Book Entry", async () => {

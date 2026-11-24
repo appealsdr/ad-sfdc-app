@@ -53,6 +53,10 @@ private class PricebookEntryTableControllerTest {
       'The price book entry should be returned.'
     );
     Assert.areEqual(250, result.rows[0].values.get('UnitPrice'));
+    Assert.areEqual(
+      [SELECT Product2Id FROM PricebookEntry LIMIT 1].Product2Id,
+      result.rows[0].productId
+    );
     Assert.areEqual('Appeal Service', result.rows[0].values.get('Product2Id'));
     Assert.isTrue(result.canCreateEntries);
     Assert.isTrue(result.canUpdateEntries);
@@ -169,5 +173,41 @@ private class PricebookEntryTableControllerTest {
       [SELECT COUNT() FROM PricebookEntry WHERE Id = :entry.Id],
       'The selected Price Book Entry should be deleted.'
     );
+  }
+
+  @IsTest
+  static void requiresPaymentTypeAndDepositAmount() {
+    PricebookEntry entry = [
+      SELECT Id, Pricebook2Id
+      FROM PricebookEntry
+      LIMIT 1
+    ];
+    PricebookEntryTableController.EntryUpdate input = new PricebookEntryTableController.EntryUpdate();
+    input.entryId = entry.Id;
+    input.unitPrice = 300;
+    input.active = true;
+
+    Boolean missingPaymentTypeRejected = false;
+    try {
+      PricebookEntryTableController.saveEntries(
+        entry.Pricebook2Id,
+        new List<PricebookEntryTableController.EntryUpdate>{ input }
+      );
+    } catch (AuraHandledException expected) {
+      missingPaymentTypeRejected = true;
+    }
+    Assert.isTrue(missingPaymentTypeRejected);
+
+    input.paymentType = 'Deposit';
+    Boolean missingDepositRejected = false;
+    try {
+      PricebookEntryTableController.saveEntries(
+        entry.Pricebook2Id,
+        new List<PricebookEntryTableController.EntryUpdate>{ input }
+      );
+    } catch (AuraHandledException expected) {
+      missingDepositRejected = true;
+    }
+    Assert.isTrue(missingDepositRejected);
   }
 }

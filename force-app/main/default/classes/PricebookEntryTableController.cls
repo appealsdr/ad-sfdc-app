@@ -74,6 +74,9 @@ public with sharing class PricebookEntryTableController {
       row.values = new Map<String, Object>();
       for (FieldDescriptor field : result.fields) {
         Object value = entry.get(field.apiName);
+        if (field.apiName == 'Product2Id') {
+          row.productId = (Id) value;
+        }
         if (field.displayPath != null) {
           SObject relatedRecord = entry.getSObject(field.relationshipName);
           value = relatedRecord == null ? null : relatedRecord.get('Name');
@@ -220,6 +223,20 @@ public with sharing class PricebookEntryTableController {
     for (EntryUpdate item : updates) {
       if (item == null || item.entryId == null) {
         continue;
+      }
+      if (String.isBlank(item.paymentType)) {
+        throw new AuraHandledException(
+          'Select a Payment Type for every Price Book Entry.'
+        );
+      }
+      if (
+        item.paymentType == 'Deposit' &&
+        (item.deposit == null ||
+        item.deposit <= 0)
+      ) {
+        throw new AuraHandledException(
+          'Enter a deposit greater than zero when Payment Type is Deposit.'
+        );
       }
       records.add(
         new PricebookEntry(
@@ -468,6 +485,8 @@ public with sharing class PricebookEntryTableController {
   public class Row {
     @AuraEnabled
     public Id id;
+    @AuraEnabled
+    public Id productId;
     @AuraEnabled
     public Map<String, Object> values;
   }

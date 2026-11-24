@@ -111,6 +111,7 @@
                     min="0"
                     label="Deposit"
                     value={row.deposit}
+                    required={row.depositRequired}
                     disabled={row.inputsDisabled}
                     data-id={row.pricebookId}
                     data-field="deposit"
@@ -121,6 +122,7 @@
                     label="Payment Type"
                     value={row.paymentType}
                     options={paymentTypeOptions}
+                    required={row.selected}
                     disabled={row.inputsDisabled}
                     data-id={row.pricebookId}
                     data-field="paymentType"
@@ -204,14 +206,14 @@
                   data-field="acceptedFormat"
                   onchange={handleRequirementChange}
                 ></lightning-input>
-                <lightning-textarea
+                <lightning-input-rich-text
                   class="requirement-input slds-col slds-size_1-of-1"
                   label="Client Instructions"
                   value={row.instructions}
                   data-key={row.key}
                   data-field="instructions"
                   onchange={handleRequirementChange}
-                ></lightning-textarea>
+                ></lightning-input-rich-text>
                 <lightning-input
                   class="requirement-input slds-col slds-size_1-of-1"
                   type="checkbox"

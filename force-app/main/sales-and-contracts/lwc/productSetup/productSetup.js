@@ -100,10 +100,9 @@ export default class ProductSetup extends LightningElement {
   }
 
   applySetup(data) {
-    this.pricebooks = (data?.pricebooks || []).map((row) => ({
-      ...row,
-      inputsDisabled: !row.selected
-    }));
+    this.pricebooks = (data?.pricebooks || []).map((row) =>
+      this.decoratePricebook(row)
+    );
     this.templates = (data?.templates || []).map((row) => ({ ...row }));
     this.requirements = (data?.requirements || []).map((row) => ({
       ...row,
@@ -146,10 +145,16 @@ export default class ProductSetup extends LightningElement {
     }
     this.pricebooks = this.pricebooks.map((row) => {
       if (row.pricebookId !== id) return row;
-      const changed = { ...row, [field]: value };
-      if (field === "selected") changed.inputsDisabled = !value;
-      return changed;
+      return this.decoratePricebook({ ...row, [field]: value });
     });
+  }
+
+  decoratePricebook(row) {
+    return {
+      ...row,
+      inputsDisabled: !row.selected,
+      depositRequired: row.selected && row.paymentType === "Deposit"
+    };
   }
 
   async handleSavePricebooks() {
@@ -279,7 +284,10 @@ export default class ProductSetup extends LightningElement {
 
   validate(selector) {
     return [...this.template.querySelectorAll(selector)].reduce(
-      (valid, input) => input.reportValidity() && valid,
+      (valid, input) =>
+        (typeof input.reportValidity !== "function" ||
+          input.reportValidity()) &&
+        valid,
       true
     );
   }

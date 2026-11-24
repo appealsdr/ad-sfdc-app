@@ -94,7 +94,9 @@
             <template for:each={editRows} for:item="row">
               <tr key={row.Id}>
                 <th scope="row">
-                  <span class="product-name">{row.Product2Id}</span>
+                  <a class="product-name" href={row.ProductUrl}
+                    >{row.Product2Id}</a
+                  >
                 </th>
                 <td>
                   <lightning-input
@@ -134,6 +136,7 @@
                     variant="label-hidden"
                     label="Deposit"
                     value={row.Deposit__c}
+                    required={row.depositRequired}
                     data-id={row.Id}
                     data-field="Deposit__c"
                     onchange={handleEditChange}
@@ -146,6 +149,7 @@
                     label="Payment Type"
                     value={row.Payment_type__c}
                     options={paymentTypeOptions}
+                    required
                     data-id={row.Id}
                     data-field="Payment_type__c"
                     onchange={handleEditChange}

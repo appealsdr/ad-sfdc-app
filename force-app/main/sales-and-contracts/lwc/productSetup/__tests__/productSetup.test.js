@@ -170,6 +170,24 @@ describe("c-product-setup", () => {
     });
   });
 
+  it("requires Payment Type and requires Deposit only for deposit pricing", async () => {
+    const element = await mount();
+    const customPaymentType = element.shadowRoot.querySelector(
+      `lightning-combobox[data-id="${CUSTOM_ID}"][data-field="paymentType"]`
+    );
+    expect(customPaymentType.required).toBe(true);
+
+    customPaymentType.dispatchEvent(
+      new CustomEvent("change", { detail: { value: "Deposit" } })
+    );
+    await flushPromises();
+    expect(
+      element.shadowRoot.querySelector(
+        `lightning-input[data-id="${CUSTOM_ID}"][data-field="deposit"]`
+      ).required
+    ).toBe(true);
+  });
+
   it("prefills a required document from a template and saves it", async () => {
     const element = await mount();
     button(element, "Add Document").click();
@@ -185,6 +203,11 @@ describe("c-product-setup", () => {
       '.requirement-row lightning-input[data-field="name"]'
     );
     expect(name.value).toBe("Invoice");
+    expect(
+      element.shadowRoot.querySelector(
+        ".requirement-row lightning-input-rich-text"
+      )
+    ).not.toBeNull();
     element.shadowRoot
       .querySelectorAll(".requirement-input")
       .forEach((input) => {

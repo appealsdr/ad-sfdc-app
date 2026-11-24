@@ -45,7 +45,15 @@ export default class PricebookEntryTable extends LightningElement {
   wiredResult;
 
   availableProductColumns = [
-    { label: "Product", fieldName: "productName", type: "text" },
+    {
+      label: "Product",
+      fieldName: "productUrl",
+      type: "url",
+      typeAttributes: {
+        label: { fieldName: "productName" },
+        target: "_self"
+      }
+    },
     { label: "Product Code", fieldName: "productCode", type: "text" },
     {
       label: "Standard Price",
@@ -71,10 +79,10 @@ export default class PricebookEntryTable extends LightningElement {
             "Only the first 1,000 entries are displayed."
           )
         : data.warning;
-      this.paymentTypeOptions = [
-        { label: "None", value: "" },
-        ...(data.paymentTypes || []).map((value) => ({ label: value, value }))
-      ];
+      this.paymentTypeOptions = (data.paymentTypes || []).map((value) => ({
+        label: value,
+        value
+      }));
       this.errorMessage = undefined;
       this.applySearch();
       this.isLoading = false;
@@ -119,13 +127,26 @@ export default class PricebookEntryTable extends LightningElement {
   }
 
   buildColumns(fields) {
-    const fieldColumns = fields.map((field) => ({
-      label: field.label,
-      fieldName: field.apiName,
-      type: this.datatableType(field.dataType),
-      sortable: true,
-      wrapText: field.dataType === "textarea"
-    }));
+    const fieldColumns = fields.map((field) =>
+      field.apiName === "Product2Id"
+        ? {
+            label: field.label,
+            fieldName: "ProductUrl",
+            type: "url",
+            sortable: true,
+            typeAttributes: {
+              label: { fieldName: "Product2Id" },
+              target: "_self"
+            }
+          }
+        : {
+            label: field.label,
+            fieldName: field.apiName,
+            type: this.datatableType(field.dataType),
+            sortable: true,
+            wrapText: field.dataType === "textarea"
+          }
+    );
     if (this.canDeleteEntries) {
       fieldColumns.push({
         label: "Actions",
@@ -146,6 +167,9 @@ export default class PricebookEntryTable extends LightningElement {
   flattenRow(row) {
     return {
       Id: row.id,
+      ProductUrl: row.productId
+        ? `/lightning/r/Product2/${row.productId}/view`
+        : undefined,
       ...(row.values || {})
     };
   }
@@ -199,7 +223,10 @@ export default class PricebookEntryTable extends LightningElement {
     }
     this.searchTerm = "";
     this.applySearch();
-    this.editRows = this.rows.map((row) => ({ ...row }));
+    this.editRows = this.rows.map((row) => ({
+      ...row,
+      depositRequired: row.Payment_type__c === "Deposit"
+    }));
     this.isEditing = true;
   }
 
@@ -218,9 +245,12 @@ export default class PricebookEntryTable extends LightningElement {
     if (field === "UnitPrice" || field === "Deposit__c") {
       value = value === "" || value === null ? null : Number(value);
     }
-    this.editRows = this.editRows.map((row) =>
-      row.Id === id ? { ...row, [field]: value } : row
-    );
+    this.editRows = this.editRows.map((row) => {
+      if (row.Id !== id) return row;
+      const changed = { ...row, [field]: value };
+      changed.depositRequired = changed.Payment_type__c === "Deposit";
+      return changed;
+    });
   }
 
   async handleSaveEntries() {
@@ -277,9 +307,13 @@ export default class PricebookEntryTable extends LightningElement {
     this.availableProducts = [];
     this.selectedProductIds = [];
     try {
-      this.availableProducts = await getAvailableProducts({
+      const products = await getAvailableProducts({
         pricebookId: this.recordId
       });
+      this.availableProducts = products.map((product) => ({
+        ...product,
+        productUrl: `/lightning/r/Product2/${product.productId}/view`
+      }));
     } catch (error) {
       this.toast("Unable to load Products", this.reduceError(error), "error");
       this.isAddOpen = false;

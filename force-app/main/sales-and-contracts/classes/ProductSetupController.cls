@@ -156,6 +156,9 @@ public with sharing class ProductSetupController {
           'Enter a non-negative list price for every selected price book.'
         );
       }
+      if (String.isBlank(row.paymentType)) {
+        throw handled('Select a Payment Type for every selected price book.');
+      }
       if (
         row.paymentType == 'Deposit' &&
         (row.deposit == null ||

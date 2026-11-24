@@ -96,6 +96,7 @@ private class ProductSetupControllerTest {
     row.pricebookId = customPricebook.Id;
     row.selected = true;
     row.unitPrice = 450;
+    row.paymentType = paymentType();
 
     Boolean threw = false;
     Test.startTest();
@@ -112,6 +113,38 @@ private class ProductSetupControllerTest {
       threw,
       'Custom pricing must require a Standard Price Book entry.'
     );
+  }
+
+  @IsTest
+  static void requiresPaymentTypeAndDepositAmount() {
+    Product2 product = [SELECT Id FROM Product2 WHERE Name = 'AD-1942 Product'];
+    ProductSetupController.PricebookInput row = new ProductSetupController.PricebookInput();
+    row.pricebookId = Test.getStandardPricebookId();
+    row.selected = true;
+    row.unitPrice = 500;
+
+    Boolean missingPaymentTypeRejected = false;
+    try {
+      ProductSetupController.savePricebooks(
+        product.Id,
+        new List<ProductSetupController.PricebookInput>{ row }
+      );
+    } catch (AuraHandledException expected) {
+      missingPaymentTypeRejected = true;
+    }
+    System.assert(missingPaymentTypeRejected);
+
+    row.paymentType = 'Deposit';
+    Boolean missingDepositRejected = false;
+    try {
+      ProductSetupController.savePricebooks(
+        product.Id,
+        new List<ProductSetupController.PricebookInput>{ row }
+      );
+    } catch (AuraHandledException expected) {
+      missingDepositRejected = true;
+    }
+    System.assert(missingDepositRejected);
   }
 
   @IsTest
