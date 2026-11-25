@@ -67,6 +67,74 @@ private class ProductSetupControllerTest {
   }
 
   @IsTest
+  static void updatesExistingPriceBookEntriesWithSparseRecords() {
+    Product2 product = [SELECT Id FROM Product2 WHERE Name = 'AD-1942 Product'];
+    Id standardPricebookId = Test.getStandardPricebookId();
+    Pricebook2 customPricebook = [
+      SELECT Id
+      FROM Pricebook2
+      WHERE Name = 'AD-1942 Custom Price Book'
+    ];
+    String paymentType = paymentType();
+    insert new List<PricebookEntry>{
+      new PricebookEntry(
+        Pricebook2Id = standardPricebookId,
+        Product2Id = product.Id,
+        UnitPrice = 100,
+        IsActive = true
+      ),
+      new PricebookEntry(
+        Pricebook2Id = customPricebook.Id,
+        Product2Id = product.Id,
+        UnitPrice = 90,
+        IsActive = true
+      )
+    };
+
+    ProductSetupController.PricebookInput standardRow = new ProductSetupController.PricebookInput();
+    standardRow.pricebookId = standardPricebookId;
+    standardRow.selected = true;
+    standardRow.unitPrice = 200;
+    standardRow.deposit = 25;
+    standardRow.paymentType = paymentType;
+    ProductSetupController.PricebookInput customRow = new ProductSetupController.PricebookInput();
+    customRow.pricebookId = customPricebook.Id;
+    customRow.selected = false;
+
+    Test.startTest();
+    ProductSetupController.savePricebooks(
+      product.Id,
+      new List<ProductSetupController.PricebookInput>{ standardRow, customRow }
+    );
+    Test.stopTest();
+
+    Map<Id, PricebookEntry> entriesByPricebook = new Map<Id, PricebookEntry>();
+    for (PricebookEntry entry : [
+      SELECT Pricebook2Id, UnitPrice, Deposit__c, Payment_type__c, IsActive
+      FROM PricebookEntry
+      WHERE Product2Id = :product.Id
+    ]) {
+      entriesByPricebook.put(entry.Pricebook2Id, entry);
+    }
+    System.assertEquals(
+      200,
+      entriesByPricebook.get(standardPricebookId).UnitPrice
+    );
+    System.assertEquals(
+      25,
+      entriesByPricebook.get(standardPricebookId).Deposit__c
+    );
+    System.assertEquals(
+      paymentType,
+      entriesByPricebook.get(standardPricebookId).Payment_type__c
+    );
+    System.assertEquals(
+      false,
+      entriesByPricebook.get(customPricebook.Id).IsActive
+    );
+  }
+
+  @IsTest
   static void loadsActivePriceBooksWithoutExistingProductPrices() {
     Product2 product = [SELECT Id FROM Product2 WHERE Name = 'AD-1942 Product'];
 
@@ -96,6 +164,7 @@ private class ProductSetupControllerTest {
     row.pricebookId = customPricebook.Id;
     row.selected = true;
     row.unitPrice = 450;
+    row.paymentType = paymentType();
 
     Boolean threw = false;
     Test.startTest();
@@ -112,6 +181,38 @@ private class ProductSetupControllerTest {
       threw,
       'Custom pricing must require a Standard Price Book entry.'
     );
+  }
+
+  @IsTest
+  static void requiresPaymentTypeAndDepositAmount() {
+    Product2 product = [SELECT Id FROM Product2 WHERE Name = 'AD-1942 Product'];
+    ProductSetupController.PricebookInput row = new ProductSetupController.PricebookInput();
+    row.pricebookId = Test.getStandardPricebookId();
+    row.selected = true;
+    row.unitPrice = 500;
+
+    Boolean missingPaymentTypeRejected = false;
+    try {
+      ProductSetupController.savePricebooks(
+        product.Id,
+        new List<ProductSetupController.PricebookInput>{ row }
+      );
+    } catch (AuraHandledException expected) {
+      missingPaymentTypeRejected = true;
+    }
+    System.assert(missingPaymentTypeRejected);
+
+    row.paymentType = 'Deposit';
+    Boolean missingDepositRejected = false;
+    try {
+      ProductSetupController.savePricebooks(
+        product.Id,
+        new List<ProductSetupController.PricebookInput>{ row }
+      );
+    } catch (AuraHandledException expected) {
+      missingDepositRejected = true;
+    }
+    System.assert(missingDepositRejected);
   }
 
   @IsTest
