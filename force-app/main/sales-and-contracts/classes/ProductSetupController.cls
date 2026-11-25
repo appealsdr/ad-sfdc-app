@@ -156,6 +156,9 @@ public with sharing class ProductSetupController {
           'Enter a non-negative list price for every selected price book.'
         );
       }
+      if (String.isBlank(row.paymentType)) {
+        throw handled('Select a Payment Type for every selected price book.');
+      }
       if (
         row.paymentType == 'Deposit' &&
         (row.deposit == null ||
@@ -202,16 +205,19 @@ public with sharing class ProductSetupController {
           else
             customInserts.add(created);
         } else {
-          existing.UnitPrice = row.unitPrice;
-          existing.Deposit__c = row.deposit;
-          existing.Payment_type__c = row.paymentType;
-          existing.IsActive = true;
-          existing.UseStandardPrice = false;
-          updates.add(existing);
+          updates.add(
+            new PricebookEntry(
+              Id = existing.Id,
+              UnitPrice = row.unitPrice,
+              Deposit__c = row.deposit,
+              Payment_type__c = row.paymentType,
+              IsActive = true,
+              UseStandardPrice = false
+            )
+          );
         }
       } else if (existing != null && existing.IsActive) {
-        existing.IsActive = false;
-        updates.add(existing);
+        updates.add(new PricebookEntry(Id = existing.Id, IsActive = false));
       }
     }
     if (!standardInserts.isEmpty())
