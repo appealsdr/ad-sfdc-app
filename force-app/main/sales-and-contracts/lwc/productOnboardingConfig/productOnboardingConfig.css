@@ -4,7 +4,11 @@
 
 .card-body {
   position: relative;
-  min-height: 4rem;
+  padding: 0 0.5rem 0.5rem;
+}
+
+.card-body:has(lightning-spinner) {
+  min-height: 3rem;
 }
 
 .row-heading,
@@ -19,14 +23,37 @@
   margin-left: auto;
 }
 
-.editor-row {
-  padding-block: 0.75rem;
+.editor-row,
+.detail-row {
+  border-bottom: 1px solid #e5e5e5;
+  padding-block: 0.25rem;
+}
+
+.field-list > :last-child {
+  border-bottom: 0;
+}
+
+.field-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+}
+
+.field-control {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.field-controls > lightning-input {
+  align-self: end;
+  margin-bottom: 0.375rem;
 }
 
 .drag-handle {
   display: inline-flex;
   cursor: grab;
-  padding: 0.5rem;
+  padding: 0.125rem;
 }
 
 .drag-handle:active {

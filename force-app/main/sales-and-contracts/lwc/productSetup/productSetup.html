@@ -61,182 +61,263 @@
       </div>
     </template>
 
-    <lightning-card title="Price Book Setup" icon-name="standard:price_books">
-      <lightning-button
-        slot="actions"
-        label="Save Price Books"
-        variant="neutral"
-        onclick={handleSavePricebooks}
-        disabled={pricebookSaveDisabled}
-      ></lightning-button>
-      <div class="slds-p-horizontal_medium slds-p-bottom_medium">
-        <p class="slds-text-color_weak slds-m-bottom_small">
-          Select the price books where this Product can be sold. The Standard
-          Price Book is required before custom price books.
-        </p>
-        <div class="pricebook-list">
-          <template for:each={pricebookGroups} for:item="group">
-            <section key={group.key} class="pricebook-group">
-              <h3 class="pricebook-group__heading">{group.label}</h3>
-              <template for:each={group.rows} for:item="row">
-                <section key={row.pricebookId} class="setup-row pricebook-row">
-                  <lightning-input
-                    class="pricebook-input"
-                    type="checkbox"
-                    label={row.pricebookName}
-                    checked={row.selected}
-                    data-id={row.pricebookId}
-                    data-field="selected"
-                    onchange={handlePricebookChange}
-                  ></lightning-input>
-                  <lightning-input
-                    class="pricebook-input"
-                    type="number"
-                    formatter="currency"
-                    step="0.01"
-                    min="0"
-                    label="List Price"
-                    value={row.unitPrice}
-                    required={row.selected}
-                    disabled={row.inputsDisabled}
-                    data-id={row.pricebookId}
-                    data-field="unitPrice"
-                    onchange={handlePricebookChange}
-                  ></lightning-input>
-                  <lightning-input
-                    class="pricebook-input"
-                    type="number"
-                    formatter="currency"
-                    step="0.01"
-                    min="0"
-                    label="Deposit"
-                    value={row.deposit}
-                    disabled={row.inputsDisabled}
-                    data-id={row.pricebookId}
-                    data-field="deposit"
-                    onchange={handlePricebookChange}
-                  ></lightning-input>
-                  <lightning-combobox
-                    class="pricebook-input"
-                    label="Payment Type"
-                    value={row.paymentType}
-                    options={paymentTypeOptions}
-                    disabled={row.inputsDisabled}
-                    data-id={row.pricebookId}
-                    data-field="paymentType"
-                    onchange={handlePricebookChange}
-                  ></lightning-combobox>
+    <lightning-tabset>
+      <lightning-tab label="Price Books" value="pricing">
+        <lightning-card
+          title="Price Book Setup"
+          icon-name="standard:price_books"
+        >
+          <lightning-button
+            slot="actions"
+            label="Save Price Books"
+            variant="neutral"
+            onclick={handleSavePricebooks}
+            disabled={pricebookSaveDisabled}
+          ></lightning-button>
+          <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <p class="slds-text-color_weak slds-m-bottom_small">
+              Select the price books where this Product can be sold. The
+              Standard Price Book is required before custom price books.
+            </p>
+            <div class="pricebook-list">
+              <template for:each={pricebookGroups} for:item="group">
+                <section key={group.key} class="pricebook-group">
+                  <h3 class="pricebook-group__heading">{group.label}</h3>
+                  <template for:each={group.rows} for:item="row">
+                    <section
+                      key={row.pricebookId}
+                      class="setup-row pricebook-row"
+                    >
+                      <lightning-input
+                        class="pricebook-input"
+                        type="checkbox"
+                        label={row.pricebookName}
+                        checked={row.selected}
+                        data-id={row.pricebookId}
+                        data-field="selected"
+                        onchange={handlePricebookChange}
+                      ></lightning-input>
+                      <lightning-input
+                        class="pricebook-input"
+                        type="number"
+                        formatter="currency"
+                        step="0.01"
+                        min="0"
+                        label="List Price"
+                        value={row.unitPrice}
+                        required={row.selected}
+                        disabled={row.inputsDisabled}
+                        data-id={row.pricebookId}
+                        data-field="unitPrice"
+                        onchange={handlePricebookChange}
+                      ></lightning-input>
+                      <lightning-input
+                        class="pricebook-input"
+                        type="number"
+                        formatter="currency"
+                        step="0.01"
+                        min="0"
+                        label="Deposit"
+                        value={row.deposit}
+                        disabled={row.inputsDisabled}
+                        data-id={row.pricebookId}
+                        data-field="deposit"
+                        onchange={handlePricebookChange}
+                      ></lightning-input>
+                      <lightning-combobox
+                        class="pricebook-input"
+                        label="Payment Type"
+                        value={row.paymentType}
+                        options={paymentTypeOptions}
+                        disabled={row.inputsDisabled}
+                        data-id={row.pricebookId}
+                        data-field="paymentType"
+                        onchange={handlePricebookChange}
+                      ></lightning-combobox>
+                    </section>
+                  </template>
                 </section>
               </template>
-            </section>
-          </template>
+            </div>
+          </div>
+        </lightning-card>
+      </lightning-tab>
+      <lightning-tab label="Onboarding Configuration" value="onboarding">
+        <c-product-onboarding-config
+          record-id={productId}
+          object-api-name="Product2"
+        ></c-product-onboarding-config>
+        <lightning-card title="Required Documents" icon-name="standard:file">
+          <div slot="actions" class="slds-button-group" role="group">
+            <lightning-button
+              label="Add Document"
+              icon-name="utility:add"
+              disabled={requirementSaveDisabled}
+              onclick={handleAddRequirement}
+            ></lightning-button>
+            <lightning-button
+              label="Save Documents"
+              variant="neutral"
+              onclick={handleSaveRequirements}
+              disabled={requirementSaveDisabled}
+            ></lightning-button>
+          </div>
+          <div class="documents-body">
+            <template lwc:if={hasRequirements}>
+              <ul aria-label="Required documents for this product">
+                <template for:each={requirements} for:item="row">
+                  <li key={row.key} class="setup-row document-row">
+                    <div class="row-heading">
+                      <span class="slds-text-title_bold">{row.name}</span>
+                      <div class="slds-button-group" role="group">
+                        <lightning-button-icon
+                          icon-name="utility:edit"
+                          alternative-text="Edit required document"
+                          title="Edit required document"
+                          disabled={requirementSaveDisabled}
+                          data-key={row.key}
+                          onclick={handleEditRequirement}
+                        ></lightning-button-icon>
+                        <lightning-button-icon
+                          icon-name="utility:copy"
+                          alternative-text="Clone required document"
+                          title="Clone required document"
+                          disabled={requirementSaveDisabled}
+                          data-key={row.key}
+                          onclick={handleCloneRequirement}
+                        ></lightning-button-icon>
+                        <lightning-button-icon
+                          icon-name="utility:delete"
+                          alternative-text="Remove required document"
+                          title="Remove required document"
+                          disabled={requirementSaveDisabled}
+                          data-key={row.key}
+                          onclick={handleRemoveRequirement}
+                        ></lightning-button-icon>
+                      </div>
+                    </div>
+                    <template lwc:if={row.shortDescription}>
+                      <p>{row.shortDescription}</p>
+                    </template>
+                    <template lwc:if={row.acceptedFormat}>
+                      <p>Accepted formats: {row.acceptedFormat}</p>
+                    </template>
+                    <template lwc:if={row.active}>
+                      <span class="slds-text-color_weak">Active</span>
+                    </template>
+                    <template lwc:else>
+                      <span class="slds-text-color_weak">Inactive</span>
+                    </template>
+                  </li>
+                </template>
+              </ul>
+            </template>
+            <template lwc:else>
+              <p class="slds-p-vertical_xx-small slds-text-color_weak">
+                No required documents configured.
+              </p>
+            </template>
+          </div>
+        </lightning-card>
+      </lightning-tab>
+    </lightning-tabset>
+
+    <template lwc:if={documentDraft}>
+      <section
+        class="slds-modal slds-fade-in-open document-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-label={documentDialogTitle}
+        tabindex="-1"
+        onkeydown={handleDocumentKeyDown}
+      >
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <lightning-button-icon
+              class="slds-modal__close"
+              icon-name="utility:close"
+              variant="bare-inverse"
+              alternative-text="Close required document"
+              title="Close required document"
+              onclick={handleCloseDocument}
+            ></lightning-button-icon>
+            <h2 class="slds-text-heading_medium">{documentDialogTitle}</h2>
+          </header>
+          <div class="slds-modal__content slds-p-around_small">
+            <lightning-input
+              type="checkbox"
+              label="Active"
+              checked={documentDraft.active}
+              data-field="active"
+              onchange={handleRequirementChange}
+            ></lightning-input>
+            <lightning-combobox
+              label="Document Template"
+              value={documentDraft.templateId}
+              options={templateOptions}
+              onchange={handleTemplateChange}
+            ></lightning-combobox>
+            <lightning-input
+              class="requirement-input"
+              label="Document Name"
+              value={documentDraft.name}
+              required
+              data-field="name"
+              onchange={handleRequirementChange}
+            ></lightning-input>
+            <lightning-dual-listbox
+              class="requirement-input"
+              label="Accepted Formats"
+              source-label="Available"
+              selected-label="Selected"
+              options={formatOptions}
+              value={selectedFormats}
+              required
+              min="1"
+              data-field="acceptedFormat"
+              onchange={handleRequirementChange}
+            ></lightning-dual-listbox>
+            <lightning-textarea
+              class="requirement-input"
+              label="Short Description"
+              value={documentDraft.shortDescription}
+              required
+              data-field="shortDescription"
+              onchange={handleRequirementChange}
+            ></lightning-textarea>
+            <lightning-input-rich-text
+              label="Client Instructions"
+              label-visible
+              required
+              valid={instructionsValid}
+              value={documentDraft.instructions}
+              data-field="instructions"
+              onchange={handleRequirementChange}
+            ></lightning-input-rich-text>
+            <template lwc:if={showInstructionError}>
+              <p
+                class="slds-form-element__help slds-text-color_error"
+                role="alert"
+              >
+                Enter client instructions.
+              </p>
+            </template>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning-button
+              label="Cancel"
+              onclick={handleCloseDocument}
+            ></lightning-button>
+            <lightning-button
+              class="slds-m-left_small"
+              label="Apply Document"
+              variant="brand"
+              onclick={handleApplyDocument}
+            ></lightning-button>
+          </footer>
         </div>
-      </div>
-    </lightning-card>
-
-    <lightning-card title="Required Documents" icon-name="standard:file">
-      <div slot="actions" class="slds-button-group" role="group">
-        <lightning-button
-          label="Add Document"
-          icon-name="utility:add"
-          onclick={handleAddRequirement}
-        ></lightning-button>
-        <lightning-button
-          label="Save Documents"
-          variant="neutral"
-          onclick={handleSaveRequirements}
-          disabled={requirementSaveDisabled}
-        ></lightning-button>
-      </div>
-      <div class="slds-p-horizontal_medium slds-p-bottom_medium">
-        <p class="slds-text-color_weak slds-m-bottom_small">
-          Build the checklist created for every new Case using this Product.
-          Choose a template to prefill the document details, or configure it
-          manually.
-        </p>
-        <template lwc:if={hasRequirements}>
-          <template for:each={requirements} for:item="row">
-            <section key={row.key} class="setup-row requirement-row">
-              <div class="row-heading">
-                <span class="slds-text-title_bold">Required document</span>
-                <lightning-button-icon
-                  icon-name="utility:delete"
-                  alternative-text="Remove required document"
-                  title="Remove required document"
-                  data-key={row.key}
-                  onclick={handleRemoveRequirement}
-                ></lightning-button-icon>
-              </div>
-              <div class="slds-grid slds-wrap slds-gutters_small">
-                <lightning-combobox
-                  class="requirement-input slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
-                  label="Document Template"
-                  value={row.templateId}
-                  options={templateOptions}
-                  data-key={row.key}
-                  onchange={handleTemplateChange}
-                ></lightning-combobox>
-                <lightning-input
-                  class="requirement-input slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
-                  type="text"
-                  label="Document Name"
-                  value={row.name}
-                  required
-                  data-key={row.key}
-                  data-field="name"
-                  onchange={handleRequirementChange}
-                ></lightning-input>
-                <lightning-textarea
-                  class="requirement-input slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
-                  label="Short Description"
-                  value={row.shortDescription}
-                  data-key={row.key}
-                  data-field="shortDescription"
-                  onchange={handleRequirementChange}
-                ></lightning-textarea>
-                <lightning-input
-                  class="requirement-input slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
-                  type="text"
-                  label="Accepted Formats"
-                  value={row.acceptedFormat}
-                  placeholder="PDF;JPG;PNG"
-                  data-key={row.key}
-                  data-field="acceptedFormat"
-                  onchange={handleRequirementChange}
-                ></lightning-input>
-                <lightning-textarea
-                  class="requirement-input slds-col slds-size_1-of-1"
-                  label="Client Instructions"
-                  value={row.instructions}
-                  data-key={row.key}
-                  data-field="instructions"
-                  onchange={handleRequirementChange}
-                ></lightning-textarea>
-                <lightning-input
-                  class="requirement-input slds-col slds-size_1-of-1"
-                  type="checkbox"
-                  label="Active"
-                  checked={row.active}
-                  data-key={row.key}
-                  data-field="active"
-                  onchange={handleRequirementChange}
-                ></lightning-input>
-              </div>
-            </section>
-          </template>
-        </template>
-        <template lwc:else>
-          <p class="slds-p-vertical_medium slds-text-color_weak">
-            No required documents configured. Use Add Document to create the
-            checklist.
-          </p>
-        </template>
-      </div>
-    </lightning-card>
-
-    <c-product-onboarding-config
-      record-id={productId}
-      object-api-name="Product2"
-    ></c-product-onboarding-config>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
   </template>
 </template>
