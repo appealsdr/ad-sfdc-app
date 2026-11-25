@@ -1,5 +1,8 @@
-import { LightningElement, api } from "lwc";
+import { LightningElement, api, wire } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import { getObjectInfo, getPicklistValues } from "lightning/uiObjectInfoApi";
+import REQUIRED_FILE from "@salesforce/schema/Required_File__c";
+import ACCEPTED_FORMAT from "@salesforce/schema/Required_File__c.Accepted_Format__c";
 import getSetup from "@salesforce/apex/ProductSetupController.getSetup";
 import savePricebooks from "@salesforce/apex/ProductSetupController.savePricebooks";
 import saveRequirements from "@salesforce/apex/ProductSetupController.saveRequirements";
@@ -22,6 +25,46 @@ export default class ProductSetup extends LightningElement {
   savingRequirements = false;
   error;
   nextKey = 0;
+  documentDraft;
+  documentDialogMode;
+  documentDialogTrigger;
+  showInstructionError = false;
+
+  @wire(getObjectInfo, { objectApiName: REQUIRED_FILE })
+  requiredFileInfo;
+
+  @wire(getPicklistValues, {
+    recordTypeId: "$requiredFileInfo.data.defaultRecordTypeId",
+    fieldApiName: ACCEPTED_FORMAT
+  })
+  acceptedFormats;
+
+  get formatOptions() {
+    const options = this.acceptedFormats?.data?.values || [];
+    const existingValues = (this.documentDraft?.acceptedFormat || "")
+      .split(";")
+      .filter(Boolean);
+    return [
+      ...options,
+      ...existingValues
+        .filter((value) => !options.some((option) => option.value === value))
+        .map((value) => ({ label: value, value }))
+    ];
+  }
+
+  get selectedFormats() {
+    return (this.documentDraft?.acceptedFormat || "")
+      .split(";")
+      .filter(Boolean);
+  }
+
+  get documentDialogTitle() {
+    return `${this.documentDialogMode} Required Document`;
+  }
+
+  get instructionsValid() {
+    return !this.showInstructionError;
+  }
 
   @api
   get recordId() {
@@ -29,7 +72,9 @@ export default class ProductSetup extends LightningElement {
   }
 
   set recordId(value) {
+    if (value === this._recordId) return;
     this._recordId = value;
+    this.documentDraft = undefined;
     if (value) this.loadSetup();
   }
 
@@ -60,7 +105,12 @@ export default class ProductSetup extends LightningElement {
   }
 
   get pricebookSaveDisabled() {
-    return this.loading || this.savingPricebooks || !this.pricebooks.length;
+    return (
+      this.loading ||
+      this.savingPricebooks ||
+      Boolean(this.error) ||
+      !this.pricebooks.length
+    );
   }
 
   get pricebookGroups() {
@@ -80,7 +130,7 @@ export default class ProductSetup extends LightningElement {
   }
 
   get requirementSaveDisabled() {
-    return this.loading || this.savingRequirements;
+    return this.loading || this.savingRequirements || Boolean(this.error);
   }
 
   async loadSetup() {
@@ -100,19 +150,27 @@ export default class ProductSetup extends LightningElement {
   }
 
   applySetup(data) {
+    this.applyPricing(data);
+    this.applyDocuments(data);
+  }
+
+  applyPricing(data) {
     this.pricebooks = (data?.pricebooks || []).map((row) => ({
       ...row,
       inputsDisabled: !row.selected
     }));
+    this.paymentTypeOptions = (data?.paymentTypes || []).map((value) => ({
+      label: value,
+      value
+    }));
+  }
+
+  applyDocuments(data) {
     this.templates = (data?.templates || []).map((row) => ({ ...row }));
     this.requirements = (data?.requirements || []).map((row) => ({
       ...row,
       key: row.id || `new-${this.nextKey++}`,
       templateId: row.templateId || ""
-    }));
-    this.paymentTypeOptions = (data?.paymentTypes || []).map((value) => ({
-      label: value,
-      value
     }));
   }
 
@@ -162,9 +220,10 @@ export default class ProductSetup extends LightningElement {
       return;
     }
     this.savingPricebooks = true;
+    const productId = this.productId;
     try {
       const data = await savePricebooks({
-        productId: this.productId,
+        productId,
         rows: this.pricebooks.map((row) => ({
           pricebookId: row.pricebookId,
           selected: row.selected,
@@ -173,7 +232,8 @@ export default class ProductSetup extends LightningElement {
           paymentType: row.paymentType
         }))
       });
-      this.applySetup(data);
+      if (productId !== this.productId) return;
+      this.applyPricing(data);
       this.toast(
         "Price books saved",
         "Product pricing is ready for quoting.",
@@ -186,11 +246,9 @@ export default class ProductSetup extends LightningElement {
     }
   }
 
-  handleAddRequirement() {
-    this.requirements = [
-      ...this.requirements,
+  handleAddRequirement(event) {
+    this.openDocumentDialog(
       {
-        key: `new-${this.nextKey++}`,
         id: null,
         name: "",
         templateId: "",
@@ -198,38 +256,121 @@ export default class ProductSetup extends LightningElement {
         acceptedFormat: "",
         instructions: "",
         active: true
-      }
-    ];
+      },
+      "Add",
+      event.currentTarget
+    );
+  }
+
+  handleEditRequirement(event) {
+    const row = this.requirements.find(
+      ({ key }) => key === event.currentTarget.dataset.key
+    );
+    if (row) this.openDocumentDialog({ ...row }, "Edit", event.currentTarget);
+  }
+
+  handleCloneRequirement(event) {
+    const row = this.requirements.find(
+      ({ key }) => key === event.currentTarget.dataset.key
+    );
+    if (!row) return;
+    this.openDocumentDialog(
+      {
+        id: null,
+        name: row.name,
+        templateId: row.templateId,
+        shortDescription: row.shortDescription,
+        acceptedFormat: row.acceptedFormat,
+        instructions: row.instructions,
+        active: row.active
+      },
+      "Clone",
+      event.currentTarget
+    );
+  }
+
+  openDocumentDialog(draft, mode, trigger) {
+    this.documentDialogMode = mode;
+    this.documentDialogTrigger = trigger;
+    this.showInstructionError = false;
+    this.documentDraft = draft;
+    Promise.resolve().then(() =>
+      this.template.querySelector(".document-dialog")?.focus()
+    );
+  }
+
+  handleCloseDocument() {
+    const trigger = this.documentDialogTrigger;
+    this.documentDialogTrigger = undefined;
+    this.documentDraft = undefined;
+    Promise.resolve().then(() => trigger?.focus());
+  }
+
+  handleDocumentKeyDown(event) {
+    if (event.key === "Escape" && !event.defaultPrevented) {
+      event.stopPropagation();
+      this.handleCloseDocument();
+    }
+  }
+
+  handleApplyDocument() {
+    const draft = {
+      ...this.documentDraft,
+      name: this.documentDraft.name?.trim(),
+      shortDescription: this.documentDraft.shortDescription?.trim()
+    };
+    const instructions = (draft.instructions || "")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;|&#0*160;|&#x0*a0;/gi, " ")
+      .replace(/[\u200B-\u200D\uFEFF]/g, "")
+      .trim();
+    this.showInstructionError = !instructions;
+    if (!this.validate(".requirement-input") || this.showInstructionError)
+      return;
+    if (
+      !draft.name ||
+      !draft.shortDescription ||
+      !this.selectedFormats.length
+    ) {
+      this.toast(
+        "Complete required information",
+        "Enter a document name and short description, and select at least one accepted format.",
+        "error"
+      );
+      return;
+    }
+    this.requirements = draft.key
+      ? this.requirements.map((row) => (row.key === draft.key ? draft : row))
+      : [...this.requirements, { ...draft, key: `new-${this.nextKey++}` }];
+    this.handleCloseDocument();
   }
 
   handleRequirementChange(event) {
-    const key = event.currentTarget.dataset.key;
     const field = event.currentTarget.dataset.field;
     const value =
       field === "active"
         ? event.target.checked
-        : (event.detail?.value ?? event.target.value);
-    this.requirements = this.requirements.map((row) =>
-      row.key === key ? { ...row, [field]: value } : row
-    );
+        : field === "acceptedFormat"
+          ? event.detail.value.join(";")
+          : (event.detail?.value ?? event.target.value);
+    this.documentDraft = { ...this.documentDraft, [field]: value };
+    if (field === "instructions") this.showInstructionError = false;
   }
 
   handleTemplateChange(event) {
-    const key = event.currentTarget.dataset.key;
+    this.showInstructionError = false;
     const templateId = event.detail.value;
     const template = this.templates.find((row) => row.id === templateId);
-    this.requirements = this.requirements.map((row) => {
-      if (row.key !== key) return row;
-      if (!template) return { ...row, templateId: "" };
-      return {
-        ...row,
-        templateId,
-        name: template.name,
-        shortDescription: template.shortDescription || "",
-        acceptedFormat: template.acceptedFormat || "",
-        instructions: template.instructions || ""
-      };
-    });
+    this.documentDraft = template
+      ? {
+          ...this.documentDraft,
+          templateId,
+          name: template.name,
+          shortDescription: template.shortDescription || "",
+          acceptedFormat: template.acceptedFormat || "",
+          instructions: template.instructions || ""
+        }
+      : { ...this.documentDraft, templateId: "" };
   }
 
   handleRemoveRequirement(event) {
@@ -238,18 +379,12 @@ export default class ProductSetup extends LightningElement {
   }
 
   async handleSaveRequirements() {
-    if (!this.validate(".requirement-input")) {
-      this.toast(
-        "Complete required information",
-        "Review the highlighted required document fields before saving.",
-        "error"
-      );
-      return;
-    }
+    if (this.requirementSaveDisabled || this.documentDraft) return;
     this.savingRequirements = true;
+    const productId = this.productId;
     try {
       const data = await saveRequirements({
-        productId: this.productId,
+        productId,
         rows: this.requirements.map((row) => ({
           id: row.id,
           name: row.name,
@@ -260,7 +395,8 @@ export default class ProductSetup extends LightningElement {
           active: row.active
         }))
       });
-      this.applySetup(data);
+      if (productId !== this.productId) return;
+      this.applyDocuments(data);
       this.toast(
         "Required documents saved",
         "New Cases for this product will receive this checklist.",

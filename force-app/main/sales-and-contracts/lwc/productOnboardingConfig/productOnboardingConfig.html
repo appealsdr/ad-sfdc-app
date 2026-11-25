@@ -35,7 +35,7 @@
       </template>
     </div>
 
-    <div class="card-body slds-p-horizontal_medium slds-p-bottom_medium">
+    <div class="card-body">
       <template lwc:if={isLoading}>
         <lightning-spinner
           alternative-text="Loading onboarding fields"
@@ -60,12 +60,12 @@
       </template>
 
       <template lwc:if={isEditing}>
-        <p class="slds-text-color_weak slds-m-bottom_small">
+        <p class="slds-text-color_weak slds-m-bottom_xx-small">
           Add Case fields, override their labels, and mark them required. Drag
           the handles or use the arrows to change the order.
         </p>
         <template lwc:if={hasDraftRows}>
-          <ol class="slds-has-dividers_bottom-space">
+          <ol class="field-list">
             <template for:each={editorRows} for:item="row">
               <li
                 key={row.key}
@@ -74,9 +74,9 @@
                 ondragover={handleDragOver}
                 ondrop={handleDrop}
               >
-                <div class="row-heading slds-m-bottom_x-small">
+                <div class="row-heading">
                   <span
-                    class="drag-handle slds-m-right_x-small"
+                    class="drag-handle"
                     draggable={canDrag}
                     data-key={row.key}
                     ondragstart={handleDragStart}
@@ -119,10 +119,8 @@
                     ></lightning-button-icon>
                   </div>
                 </div>
-                <div class="slds-grid slds-wrap slds-gutters_small">
-                  <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
-                  >
+                <div class="field-controls">
+                  <div class="field-control">
                     <lightning-combobox
                       label="Case Field"
                       value={row.fieldapiname}
@@ -134,9 +132,7 @@
                       disabled={isSaving}
                     ></lightning-combobox>
                   </div>
-                  <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2"
-                  >
+                  <div class="field-control">
                     <lightning-input
                       type="text"
                       label="Override Label"
@@ -147,16 +143,15 @@
                       disabled={isSaving}
                     ></lightning-input>
                   </div>
+                  <lightning-input
+                    type="checkbox"
+                    label="Required"
+                    checked={row.required}
+                    data-key={row.key}
+                    onchange={handleRequiredChange}
+                    disabled={isSaving}
+                  ></lightning-input>
                 </div>
-                <lightning-input
-                  class="slds-m-top_small"
-                  type="checkbox"
-                  label="Required"
-                  checked={row.required}
-                  data-key={row.key}
-                  onchange={handleRequiredChange}
-                  disabled={isSaving}
-                ></lightning-input>
                 <template lwc:if={row.unavailable}>
                   <p class="slds-text-color_weak slds-m-top_x-small">
                     This saved field is unavailable. It will be preserved unless
@@ -168,14 +163,14 @@
           </ol>
         </template>
         <template lwc:else>
-          <p class="slds-text-color_weak slds-p-vertical_medium">
+          <p class="slds-text-color_weak slds-p-vertical_xx-small">
             No fields selected. Use Add Field to start.
           </p>
         </template>
       </template>
       <template lwc:elseif={recordLoaded}>
         <template lwc:if={hasSavedRows}>
-          <ol class="slds-has-dividers_bottom-space">
+          <ol class="field-list">
             <template for:each={displayRows} for:item="row">
               <li key={row.fieldapiname} class="slds-item detail-row">
                 <div class="field-description">
@@ -190,7 +185,7 @@
           </ol>
         </template>
         <template lwc:elseif={showEmptySaved}>
-          <p class="slds-text-color_weak slds-p-vertical_medium">
+          <p class="slds-text-color_weak slds-p-vertical_xx-small">
             No Case fields configured.
           </p>
         </template>

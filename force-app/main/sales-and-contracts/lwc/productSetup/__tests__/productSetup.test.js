@@ -3,6 +3,7 @@ import ProductSetup from "c/productSetup";
 import getSetup from "@salesforce/apex/ProductSetupController.getSetup";
 import savePricebooks from "@salesforce/apex/ProductSetupController.savePricebooks";
 import saveRequirements from "@salesforce/apex/ProductSetupController.saveRequirements";
+import { getPicklistValues } from "lightning/uiObjectInfoApi";
 
 jest.mock(
   "@salesforce/apex/ProductSetupController.getSetup",
@@ -68,8 +69,8 @@ function button(element, label) {
   );
 }
 
-async function mount() {
-  getSetup.mockResolvedValue(setup());
+async function mount(overrides) {
+  getSetup.mockResolvedValue(setup(overrides));
   const element = createElement("c-product-setup", { is: ProductSetup });
   element.recordId = PRODUCT_ID;
   document.body.appendChild(element);
@@ -92,6 +93,11 @@ describe("c-product-setup", () => {
 
   it("loads price books, required documents, and the onboarding field editor", async () => {
     const element = await mount();
+    expect(
+      [...element.shadowRoot.querySelectorAll("lightning-tab")].map(
+        (tab) => tab.label
+      )
+    ).toEqual(["Price Books", "Onboarding Configuration"]);
     const cards = [...element.shadowRoot.querySelectorAll("lightning-card")];
     expect(cards.map((card) => card.title)).toEqual([
       "Price Book Setup",
@@ -172,24 +178,47 @@ describe("c-product-setup", () => {
 
   it("prefills a required document from a template and saves it", async () => {
     const element = await mount();
+    getPicklistValues.emit({
+      values: [
+        { label: "PDF", value: "PDF" },
+        { label: "PNG", value: "PNG" }
+      ]
+    });
     button(element, "Add Document").click();
     await flushPromises();
+    const dialog = element.shadowRoot.querySelector('[role="dialog"]');
     const template = element.shadowRoot.querySelector(
-      ".requirement-row lightning-combobox"
+      ".document-dialog lightning-combobox"
     );
     template.dispatchEvent(
       new CustomEvent("change", { detail: { value: TEMPLATE_ID } })
     );
     await flushPromises();
     const name = element.shadowRoot.querySelector(
-      '.requirement-row lightning-input[data-field="name"]'
+      '.document-dialog lightning-input[data-field="name"]'
     );
     expect(name.value).toBe("Invoice");
+    const formats = dialog.querySelector("lightning-dual-listbox");
+    expect(formats.value).toEqual(["PDF"]);
+    expect(formats.options.map((option) => option.value)).toEqual([
+      "PDF",
+      "PNG"
+    ]);
+    formats.dispatchEvent(
+      new CustomEvent("change", { detail: { value: ["PDF", "PNG"] } })
+    );
     element.shadowRoot
       .querySelectorAll(".requirement-input")
       .forEach((input) => {
         input.reportValidity = jest.fn().mockReturnValue(true);
       });
+    button(element, "Apply Document").click();
+    await flushPromises();
+    expect(saveRequirements).not.toHaveBeenCalled();
+    expect(element.shadowRoot.querySelector('[role="dialog"]')).toBeNull();
+    expect(element.shadowRoot.querySelector("ul").textContent).toContain(
+      "Invoice"
+    );
     saveRequirements.mockResolvedValue(
       setup({
         requirements: [
@@ -211,10 +240,118 @@ describe("c-product-setup", () => {
         expect.objectContaining({
           name: "Invoice",
           templateId: TEMPLATE_ID,
-          acceptedFormat: "PDF",
+          acceptedFormat: "PDF;PNG",
           active: true
         })
       ]
     });
+  });
+
+  it("discards the document draft when the dialog is canceled", async () => {
+    const element = await mount();
+    button(element, "Add Document").click();
+    await flushPromises();
+    button(element, "Cancel").click();
+    await flushPromises();
+    expect(element.shadowRoot.querySelector('[role="dialog"]')).toBeNull();
+    expect(element.shadowRoot.textContent).toContain(
+      "No required documents configured"
+    );
+    expect(saveRequirements).not.toHaveBeenCalled();
+  });
+
+  it("requires all document inputs except template and allows an inactive document", async () => {
+    const element = await mount();
+    button(element, "Add Document").click();
+    await flushPromises();
+    const dialog = element.shadowRoot.querySelector('[role="dialog"]');
+    expect(
+      dialog.querySelector(".slds-modal__content").firstElementChild.label
+    ).toBe("Active");
+    expect(dialog.querySelector("lightning-combobox").required).toBeFalsy();
+    for (const field of [
+      "name",
+      "shortDescription",
+      "acceptedFormat",
+      "instructions"
+    ]) {
+      expect(dialog.querySelector(`[data-field="${field}"]`).required).toBe(
+        true
+      );
+    }
+    const change = (field, value) =>
+      dialog
+        .querySelector(`[data-field="${field}"]`)
+        .dispatchEvent(new CustomEvent("change", { detail: { value } }));
+    dialog.querySelectorAll(".requirement-input").forEach((input) => {
+      input.reportValidity = jest.fn().mockReturnValue(true);
+    });
+    change("name", "Proof");
+    change("shortDescription", "Customer proof");
+    change("acceptedFormat", ["PDF"]);
+    change("instructions", "<p>&nbsp;<br></p>");
+    const active = dialog.querySelector('[data-field="active"]');
+    active.checked = false;
+    active.dispatchEvent(new CustomEvent("change"));
+    button(element, "Apply Document").click();
+    await flushPromises();
+    expect(dialog.textContent).toContain("Enter client instructions.");
+    change("instructions", "<p>Upload proof.</p>");
+    button(element, "Apply Document").click();
+    await flushPromises();
+    expect(element.shadowRoot.querySelector('[role="dialog"]')).toBeNull();
+    expect(element.shadowRoot.querySelector("ul").textContent).toContain(
+      "Inactive"
+    );
+  });
+
+  it("clones a document into a new draft and discards it through the close icon", async () => {
+    const original = {
+      id: "a20000000000001AAA",
+      name: "Invoice",
+      templateId: TEMPLATE_ID,
+      shortDescription: "Latest invoice",
+      acceptedFormat: "PDF;PNG",
+      instructions: "Upload an invoice.",
+      active: true
+    };
+    const element = await mount({ requirements: [original] });
+    const clone = element.shadowRoot.querySelector(
+      'lightning-button-icon[title="Clone required document"]'
+    );
+    clone.click();
+    await flushPromises();
+    let dialog = element.shadowRoot.querySelector('[role="dialog"]');
+    expect(dialog.getAttribute("aria-label")).toBe("Clone Required Document");
+    expect(dialog.querySelector('[data-field="name"]').value).toBe(
+      original.name
+    );
+    expect(dialog.querySelector("lightning-dual-listbox").value).toEqual([
+      "PDF",
+      "PNG"
+    ]);
+    dialog
+      .querySelector('lightning-button-icon[title="Close required document"]')
+      .click();
+    await flushPromises();
+    expect(element.shadowRoot.querySelector("ul").children).toHaveLength(1);
+    expect(saveRequirements).not.toHaveBeenCalled();
+
+    clone.click();
+    await flushPromises();
+    dialog = element.shadowRoot.querySelector('[role="dialog"]');
+    dialog.querySelectorAll(".requirement-input").forEach((input) => {
+      input.reportValidity = jest.fn().mockReturnValue(true);
+    });
+    button(element, "Apply Document").click();
+    await flushPromises();
+    expect(element.shadowRoot.querySelector("ul").children).toHaveLength(2);
+    saveRequirements.mockResolvedValue(setup());
+    button(element, "Save Documents").click();
+    await flushPromises();
+    expect(saveRequirements.mock.calls[0][0].rows).toEqual([
+      expect.objectContaining(original),
+      expect.objectContaining({ ...original, id: null })
+    ]);
   });
 });

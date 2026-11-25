@@ -39,7 +39,16 @@ lightning-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.125rem;
+}
+
+.documents-body {
+  padding: 0 0.5rem 0.5rem;
+}
+
+.document-row {
+  padding: 0.375rem 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 @media (max-width: 64rem) {
