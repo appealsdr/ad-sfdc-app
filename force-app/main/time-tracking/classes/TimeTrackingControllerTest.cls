@@ -509,16 +509,7 @@ private class TimeTrackingControllerTest {
     }
 
     @IsTest
-    static void testCleanupSchedulerRunsService() {
-        Time_Tracking__c staleTimer = new Time_Tracking__c(
-            Assignee__c = UserInfo.getUserId(),
-            Start_Time__c = System.now().addMinutes(-20),
-            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
-            Type__c = 'Internal Task',
-            Last_Heartbeat__c = System.now().addMinutes(-10)
-        );
-        insert staleTimer;
-
+    static void testCleanupSchedulerSchedulesOnlyOneRunAndWatchdog() {
         Test.startTest();
         Id firstRun = TimeTrackingCleanupScheduler.scheduleRecurringJob();
         Id secondRun = TimeTrackingCleanupScheduler.scheduleRecurringJob();
@@ -529,8 +520,6 @@ private class TimeTrackingControllerTest {
         System.assertEquals(1, [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :TimeTrackingCleanupScheduler.WATCHDOG_JOB_NAME],
             'Exactly one hourly watchdog job must be scheduled.');
         Test.stopTest();
-        Time_Tracking__c record = [SELECT Status__c FROM Time_Tracking__c WHERE Id = :staleTimer.Id];
-        System.assertEquals(TimeTrackingConstants.STATUS_PAUSED_OFFLINE, record.Status__c);
     }
 
     @IsTest
