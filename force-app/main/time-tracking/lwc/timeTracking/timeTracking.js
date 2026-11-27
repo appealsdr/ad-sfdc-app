@@ -6,6 +6,7 @@ import startTimer from '@salesforce/apex/TimeTrackingController.startTimer';
 import pauseTimer from '@salesforce/apex/TimeTrackingController.pauseTimer';
 import resumeTimer from '@salesforce/apex/TimeTrackingController.resumeTimer';
 import heartbeat from '@salesforce/apex/TimeTrackingController.heartbeat';
+import reconcileTimer from '@salesforce/apex/TimeTrackingController.reconcileTimer';
 import completeTimer from '@salesforce/apex/TimeTrackingController.completeTimer';
 import deleteTimeTracking from '@salesforce/apex/TimeTrackingController.deleteTimeTracking';
 import createManualEntry from '@salesforce/apex/TimeTrackingController.createManualEntry';
@@ -19,7 +20,14 @@ const BASE_COLUMNS = [
     { label: 'Start Time', fieldName: 'formattedStartTime', type: 'text' },
     { label: 'End Time', fieldName: 'formattedEndTime', type: 'text' },
     { label: 'Duration', fieldName: 'durationDisplay', type: 'text' },
+    { label: 'Paused', fieldName: 'pausedDisplay', type: 'text' },
     { label: 'Status', fieldName: 'status', type: 'text' },
+    {
+        label: 'Entry',
+        fieldName: 'entryMethod',
+        type: 'text',
+        cellAttributes: { iconName: { fieldName: 'entryIcon' }, iconPosition: 'left' }
+    },
     { label: 'Comments', fieldName: 'comments', type: 'text' }
 ];
 
@@ -44,6 +52,112 @@ const TYPE_INTERNAL_TASK = 'Internal Task';
 const HEARTBEAT_INTERVAL_MS = 15000;
 const INSTANCE_ID_STORAGE_KEY = 'timeTrackingInstanceId';
 const UPDATE_EVENT_CHANNEL = '/event/TimeTracking_Update__e';
+
+// Browser-wide (localStorage) bookkeeping used to tell "the last tab running
+// this timer was closed" apart from "another tab is still open":
+//  - OPEN_TABS: { tabId: lastSeenMs } for every page load that currently
+//    owns the running timer; refreshed on every heartbeat tick and removed on
+//    pagehide. Entries not refreshed within OPEN_TAB_TTL_MS are treated as
+//    dead (crashed tab). The TTL is longer than Chrome's 1/minute throttling
+//    of hidden tabs, so background tabs still count as open.
+//  - LAST_CLOSE: written on pagehide - when, for which timer, and how many
+//    other tabs were still open at that moment.
+const OPEN_TABS_STORAGE_KEY = 'timeTrackingOpenTabs';
+const LAST_CLOSE_STORAGE_KEY = 'timeTrackingLastTabClose';
+const OPEN_TAB_TTL_MS = 150000;
+
+// One id per page load (module state is shared by every Time Tracking
+// component on the same page, e.g. record card + utility bar).
+const PAGE_STATE = {
+    tabId: generateInstanceId(),
+    closeChecked: false,
+    reconcilePromise: null,
+    runningTimerId: null
+};
+
+function readJson(key) {
+    try {
+        const raw = window.localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function writeJson(key, value) {
+    try {
+        if (value === null || value === undefined) {
+            window.localStorage.removeItem(key);
+        } else {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        }
+    } catch (error) {
+        // Storage unavailable: the server-side stale heartbeat check still covers this.
+    }
+}
+
+function liveOpenTabs(excludeTabId) {
+    const tabs = readJson(OPEN_TABS_STORAGE_KEY) || {};
+    const now = Date.now();
+    const live = {};
+    Object.keys(tabs).forEach((tabId) => {
+        if (now - Number(tabs[tabId]) <= OPEN_TAB_TTL_MS) {
+            live[tabId] = tabs[tabId];
+        }
+    });
+    if (excludeTabId) {
+        delete live[excludeTabId];
+    }
+    return live;
+}
+
+function markTabOpen() {
+    const tabs = liveOpenTabs();
+    tabs[PAGE_STATE.tabId] = Date.now();
+    writeJson(OPEN_TABS_STORAGE_KEY, tabs);
+}
+
+function markTabClosed() {
+    const tabs = liveOpenTabs(PAGE_STATE.tabId);
+    writeJson(OPEN_TABS_STORAGE_KEY, tabs);
+    return Object.keys(tabs).length;
+}
+
+function isPageReload() {
+    try {
+        const entries = window.performance?.getEntriesByType?.('navigation') || [];
+        if (entries.length) {
+            return entries[0].type === 'reload';
+        }
+        // Legacy API: 1 === TYPE_RELOAD
+        return window.performance?.navigation?.type === 1;
+    } catch (error) {
+        return false;
+    }
+}
+
+/**
+ * Runs once per page load. If this is a new page (not a reload) and the last
+ * tab that owned the running timer was closed with no other tab left open,
+ * returns { closedTimerId, secondsSinceTabClosed } so the server can pause the
+ * timer as "Paused - Offline" at the moment the tab was closed.
+ */
+function consumeTabCloseMarker() {
+    if (PAGE_STATE.closeChecked) {
+        return {};
+    }
+    PAGE_STATE.closeChecked = true;
+    const marker = readJson(LAST_CLOSE_STORAGE_KEY);
+    if (!marker) {
+        return {};
+    }
+    writeJson(LAST_CLOSE_STORAGE_KEY, null);
+    if (isPageReload() || marker.otherOpenTabs > 0 || Object.keys(liveOpenTabs(PAGE_STATE.tabId)).length > 0) {
+        return {};
+    }
+    const seconds = Math.max(0, Math.round((Date.now() - Number(marker.at)) / 1000));
+    return { closedTimerId: marker.timerId, secondsSinceTabClosed: seconds };
+}
 
 function generateInstanceId() {
     if (window.crypto && typeof window.crypto.randomUUID === 'function') {
@@ -101,6 +215,10 @@ export default class TimeTracking extends LightningElement {
 
     timerInterval;
     heartbeatInterval;
+    heartbeatTimerId;
+    reconcilePending = false;
+    refreshOnNextWire = false;
+    activePausedText = '';
     wiredDataResult;
     instanceId = getOrCreateInstanceId();
 
@@ -112,6 +230,11 @@ export default class TimeTracking extends LightningElement {
     @wire(getTimeTrackingData, { recordId: '$recordId' })
     wiredTimeTracking(result) {
         this.wiredDataResult = result;
+        if (this.refreshOnNextWire && (result.data || result.error)) {
+            this.refreshOnNextWire = false;
+            refreshApex(result).catch(() => this.wiredTimeTracking(result));
+            return;
+        }
 
         const { data, error } = result;
         if (data) {
@@ -125,7 +248,10 @@ export default class TimeTracking extends LightningElement {
                 ...record,
                 formattedStartTime: this.formatDateTime(record.startTime),
                 formattedEndTime: this.formatDateTime(record.endTime),
-                durationDisplay: this.formatDuration(record.durationMinutes)
+                durationDisplay: this.formatDuration(record.durationMinutes),
+                pausedDisplay: this.formatPausedDuration(this.pausedMinutesFor(record)),
+                entryMethod: record.isManualEntry ? 'Manual' : 'Timer',
+                entryIcon: record.isManualEntry ? 'utility:edit' : 'utility:clock'
             }));
             this.syncTimerDisplay();
             this.syncHeartbeat();
@@ -146,8 +272,13 @@ export default class TimeTracking extends LightningElement {
             this.syncTimerDisplay();
         }, 1000);
         this.boundPageHideHandler = this.handlePageHide.bind(this);
+        this.boundVisibilityHandler = this.handleVisibilityChange.bind(this);
+        this.boundOnlineHandler = this.handleOnline.bind(this);
         window.addEventListener('pagehide', this.boundPageHideHandler);
+        document.addEventListener('visibilitychange', this.boundVisibilityHandler);
+        window.addEventListener('online', this.boundOnlineHandler);
         this.subscribeToUpdateEvent();
+        this.runReconcile();
     }
 
     disconnectedCallback() {
@@ -158,7 +289,83 @@ export default class TimeTracking extends LightningElement {
         if (this.boundPageHideHandler) {
             window.removeEventListener('pagehide', this.boundPageHideHandler);
         }
+        if (this.boundVisibilityHandler) {
+            document.removeEventListener('visibilitychange', this.boundVisibilityHandler);
+        }
+        if (this.boundOnlineHandler) {
+            window.removeEventListener('online', this.boundOnlineHandler);
+        }
         this.unsubscribeFromUpdateEvent();
+    }
+
+    /**
+     * Asks the server to auto-pause the running timer as "Paused - Offline"
+     * if it was abandoned (last tab closed, or no heartbeat for longer than
+     * the stale threshold), then refreshes. Heartbeats wait for this, so a
+     * reopened tab can never "revive" a timer whose tab was closed.
+     */
+    runReconcile() {
+        const closeInfo = consumeTabCloseMarker();
+        const params = {
+            instanceId: this.instanceId,
+            closedTimerId: closeInfo.closedTimerId || null,
+            secondsSinceTabClosed: closeInfo.secondsSinceTabClosed ?? null
+        };
+        const previous = PAGE_STATE.reconcilePromise || Promise.resolve();
+        const current = previous
+            .catch(() => {})
+            .then(() => reconcileTimer(params))
+            .then((paused) => {
+                if (paused) {
+                    this.showToast(
+                        'Timer paused',
+                        'Your timer was paused as "Paused - Offline" because its browser tab was closed or inactive. Resume or stop it.',
+                        'warning'
+                    );
+                }
+                return paused;
+            })
+            .catch(() => false);
+        PAGE_STATE.reconcilePromise = current;
+        this.reconcilePending = true;
+        current.then((paused) => {
+            this.reconcilePending = false;
+            if (paused) {
+                if (this.wiredDataResult && (this.wiredDataResult.data || this.wiredDataResult.error)) {
+                    return refreshApex(this.wiredDataResult).catch(() => {});
+                }
+                // Wire has not delivered yet; its first result may predate the pause.
+                this.refreshOnNextWire = true;
+                return undefined;
+            }
+            this.syncHeartbeat();
+            return undefined;
+        });
+        return current;
+    }
+
+    handleVisibilityChange() {
+        if (document.visibilityState !== 'visible') {
+            return;
+        }
+        // Coming back to this tab: re-check the timer (it may have been
+        // paused/completed elsewhere, or this laptop may have been asleep),
+        // then refresh so the card is in sync without a reload.
+        this.stopHeartbeat();
+        this.runReconcile().then(() => {
+            if (this.wiredDataResult) {
+                refreshApex(this.wiredDataResult).catch(() => {});
+            }
+        });
+    }
+
+    handleOnline() {
+        this.stopHeartbeat();
+        this.runReconcile().then(() => {
+            if (this.wiredDataResult) {
+                refreshApex(this.wiredDataResult).catch(() => {});
+            }
+        });
     }
 
     subscribeToUpdateEvent() {
@@ -201,18 +408,21 @@ export default class TimeTracking extends LightningElement {
     }
 
     handlePageHide() {
-        // Best-effort only: browsers do not guarantee this request completes
-        // once the page is being torn down, so the heartbeat/cleanup job
-        // remains the authoritative backstop for an unresponsive tab.
-        if (!this.isActiveTimerRunning || this.activeTimer.timerInstanceId !== this.instanceId) {
+        // Do NOT pause from here: pagehide also fires on reload and when just
+        // one of several tabs is closed, and an Apex call started while the
+        // page is unloading is not guaranteed to reach the server. Instead,
+        // record the close locally; the next tab that opens (within the
+        // stale threshold) reports it to reconcileTimer, and the heartbeat
+        // staleness check / scheduled cleanup job cover everything else.
+        const runningTimerId = PAGE_STATE.runningTimerId;
+        const otherOpenTabs = markTabClosed();
+        if (!runningTimerId) {
             return;
         }
-        pauseTimer({
-            timeTrackingId: this.activeTimer.id,
-            pauseStatus: 'Paused - Offline',
-            instanceId: this.instanceId
-        }).catch(() => {
-            // Nothing to do here; the page is already closing.
+        writeJson(LAST_CLOSE_STORAGE_KEY, {
+            at: Date.now(),
+            timerId: runningTimerId,
+            otherOpenTabs
         });
     }
 
@@ -641,21 +851,52 @@ export default class TimeTracking extends LightningElement {
             });
     }
 
+    /**
+     * The running timer this browser owns, whether it belongs to this card
+     * (activeTimer) or another record (blockingTimer). Any open Time Tracking
+     * component - record page, Home, or Utility Bar - keeps it alive, so
+     * moving between records/tabs does not cause a false offline pause.
+     */
+    get ownedRunningTimer() {
+        const timer = this.activeTimer || this.blockingTimer;
+        if (timer && timer.status === STATUS_IN_PROGRESS && timer.timerInstanceId === this.instanceId) {
+            return timer;
+        }
+        return null;
+    }
+
     syncHeartbeat() {
-        const shouldHeartbeat = this.isActiveTimerRunning && this.activeTimer.timerInstanceId === this.instanceId;
-        if (!shouldHeartbeat) {
+        const timer = this.ownedRunningTimer;
+        if (!timer || this.reconcilePending) {
+            if (!timer && this.heartbeatTimerId && PAGE_STATE.runningTimerId === this.heartbeatTimerId) {
+                PAGE_STATE.runningTimerId = null;
+                markTabClosed();
+            }
             this.stopHeartbeat();
             return;
         }
-        if (this.heartbeatInterval) {
+        PAGE_STATE.runningTimerId = timer.id;
+        markTabOpen();
+        if (this.heartbeatInterval && this.heartbeatTimerId === timer.id) {
             return;
         }
-        const timerId = this.activeTimer.id;
-        this.heartbeatInterval = window.setInterval(() => {
-            heartbeat({ timeTrackingId: timerId, instanceId: this.instanceId }).catch(() => {
-                // Heartbeats are best-effort; a transient failure is retried on the next tick.
-            });
-        }, HEARTBEAT_INTERVAL_MS);
+        this.stopHeartbeat();
+        this.heartbeatTimerId = timer.id;
+        const beat = () => {
+            markTabOpen();
+            heartbeat({ timeTrackingId: timer.id, instanceId: this.instanceId })
+                .then((status) => {
+                    if (status && status !== STATUS_IN_PROGRESS && this.wiredDataResult) {
+                        // Paused/completed elsewhere or auto-paused as offline: resync now.
+                        refreshApex(this.wiredDataResult).catch(() => {});
+                    }
+                })
+                .catch(() => {
+                    // Heartbeats are best-effort; a transient failure is retried on the next tick.
+                });
+        };
+        beat();
+        this.heartbeatInterval = window.setInterval(beat, HEARTBEAT_INTERVAL_MS);
     }
 
     stopHeartbeat() {
@@ -663,28 +904,55 @@ export default class TimeTracking extends LightningElement {
             window.clearInterval(this.heartbeatInterval);
             this.heartbeatInterval = null;
         }
+        this.heartbeatTimerId = null;
+    }
+
+    /** Worked milliseconds for a timer: elapsed minus all paused time (including an ongoing pause). */
+    workedMs(timer) {
+        if (!timer?.startTime) {
+            return 0;
+        }
+        const start = new Date(timer.startTime).getTime();
+        const isPaused = PAUSED_STATUSES.includes(timer.status);
+        const end = isPaused && timer.pauseStartedAt ? new Date(timer.pauseStartedAt).getTime() : Date.now();
+        const pausedMs = (Number(timer.pausedDurationMinutes) || 0) * 60000;
+        return Math.max(0, end - start - pausedMs);
+    }
+
+    /** Total paused minutes for a timer, including an ongoing pause. */
+    pausedMinutesFor(timer) {
+        if (!timer) {
+            return 0;
+        }
+        let minutes = Number(timer.pausedDurationMinutes) || 0;
+        if (PAUSED_STATUSES.includes(timer.status) && timer.pauseStartedAt) {
+            minutes += Math.max(0, Date.now() - new Date(timer.pauseStartedAt).getTime()) / 60000;
+        }
+        return minutes;
+    }
+
+    get activePausedDisplay() {
+        const minutes = this.pausedMinutesFor(this.activeTimer);
+        return minutes > 0 ? this.formatPausedDuration(minutes) : '';
+    }
+
+    get hasActivePausedTime() {
+        return !!this.activeTimer && this.pausedMinutesFor(this.activeTimer) > 0;
     }
 
     syncTimerDisplay() {
-        const blockingElapsedMs = this.blockingTimer?.startTime
-            ? Date.now() - new Date(this.blockingTimer.startTime).getTime()
-            : 0;
-        this.blockingElapsedDisplay = this.formatElapsed(blockingElapsedMs);
+        this.blockingElapsedDisplay = this.formatElapsed(this.workedMs(this.blockingTimer));
 
         const runningTimer = this.activeTimer || this.blockingTimer;
-        const runningElapsedMs = runningTimer?.startTime
-            ? Date.now() - new Date(runningTimer.startTime).getTime()
-            : 0;
-        this.elapsedDisplay = this.formatElapsed(runningElapsedMs);
+        this.elapsedDisplay = this.formatElapsed(this.workedMs(runningTimer));
+        this.activePausedText = this.activePausedDisplay;
 
         if (!this.activeTimer || !this.activeTimer.startTime || this.isActiveTimerPaused) {
             this.displayTotalMinutes = this.totalMinutes + (this.activeTimer ? Number(this.activeTimer.durationMinutes) || 0 : 0);
             return;
         }
 
-        const elapsedMs = Math.max(0, Date.now() - new Date(this.activeTimer.startTime).getTime());
-        const pausedMs = (Number(this.activeTimer.pausedDurationMinutes) || 0) * 60000;
-        const activeDurationMinutes = Math.ceil(Math.max(0, elapsedMs - pausedMs) / 60000);
+        const activeDurationMinutes = Math.ceil(this.workedMs(this.activeTimer) / 60000);
         const activeRecordId = this.activeTimer.id;
         const completedTotal = (this.tableData || []).reduce((sum, record) => {
             if (record.id === activeRecordId) {
@@ -711,6 +979,15 @@ export default class TimeTracking extends LightningElement {
             minute: '2-digit',
             hour12: true
         });
+    }
+
+    /** Paused time is rounded to the nearest minute, but any pause shows at least 1m. */
+    formatPausedDuration(value) {
+        const minutes = Number(value);
+        if (!Number.isFinite(minutes) || minutes <= 0) {
+            return '';
+        }
+        return this.formatDuration(Math.max(1, Math.round(minutes)));
     }
 
     formatDuration(value) {

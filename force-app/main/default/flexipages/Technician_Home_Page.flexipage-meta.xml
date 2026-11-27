@@ -29,6 +29,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>timeTracking</componentName>
+                <identifier>c_timeTracking</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>home:recentRecordContainer</componentName>
                 <identifier>home_recentRecordContainer</identifier>
             </componentInstance>

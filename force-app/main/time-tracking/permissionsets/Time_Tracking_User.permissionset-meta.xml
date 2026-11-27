@@ -67,6 +67,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Time_Tracking__c.Is_Manual_Entry__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Time_Tracking__c.Last_Heartbeat__c</field>
         <readable>true</readable>
     </fieldPermissions>

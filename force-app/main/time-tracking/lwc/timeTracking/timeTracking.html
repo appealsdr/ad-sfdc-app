@@ -104,6 +104,9 @@
                                 <template if:true={isActiveTimerPaused}>
                                     <span class="slds-text-body_small slds-text-color_weak">{activeTimer.status}</span>
                                 </template>
+                                <template if:true={activePausedText}>
+                                    <span class="paused-total slds-text-body_small slds-text-color_weak">Paused: {activePausedText}</span>
+                                </template>
                             </template>
                             <template if:true={hasBlockingTimer}>
                                 <span class="blocking-timer-notice" role="status">

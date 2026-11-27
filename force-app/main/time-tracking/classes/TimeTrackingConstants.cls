@@ -26,6 +26,16 @@ public class TimeTrackingConstants {
     };
 
     public static final Integer DEFAULT_HEARTBEAT_INTERVAL_SECONDS = 15;
-    public static final Integer DEFAULT_STALE_THRESHOLD_MINUTES = 1;
+    // A running timer is considered abandoned (tab/browser closed, laptop
+    // asleep, network lost) once no open tab has sent a heartbeat for this
+    // long. Two minutes leaves headroom for Chrome's intensive throttling of
+    // hidden tabs (timers can be delayed to once per minute), so switching
+    // focus to other tabs never causes a false "Paused - Offline".
+    public static final Integer DEFAULT_STALE_THRESHOLD_MINUTES = 2;
     public static final Integer DEFAULT_CLEANUP_INTERVAL_MINUTES = 1;
+    // Tolerance used when a reopened tab reports when the last tab was closed.
+    public static final Integer TAB_CLOSE_TOLERANCE_SECONDS = 5;
+
+    public static final String ADMIN_CUSTOM_PERMISSION = 'Time_Tracking_Admin_Access';
+    public static final String ADMIN_PERMISSION_SET_NAME = 'Time_Tracking_Admin';
 }
