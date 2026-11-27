@@ -26,21 +26,30 @@ private class TimeTrackingControllerTest {
             )
         };
 
-        User adminUser = TestDataFactory.createUsers(1)[0];
-        PermissionSet adminPermSet = [
-            SELECT Id
-            FROM PermissionSet
-            WHERE Name = 'Time_Tracking_Admin'
-            LIMIT 1
-        ];
-        insert new PermissionSetAssignment(
-            AssigneeId = adminUser.Id,
-            PermissionSetId = adminPermSet.Id
-        );
+        // User 0 = Time Tracking Admin, User 1 = regular user without admin access.
+        // Admin checks run as User 1 so they do not depend on whether the
+        // user running the tests happens to hold the admin permission set.
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            User adminUser = TestDataFactory.createUsers(2)[0];
+            PermissionSet adminPermSet = [
+                SELECT Id
+                FROM PermissionSet
+                WHERE Name = 'Time_Tracking_Admin'
+                LIMIT 1
+            ];
+            insert new PermissionSetAssignment(
+                AssigneeId = adminUser.Id,
+                PermissionSetId = adminPermSet.Id
+            );
+        }
     }
 
     private static User getAdminUser() {
         return [SELECT Id FROM User WHERE LastName = 'User 0' AND FirstName = 'Test' LIMIT 1];
+    }
+
+    private static User getNonAdminUser() {
+        return [SELECT Id FROM User WHERE LastName = 'User 1' AND FirstName = 'Test' LIMIT 1];
     }
 
     private static Case getPrimaryCase() {
@@ -500,25 +509,17 @@ private class TimeTrackingControllerTest {
     }
 
     @IsTest
-    static void testCleanupSchedulerRunsService() {
-        Time_Tracking__c staleTimer = new Time_Tracking__c(
-            Assignee__c = UserInfo.getUserId(),
-            Start_Time__c = System.now().addMinutes(-20),
-            Status__c = TimeTrackingController.STATUS_IN_PROGRESS,
-            Type__c = 'Internal Task',
-            Last_Heartbeat__c = System.now().addMinutes(-10)
-        );
-        insert staleTimer;
-
+    static void testCleanupSchedulerSchedulesOnlyOneRunAndWatchdog() {
         Test.startTest();
-        TimeTrackingCleanupScheduler.scheduleRecurringJob();
-        TimeTrackingCleanupScheduler.scheduleRecurringJob();
+        Id firstRun = TimeTrackingCleanupScheduler.scheduleRecurringJob();
+        Id secondRun = TimeTrackingCleanupScheduler.scheduleRecurringJob();
+        System.assertEquals(firstRun, secondRun, 'Scheduling twice must not create a duplicate run.');
+        String runNamePattern = TimeTrackingCleanupScheduler.RUN_NAME_PREFIX + '%';
+        System.assertEquals(1, [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE :runNamePattern],
+            'Exactly one one-minute cleanup run must be pending.');
+        System.assertEquals(1, [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :TimeTrackingCleanupScheduler.WATCHDOG_JOB_NAME],
+            'Exactly one hourly watchdog job must be scheduled.');
         Test.stopTest();
-
-        System.assertEquals(1, [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :TimeTrackingCleanupScheduler.JOB_NAME],
-            'Scheduling twice must not create a duplicate job.');
-        Time_Tracking__c record = [SELECT Status__c FROM Time_Tracking__c WHERE Id = :staleTimer.Id];
-        System.assertEquals(TimeTrackingConstants.STATUS_PAUSED_OFFLINE, record.Status__c);
     }
 
     @IsTest
@@ -997,10 +998,12 @@ private class TimeTrackingControllerTest {
 
         Boolean exceptionThrown = false;
         Test.startTest();
-        try {
-            TimeTrackingController.deleteTimeTracking(record.Id, null);
-        } catch (AuraHandledException ex) {
-            exceptionThrown = true;
+        System.runAs(getNonAdminUser()) {
+            try {
+                TimeTrackingController.deleteTimeTracking(record.Id, null);
+            } catch (AuraHandledException ex) {
+                exceptionThrown = true;
+            }
         }
         Test.stopTest();
 
@@ -1231,15 +1234,17 @@ private class TimeTrackingControllerTest {
 
         Boolean exceptionThrown = false;
         Test.startTest();
-        try {
-            TimeTrackingController.updateTimeTracking(
-                record.Id,
-                System.now().addHours(-2),
-                System.now().addHours(-1),
-                null
-            );
-        } catch (AuraHandledException ex) {
-            exceptionThrown = true;
+        System.runAs(getNonAdminUser()) {
+            try {
+                TimeTrackingController.updateTimeTracking(
+                    record.Id,
+                    System.now().addHours(-2),
+                    System.now().addHours(-1),
+                    null
+                );
+            } catch (AuraHandledException ex) {
+                exceptionThrown = true;
+            }
         }
         Test.stopTest();
 
@@ -1284,9 +1289,11 @@ private class TimeTrackingControllerTest {
         User adminUser = getAdminUser();
 
         Test.startTest();
-        TimeTrackingController.TimeTrackingData dataBefore =
-            TimeTrackingController.getTimeTrackingData(testCase.Id);
-        System.assertEquals(false, dataBefore.isAdmin);
+        System.runAs(getNonAdminUser()) {
+            TimeTrackingController.TimeTrackingData dataBefore =
+                TimeTrackingController.getTimeTrackingData(testCase.Id);
+            System.assertEquals(false, dataBefore.isAdmin);
+        }
 
         System.runAs(adminUser) {
             TimeTrackingController.TimeTrackingData dataAfter =

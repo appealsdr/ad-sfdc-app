@@ -1,4 +1,9 @@
-public with sharing class TimeTrackingCleanupService {
+/**
+ * Server-side safety net for TC-08 (tab/browser closed while a timer runs).
+ * Runs from TimeTrackingCleanupScheduler as a system job, so it must see every
+ * user's running timers regardless of the scheduling user's sharing.
+ */
+public without sharing class TimeTrackingCleanupService {
 
     /**
      * Finds In-progress timers whose owning browser tab(s) have stopped

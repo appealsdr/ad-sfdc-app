@@ -2,7 +2,7 @@ public with sharing class TimeTrackingController {
 
     public static final String STATUS_IN_PROGRESS = TimeTrackingConstants.STATUS_IN_PROGRESS;
     public static final String STATUS_COMPLETED = TimeTrackingConstants.STATUS_COMPLETED;
-    public static final String ADMIN_PERMISSION_SET_NAME = 'Time_Tracking_Admin';
+    public static final String ADMIN_PERMISSION_SET_NAME = TimeTrackingConstants.ADMIN_PERMISSION_SET_NAME;
     public static final Long MAX_ENTRY_DURATION_MS = 24L * 60 * 60 * 1000;
 
     private static final Set<String> SUPPORTED_CLIENT_OBJECTS = new Set<String>{ 'Case', 'Store__c', 'Account' };
@@ -22,6 +22,7 @@ public with sharing class TimeTrackingController {
         @AuraEnabled public Decimal pausedDurationMinutes { get; set; }
         @AuraEnabled public Datetime lastHeartbeat { get; set; }
         @AuraEnabled public String timerInstanceId { get; set; }
+        @AuraEnabled public Boolean isManualEntry { get; set; }
     }
 
     public class TimeTrackingData {
@@ -157,7 +158,7 @@ public with sharing class TimeTrackingController {
             publishUpdateEvent(record.Assignee__c, record.Id, pauseStatus, instanceId);
             return toWrapper([SELECT Id, Assignee__c, Account__c, Case__c, Store__c, Start_Time__c, End_Time__c,
                                       Duration__c, Status__c, Type__c, Comments__c, Pause_Started_At__c,
-                                      Paused_Duration_Minutes__c, Last_Heartbeat__c, Timer_Instance_Id__c,
+                                      Paused_Duration_Minutes__c, Last_Heartbeat__c, Timer_Instance_Id__c, Is_Manual_Entry__c,
                                       Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
                                FROM Time_Tracking__c WHERE Id = :record.Id]);
         } catch (AuraHandledException ex) {
@@ -197,29 +198,94 @@ public with sharing class TimeTrackingController {
         }
     }
 
+    /**
+     * Keeps a running timer alive while at least one browser tab that owns it
+     * (same Timer_Instance_Id__c) is open. Returns the timer's status after
+     * the call so the tab can refresh if the timer is no longer running.
+     *
+     * If the previous heartbeat is older than the stale threshold - the tab
+     * was asleep, frozen, offline, or every tab was closed and this is a late
+     * beat - the gap is NOT papered over: the timer is paused as
+     * "Paused - Offline" at the last heartbeat instead, so unobserved time is
+     * excluded and the user decides whether to resume.
+     */
     @AuraEnabled
-    public static void heartbeat(Id timeTrackingId, String instanceId) {
+    public static String heartbeat(Id timeTrackingId, String instanceId) {
         if (timeTrackingId == null) {
-            return;
+            return null;
         }
         try {
             List<Time_Tracking__c> records = [
-                SELECT Id, Assignee__c, Status__c, Timer_Instance_Id__c
+                SELECT Id, Assignee__c, Status__c, Timer_Instance_Id__c, Start_Time__c, Last_Heartbeat__c
                 FROM Time_Tracking__c
                 WHERE Id = :timeTrackingId
                 LIMIT 1
             ];
             if (records.isEmpty()) {
-                return;
+                return null;
             }
             Time_Tracking__c record = records[0];
             Boolean ownedByCurrentUser = record.Assignee__c == UserInfo.getUserId();
             Boolean instanceMatches = instanceId != null && instanceId == record.Timer_Instance_Id__c;
             if (ownedByCurrentUser && instanceMatches && record.Status__c == STATUS_IN_PROGRESS) {
+                if (isHeartbeatStale(record, System.now())) {
+                    pauseOffline(record, heartbeatPausePoint(record));
+                    return TimeTrackingConstants.STATUS_PAUSED_OFFLINE;
+                }
                 update new Time_Tracking__c(Id = record.Id, Last_Heartbeat__c = System.now());
             }
+            return record.Status__c;
         } catch (Exception ex) {
             // Heartbeats are best-effort; swallow failures rather than surfacing errors to the user.
+            return null;
+        }
+    }
+
+    /**
+     * Called by a Time Tracking component when it loads, when its tab becomes
+     * visible again, and when the browser comes back online - before it
+     * starts sending heartbeats. Auto-pauses the current user's running timer
+     * as "Paused - Offline" when:
+     *  1. the browser reports that the last open tab owning this timer was
+     *     closed (closedTimerId / secondsSinceTabClosed, measured by the
+     *     client so clock skew does not matter) and no tab heartbeated after
+     *     that moment; or
+     *  2. no tab has heartbeated for longer than the stale threshold.
+     * Returns true when the timer was paused.
+     */
+    @AuraEnabled
+    public static Boolean reconcileTimer(String instanceId, Id closedTimerId, Integer secondsSinceTabClosed) {
+        try {
+            Time_Tracking__c record = queryCurrentUserActiveRecord(UserInfo.getUserId());
+            if (record == null || record.Status__c != STATUS_IN_PROGRESS) {
+                return false;
+            }
+            Datetime now = System.now();
+
+            Boolean tabCloseReported = closedTimerId != null
+                && closedTimerId == record.Id
+                && secondsSinceTabClosed != null
+                && secondsSinceTabClosed >= 0
+                && instanceId != null
+                && instanceId == record.Timer_Instance_Id__c;
+            if (tabCloseReported) {
+                Datetime closedAt = now.addSeconds(-secondsSinceTabClosed);
+                Boolean noHeartbeatSinceClose = record.Last_Heartbeat__c == null
+                    || record.Last_Heartbeat__c <= closedAt.addSeconds(TimeTrackingConstants.TAB_CLOSE_TOLERANCE_SECONDS);
+                if (noHeartbeatSinceClose) {
+                    Datetime pausePoint = closedAt < record.Start_Time__c ? record.Start_Time__c : closedAt;
+                    pauseOffline(record, pausePoint);
+                    return true;
+                }
+            }
+
+            if (isHeartbeatStale(record, now)) {
+                pauseOffline(record, heartbeatPausePoint(record));
+                return true;
+            }
+            return false;
+        } catch (Exception ex) {
+            throw new AuraHandledException('Error checking timer state: ' + ex.getMessage());
         }
     }
 
@@ -248,12 +314,14 @@ public with sharing class TimeTrackingController {
                 Status__c = STATUS_COMPLETED,
                 Type__c = resolvedType,
                 Paused_Duration_Minutes__c = 0,
+                Is_Manual_Entry__c = true,
                 Comments__c = String.isBlank(comments) ? null : comments.trim()
             );
             if (recordId != null) {
                 setRelatedRecord(newRecord, recordId, objectType);
             }
             insert newRecord;
+            publishUpdateEvent(newRecord.Assignee__c, newRecord.Id, STATUS_COMPLETED, null);
             return newRecord.Id;
         } catch (AuraHandledException ex) {
             throw ex;
@@ -284,19 +352,29 @@ public with sharing class TimeTrackingController {
                 throw new AuraHandledException('You do not have permission to edit time tracking records.');
             }
 
-            Time_Tracking__c record = [
-                SELECT Id, Status__c
+            List<Time_Tracking__c> matches = [
+                SELECT Id, Assignee__c, Status__c, Paused_Duration_Minutes__c, Timer_Instance_Id__c
                 FROM Time_Tracking__c
                 WHERE Id = :timeTrackingId
                 LIMIT 1
             ];
+            if (matches.isEmpty()) {
+                throw new AuraHandledException('This time tracking record no longer exists.');
+            }
+            Time_Tracking__c record = matches[0];
 
+            // Keep previously recorded paused minutes, but never more than the
+            // edited range, so the edited duration cannot go negative.
+            Decimal rangeMinutes = (endTime.getTime() - startTime.getTime()) / 60000.0;
+            Decimal pausedMinutes = record.Paused_Duration_Minutes__c == null ? 0 : record.Paused_Duration_Minutes__c;
+            record.Paused_Duration_Minutes__c = pausedMinutes > rangeMinutes ? 0 : pausedMinutes;
             record.Start_Time__c = startTime;
             record.End_Time__c = endTime;
             record.Status__c = STATUS_COMPLETED;
             record.Pause_Started_At__c = null;
             record.Comments__c = String.isBlank(comments) ? null : comments.trim();
             update record;
+            publishUpdateEvent(record.Assignee__c, record.Id, STATUS_COMPLETED, record.Timer_Instance_Id__c);
         } catch (AuraHandledException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -350,18 +428,23 @@ public with sharing class TimeTrackingController {
                 throw new AuraHandledException('You do not have permission to delete time tracking records.');
             }
 
-            Time_Tracking__c record = [
-                SELECT Id, Assignee__c, Comments__c
+            List<Time_Tracking__c> matches = [
+                SELECT Id, Assignee__c, Comments__c, Timer_Instance_Id__c
                 FROM Time_Tracking__c
                 WHERE Id = :timeTrackingId
                 LIMIT 1
             ];
+            if (matches.isEmpty()) {
+                throw new AuraHandledException('This time tracking record no longer exists.');
+            }
+            Time_Tracking__c record = matches[0];
 
             if (!String.isBlank(comments)) {
                 record.Comments__c = comments.trim();
                 update record;
             }
             delete record;
+            publishUpdateEvent(record.Assignee__c, record.Id, STATUS_COMPLETED, record.Timer_Instance_Id__c);
         } catch (AuraHandledException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -384,13 +467,43 @@ public with sharing class TimeTrackingController {
         ));
     }
 
+    /**
+     * Admin edit/delete is granted by the Time_Tracking_Admin_Access custom
+     * permission (included in the Time Tracking Admin permission set). Using
+     * the custom permission also works when the permission set is granted
+     * through a Permission Set Group or a profile. A direct assignment of the
+     * Time Tracking Admin permission set is still honored as a fallback.
+     */
+    @TestVisible
     private static Boolean hasAdminAccess() {
+        if (FeatureManagement.checkPermission(TimeTrackingConstants.ADMIN_CUSTOM_PERMISSION)) {
+            return true;
+        }
         return [
             SELECT COUNT()
             FROM PermissionSetAssignment
             WHERE AssigneeId = :UserInfo.getUserId()
             AND PermissionSet.Name = :ADMIN_PERMISSION_SET_NAME
         ] > 0;
+    }
+
+    private static Boolean isHeartbeatStale(Time_Tracking__c record, Datetime now) {
+        Datetime staleCutoff = now.addMinutes(-TimeTrackingConstants.DEFAULT_STALE_THRESHOLD_MINUTES);
+        Datetime lastSeen = record.Last_Heartbeat__c != null ? record.Last_Heartbeat__c : record.Start_Time__c;
+        return lastSeen != null && lastSeen < staleCutoff;
+    }
+
+    private static Datetime heartbeatPausePoint(Time_Tracking__c record) {
+        return record.Last_Heartbeat__c != null ? record.Last_Heartbeat__c : record.Start_Time__c;
+    }
+
+    private static void pauseOffline(Time_Tracking__c record, Datetime pausePoint) {
+        update new Time_Tracking__c(
+            Id = record.Id,
+            Status__c = TimeTrackingConstants.STATUS_PAUSED_OFFLINE,
+            Pause_Started_At__c = pausePoint
+        );
+        publishUpdateEvent(record.Assignee__c, record.Id, TimeTrackingConstants.STATUS_PAUSED_OFFLINE, record.Timer_Instance_Id__c);
     }
 
     private static String resolveClientObjectType(Id recordId) {
@@ -422,7 +535,7 @@ public with sharing class TimeTrackingController {
         return [
             SELECT Id, Assignee__c, Account__c, Case__c, Store__c, Start_Time__c, End_Time__c,
                    Duration__c, Status__c, Type__c, Comments__c, Pause_Started_At__c,
-                   Paused_Duration_Minutes__c, Last_Heartbeat__c, Timer_Instance_Id__c,
+                   Paused_Duration_Minutes__c, Last_Heartbeat__c, Timer_Instance_Id__c, Is_Manual_Entry__c,
                    Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
             FROM Time_Tracking__c
             WHERE Id = :timeTrackingId
@@ -434,7 +547,7 @@ public with sharing class TimeTrackingController {
         List<Time_Tracking__c> records = [
             SELECT Id, Assignee__c, Account__c, Case__c, Store__c, Start_Time__c, End_Time__c,
                    Duration__c, Status__c, Type__c, Comments__c, Pause_Started_At__c,
-                   Paused_Duration_Minutes__c, Last_Heartbeat__c, Timer_Instance_Id__c,
+                   Paused_Duration_Minutes__c, Last_Heartbeat__c, Timer_Instance_Id__c, Is_Manual_Entry__c,
                    Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
             FROM Time_Tracking__c
             WHERE Assignee__c = :currentUserId
@@ -450,7 +563,7 @@ public with sharing class TimeTrackingController {
             return [
                 SELECT Id, Assignee__c, Account__c, Case__c, Store__c, Start_Time__c, End_Time__c, Duration__c,
                        Status__c, Type__c, Comments__c, Pause_Started_At__c, Paused_Duration_Minutes__c,
-                       Last_Heartbeat__c, Timer_Instance_Id__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
+                       Last_Heartbeat__c, Timer_Instance_Id__c, Is_Manual_Entry__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
                 FROM Time_Tracking__c
                 WHERE Assignee__c = :UserInfo.getUserId()
                   AND Type__c IN :TimeTrackingConstants.INTERNAL_TYPES
@@ -462,7 +575,7 @@ public with sharing class TimeTrackingController {
             return [
                 SELECT Id, Assignee__c, Account__c, Case__c, Store__c, Start_Time__c, End_Time__c, Duration__c,
                        Status__c, Type__c, Comments__c, Pause_Started_At__c, Paused_Duration_Minutes__c,
-                       Last_Heartbeat__c, Timer_Instance_Id__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
+                       Last_Heartbeat__c, Timer_Instance_Id__c, Is_Manual_Entry__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
                 FROM Time_Tracking__c
                 WHERE Case__c = :recordId
                 ORDER BY Start_Time__c DESC
@@ -472,7 +585,7 @@ public with sharing class TimeTrackingController {
             return [
                 SELECT Id, Assignee__c, Account__c, Case__c, Store__c, Start_Time__c, End_Time__c, Duration__c,
                        Status__c, Type__c, Comments__c, Pause_Started_At__c, Paused_Duration_Minutes__c,
-                       Last_Heartbeat__c, Timer_Instance_Id__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
+                       Last_Heartbeat__c, Timer_Instance_Id__c, Is_Manual_Entry__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
                 FROM Time_Tracking__c
                 WHERE Account__c = :recordId
                 ORDER BY Start_Time__c DESC
@@ -482,7 +595,7 @@ public with sharing class TimeTrackingController {
         return [
             SELECT Id, Assignee__c, Account__c, Case__c, Store__c, Start_Time__c, End_Time__c, Duration__c,
                    Status__c, Type__c, Comments__c, Pause_Started_At__c, Paused_Duration_Minutes__c,
-                   Last_Heartbeat__c, Timer_Instance_Id__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
+                   Last_Heartbeat__c, Timer_Instance_Id__c, Is_Manual_Entry__c, Assignee__r.Name, Case__r.CaseNumber, Store__r.Name, Account__r.Name
             FROM Time_Tracking__c
             WHERE Store__c = :recordId
               AND Case__c = null
@@ -506,6 +619,7 @@ public with sharing class TimeTrackingController {
         wrapper.pausedDurationMinutes = record.Paused_Duration_Minutes__c;
         wrapper.lastHeartbeat = record.Last_Heartbeat__c;
         wrapper.timerInstanceId = record.Timer_Instance_Id__c;
+        wrapper.isManualEntry = record.Is_Manual_Entry__c == true;
         return wrapper;
     }
 

@@ -6,6 +6,42 @@
                 <componentInstanceProperties>
                     <name>eager</name>
                     <type>decorator</type>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>height</name>
+                    <type>decorator</type>
+                    <value>560</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>icon</name>
+                    <type>decorator</type>
+                    <value>clock</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <type>decorator</type>
+                    <value>Time Tracking</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>scrollable</name>
+                    <type>decorator</type>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>width</name>
+                    <type>decorator</type>
+                    <value>480</value>
+                </componentInstanceProperties>
+                <componentName>timeTracking</componentName>
+                <identifier>c_timeTracking</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>eager</name>
+                    <type>decorator</type>
                     <value>false</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>

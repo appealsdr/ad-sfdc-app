@@ -6,6 +6,7 @@ import startTimer from "@salesforce/apex/TimeTrackingController.startTimer";
 import pauseTimer from "@salesforce/apex/TimeTrackingController.pauseTimer";
 import resumeTimer from "@salesforce/apex/TimeTrackingController.resumeTimer";
 import heartbeat from "@salesforce/apex/TimeTrackingController.heartbeat";
+import reconcileTimer from "@salesforce/apex/TimeTrackingController.reconcileTimer";
 import completeTimer from "@salesforce/apex/TimeTrackingController.completeTimer";
 import createManualEntry from "@salesforce/apex/TimeTrackingController.createManualEntry";
 import { subscribe } from "lightning/empApi";
@@ -42,6 +43,11 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/TimeTrackingController.heartbeat",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/TimeTrackingController.reconcileTimer",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -196,7 +202,11 @@ describe("c-time-tracking", () => {
     resumeTimer.mockReset();
     resumeTimer.mockResolvedValue({ status: "In progress" });
     heartbeat.mockReset();
-    heartbeat.mockResolvedValue();
+    heartbeat.mockResolvedValue("In progress");
+    reconcileTimer.mockReset();
+    reconcileTimer.mockResolvedValue(false);
+    window.localStorage.removeItem("timeTrackingOpenTabs");
+    window.localStorage.removeItem("timeTrackingLastTabClose");
     completeTimer.mockReset();
     completeTimer.mockResolvedValue();
     createManualEntry.mockReset();
@@ -779,7 +789,7 @@ describe("c-time-tracking", () => {
       })
     );
     expect(interval.mock.calls.length).toBeGreaterThan(heartbeatCallsBefore);
-    const heartbeatCall = interval.mock.calls.find((call) => call[1] === 30000);
+    const heartbeatCall = interval.mock.calls.find((call) => call[1] === 15000);
     expect(heartbeatCall).toBeDefined();
     heartbeatCall[0]();
     expect(heartbeat).toHaveBeenCalledWith(
@@ -802,8 +812,94 @@ describe("c-time-tracking", () => {
     await flushPromises();
 
     expect(startTimer).toHaveBeenCalledWith(
-      expect.objectContaining({ recordId: undefined, type: "Internal Task" })
+      expect.objectContaining({ recordId: null, type: "Internal Task" })
     );
+  });
+
+  it("checks for an abandoned timer on load before it starts sending heartbeats", async () => {
+    let resolveReconcile;
+    reconcileTimer.mockReturnValue(new Promise((resolve) => (resolveReconcile = resolve)));
+    window.localStorage.setItem("timeTrackingInstanceId", "this-browser");
+    const thisInstanceId = "this-browser";
+    const owningTimer = { ...ACTIVE_TIMER, timerInstanceId: thisInstanceId };
+    await mount(trackingData({ activeTimer: owningTimer, records: [...COMPLETED_RECORDS, owningTimer] }));
+
+    expect(reconcileTimer).toHaveBeenCalledWith(expect.objectContaining({ instanceId: thisInstanceId }));
+    expect(heartbeat).not.toHaveBeenCalled();
+
+    resolveReconcile(false);
+    await flushPromises();
+    expect(heartbeat).toHaveBeenCalledWith(
+      expect.objectContaining({ timeTrackingId: owningTimer.id, instanceId: thisInstanceId })
+    );
+  });
+
+  it("refreshes instead of heartbeating when the server auto-paused the timer as offline", async () => {
+    reconcileTimer.mockResolvedValue(true);
+    window.localStorage.setItem("timeTrackingInstanceId", "this-browser");
+    const thisInstanceId = "this-browser";
+    const owningTimer = { ...ACTIVE_TIMER, timerInstanceId: thisInstanceId };
+    refreshApex.mockClear();
+    await mount(trackingData({ activeTimer: owningTimer, records: [...COMPLETED_RECORDS, owningTimer] }));
+    await flushPromises();
+    expect(refreshApex).toHaveBeenCalled();
+    expect(heartbeat).not.toHaveBeenCalled();
+  });
+
+  it("does not pause the timer from pagehide and records the tab close for the next tab instead", async () => {
+    window.localStorage.setItem("timeTrackingInstanceId", "this-browser");
+    const thisInstanceId = "this-browser";
+    const owningTimer = { ...ACTIVE_TIMER, timerInstanceId: thisInstanceId };
+    await mount(trackingData({ activeTimer: owningTimer, records: [...COMPLETED_RECORDS, owningTimer] }));
+    await flushPromises();
+
+    window.dispatchEvent(new Event("pagehide"));
+
+    expect(pauseTimer).not.toHaveBeenCalled();
+    const marker = JSON.parse(window.localStorage.getItem("timeTrackingLastTabClose"));
+    expect(marker).toEqual(expect.objectContaining({ timerId: owningTimer.id, otherOpenTabs: 0 }));
+  });
+
+  it("shows paused minutes and marks manual entries in Logged Time", async () => {
+    const element = await mount(
+      trackingData({
+        records: [
+          { ...COMPLETED_RECORDS[0], pausedDurationMinutes: 3.02, isManualEntry: false },
+          { ...COMPLETED_RECORDS[1], pausedDurationMinutes: 0, isManualEntry: true }
+        ]
+      })
+    );
+    const table = element.shadowRoot.querySelector("lightning-datatable");
+    const fields = table.columns.map((column) => column.fieldName);
+    expect(fields).toEqual(expect.arrayContaining(["pausedDisplay", "entryMethod"]));
+    expect(table.data[0].pausedDisplay).toBe("0d 0h 3m");
+    expect(table.data[0].entryMethod).toBe("Timer");
+    expect(table.data[1].pausedDisplay).toBe("");
+    expect(table.data[1].entryMethod).toBe("Manual");
+  });
+
+  it("shows Edit and Delete row actions only for Time Tracking admins", async () => {
+    const regular = await mount(trackingData({ isAdmin: false }));
+    const regularColumns = regular.shadowRoot.querySelector("lightning-datatable").columns;
+    expect(regularColumns.some((column) => column.type === "action")).toBe(false);
+
+    const admin = await mount(trackingData({ isAdmin: true }));
+    const adminColumns = admin.shadowRoot.querySelector("lightning-datatable").columns;
+    const actionColumn = adminColumns.find((column) => column.type === "action");
+    expect(actionColumn.typeAttributes.rowActions.map((action) => action.name)).toEqual(["edit", "delete"]);
+  });
+
+  it("shows the total paused time on the card while a timer is paused", async () => {
+    const pausedTimer = {
+      ...ACTIVE_TIMER,
+      status: "Paused - Lunch/Break",
+      pauseStartedAt: new Date(NOW - 2 * 60000).toISOString(),
+      pausedDurationMinutes: 1
+    };
+    const element = await mount(trackingData({ activeTimer: pausedTimer }));
+    await flushPromises();
+    const pausedText = element.shadowRoot.querySelector(".paused-total");
+    expect(pausedText.textContent).toContain("0d 0h 3m");
   });
 
   it("subscribes to the TimeTracking_Update__e platform event for cross-tab/window sync", async () => {

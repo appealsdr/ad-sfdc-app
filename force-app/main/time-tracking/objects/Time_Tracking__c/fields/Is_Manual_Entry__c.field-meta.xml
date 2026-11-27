@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Manual_Entry__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checked when the entry was added manually with the + (Add manual entry) action instead of being recorded by the Start/Stop timer.</description>
+    <inlineHelpText>Checked when this time was entered manually rather than recorded by the timer.</inlineHelpText>
+    <label>Manual Entry</label>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

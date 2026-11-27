@@ -4,6 +4,10 @@
         <apexClass>TimeTrackingController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Time_Tracking_Admin_Access</name>
+    </customPermissions>
     <description>Grants full edit and delete access to Time Tracking records, including records owned by other users.</description>
     <fieldPermissions>
         <editable>true</editable>
@@ -63,6 +67,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Time_Tracking__c.Paused_Duration_Minutes__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Time_Tracking__c.Is_Manual_Entry__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
