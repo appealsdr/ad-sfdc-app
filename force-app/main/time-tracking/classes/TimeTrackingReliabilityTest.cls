@@ -19,13 +19,15 @@ private class TimeTrackingReliabilityTest {
         update store;
         insert new Case(Subject = 'Reliability Case', Origin = 'Phone', Status = 'New', Store__c = store.Id);
 
-        List<User> users = TestDataFactory.createUsers(2);
-        PermissionSet adminPermSet = [SELECT Id FROM PermissionSet WHERE Name = 'Time_Tracking_Admin' LIMIT 1];
-        PermissionSet userPermSet = [SELECT Id FROM PermissionSet WHERE Name = 'Time_Tracking_User' LIMIT 1];
-        insert new List<PermissionSetAssignment>{
-            new PermissionSetAssignment(AssigneeId = users[0].Id, PermissionSetId = adminPermSet.Id),
-            new PermissionSetAssignment(AssigneeId = users[1].Id, PermissionSetId = userPermSet.Id)
-        };
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            List<User> users = TestDataFactory.createUsers(2);
+            PermissionSet adminPermSet = [SELECT Id FROM PermissionSet WHERE Name = 'Time_Tracking_Admin' LIMIT 1];
+            PermissionSet userPermSet = [SELECT Id FROM PermissionSet WHERE Name = 'Time_Tracking_User' LIMIT 1];
+            insert new List<PermissionSetAssignment>{
+                new PermissionSetAssignment(AssigneeId = users[0].Id, PermissionSetId = adminPermSet.Id),
+                new PermissionSetAssignment(AssigneeId = users[1].Id, PermissionSetId = userPermSet.Id)
+            };
+        }
     }
 
     private static User adminUser() {

@@ -29,17 +29,19 @@ private class TimeTrackingControllerTest {
         // User 0 = Time Tracking Admin, User 1 = regular user without admin access.
         // Admin checks run as User 1 so they do not depend on whether the
         // user running the tests happens to hold the admin permission set.
-        User adminUser = TestDataFactory.createUsers(2)[0];
-        PermissionSet adminPermSet = [
-            SELECT Id
-            FROM PermissionSet
-            WHERE Name = 'Time_Tracking_Admin'
-            LIMIT 1
-        ];
-        insert new PermissionSetAssignment(
-            AssigneeId = adminUser.Id,
-            PermissionSetId = adminPermSet.Id
-        );
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            User adminUser = TestDataFactory.createUsers(2)[0];
+            PermissionSet adminPermSet = [
+                SELECT Id
+                FROM PermissionSet
+                WHERE Name = 'Time_Tracking_Admin'
+                LIMIT 1
+            ];
+            insert new PermissionSetAssignment(
+                AssigneeId = adminUser.Id,
+                PermissionSetId = adminPermSet.Id
+            );
+        }
     }
 
     private static User getAdminUser() {
